@@ -20,7 +20,7 @@ int main() {
 
     map <string, int> words_data;
 
-    // Reading strings
+    // Reading strings      HEHEHEHE
     string current_string;
     while (!fin.eof()) {
         getline(fin, current_string,'\n');
