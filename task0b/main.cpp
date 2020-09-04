@@ -2,6 +2,9 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <vector>
+#include <utility>
+#include <algorithm>
 
 using namespace std;
 
@@ -12,6 +15,10 @@ bool is_word_part(char character) {
     return false;
 }
 
+int int_cmp(const void * a, const void * b) {
+  return (*(int*)a - *(int*)b);
+}
+
 int main() {
     ifstream fin;
     ofstream fout;
@@ -20,7 +27,8 @@ int main() {
 
     map <string, int> words_data;
 
-    // Reading strings      HEHEHEHE
+    // Reading strings
+    int words_total = 0;
     string current_string;
     while (!fin.eof()) {
         getline(fin, current_string,'\n');
@@ -32,16 +40,31 @@ int main() {
             }
             else if (is_word_part(current_string[i - 1])) {
                 words_data[new_word]++;
+                words_total++;
                 new_word = "";
             }
         }
     }
 
-    for(auto i : words_data) {
+    vector <pair <int, string>> words_freq;
+
+    for (auto i : words_data) {
+        pair <int, string> p;
+        p.first = i.second;
+        p.second = i.first;
+
+        words_freq.push_back(p);
+        //cout <<  i.first << " : " << i.second << endl; 
+    }
+
+    sort(words_freq.begin(), words_freq.end());
+    //qsort(words_freq.begin(), words_freq.size, int_cmp);
+
+    for (auto i : words_freq) {
         cout <<  i.first << " : " << i.second << endl; 
     }
 
-    cout << current_string << endl;
+    fout.open("out.csv");
 
     return 0;
 }
