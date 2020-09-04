@@ -19,6 +19,11 @@ int int_cmp(const void * a, const void * b) {
   return (*(int*)a - *(int*)b);
 }
 
+int percentage(int freq, int total) {
+    double result = freq / (double) total;
+    return result * 100;
+}
+
 int main() {
     ifstream fin;
     ofstream fout;
@@ -48,23 +53,27 @@ int main() {
 
     vector <pair <int, string>> words_freq;
 
+    // Making vector of pairs
     for (auto i : words_data) {
         pair <int, string> p;
         p.first = i.second;
         p.second = i.first;
 
-        words_freq.push_back(p);
-        //cout <<  i.first << " : " << i.second << endl; 
+        words_freq.push_back(p); 
     }
 
+    // Sorting vector by frequency
     sort(words_freq.begin(), words_freq.end());
-    //qsort(words_freq.begin(), words_freq.size, int_cmp);
-
-    for (auto i : words_freq) {
-        cout <<  i.first << " : " << i.second << endl; 
-    }
 
     fout.open("out.csv");
+
+    // Writing down from most frequent to less
+    for (int i = words_freq.size() - 1; i >= 0; i--) {
+        fout << words_freq[i].second << "," << words_freq[i].first << "," << percentage(words_freq[i].first, words_total) << "%" << endl;
+    }
+
+    fin.close();
+    fout.close();
 
     return 0;
 }
