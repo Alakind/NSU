@@ -24,11 +24,14 @@ int percentage(int freq, int total) {
     return result * 100;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     ifstream fin;
     ofstream fout;
 
-    fin.open("text.txt");
+    string file_in_name = argv[1];
+    string file_out_name = argv[2];
+
+    fin.open(file_in_name);
 
     map <string, int> words_data;
 
@@ -65,7 +68,7 @@ int main() {
     // Sorting vector by frequency
     sort(words_freq.begin(), words_freq.end());
 
-    fout.open("out.csv");
+    fout.open(file_out_name);
 
     // Writing down from most frequent to less
     for (int i = words_freq.size() - 1; i >= 0; i--) {
