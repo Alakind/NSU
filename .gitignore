@@ -4,3 +4,4 @@
 *.cmake
 *CMakeCache.txt
 *Makefile
+*main
