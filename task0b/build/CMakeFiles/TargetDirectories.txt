@@ -1,0 +1,3 @@
+/mnt/d/projects/C++/NSU/task0b/build/CMakeFiles/rebuild_cache.dir
+/mnt/d/projects/C++/NSU/task0b/build/CMakeFiles/edit_cache.dir
+/mnt/d/projects/C++/NSU/task0b/build/CMakeFiles/main.dir
