@@ -43,6 +43,13 @@ int main(int argc, char* argv[]) {
 
         string new_word = "";
         for (long unsigned int i = 0; i < current_string.length(); i++) {
+            if ((i == current_string.length() - 1) && is_word_part(current_string[i])) {
+                new_word += current_string[i];
+                words_data[new_word]++;
+                words_total++;
+                new_word = "";
+                continue;
+            }
             if (is_word_part(current_string[i])) {
                 new_word += current_string[i];
             }
