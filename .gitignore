@@ -1,2 +1,6 @@
-/*.out
-/build/*
+*.out
+*/build/*
+*/CMakeFiles/*
+*.cmake
+*CMakeCache.txt
+*Makefile
