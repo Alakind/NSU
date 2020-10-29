@@ -13,25 +13,11 @@ class TritSet{
         friend class TritProxy;
 
     public:
-        TritSet(int n) {
-            array = (uint8_t*)malloc(sizeof(uint8_t) * (n / 8));
-            capacity = n;
-            
-            // filling with 01 -- unknown
-            uint8_t all_ones = 0b01010101;
-            for (int i = 0; i < (n / sizeof(uint8_t)); i++) {
-                array[i] |= all_ones;
-            }
-        }
+        TritSet(int n) {}
 
-        ~TritSet() {
-            free(array);
-            capacity = 0;
-        }
+        ~TritSet() {}
 
-        size_t get_capacity() {
-            return capacity;
-        }
+        size_t get_capacity() {}
 
         class TritProxy{
             private:
@@ -40,13 +26,10 @@ class TritSet{
                 int arr_pos;
             
             public:
+                TritProxy(TritSet& parent, int position);
+
+                void operator= (Trit n);
+                bool operator== (Trit n);
+                bool operator!= (Trit n);
         }
 };
-
-/*uint32_t CRC32_count(const std::string& filename);
-
-uint32_t CRC32_function(unsigned char *buf, int len_, uint32_t initial_crc_);
-
-uint32_t SUM32_function(unsigned char *buf, int len_, uint32_t initial_number_);
-
-uint32_t SUM32_count(const std::string& filename);*/
