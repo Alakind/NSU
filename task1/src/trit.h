@@ -19,7 +19,7 @@ class TritSet{
 
         Trit operator[] (int position) const;
 
-        Trit get_two_bits(uint8_t byte, int pbit_index);
+        static Trit get_two_bits(uint8_t byte, int pbit_index);
 
         size_t get_capacity();
 

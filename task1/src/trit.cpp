@@ -5,16 +5,18 @@
 
 using namespace std;
 
+const int bytes_in_bit = 8;
+
 
 //  ###################################################### TritSet methods ######################################################
 
 TritSet::TritSet(int n) {
-    array = (uint8_t*)malloc(sizeof(uint8_t) * (n / sizeof(uint8_t)));
+    array = (uint8_t*)malloc(sizeof(uint8_t) * (n / (sizeof(uint8_t) * bytes_in_bit)));
     capacity = n;
     
     // filling with 01 -- unknown
     uint8_t all_ones = 0b01010101;
-    for (int i = 0; i < (n / sizeof(uint8_t)); i++) {
+    for (int i = 0; i < ceil((double) (n * 2) / (sizeof(uint8_t) * bytes_in_bit)); i++) {
         array[i] |= all_ones;
     }
 }
@@ -26,15 +28,17 @@ TritSet::~TritSet() {
 
 Trit TritSet::operator[] (int position) const
 {
-    int byte_pos = position / sizeof(uint8_t);
-    int arr_pos = (position % sizeof(uint8_t)) / 2;
+    int byte_pos = position % 4;
+    int arr_pos = (position * 2 / (sizeof(uint8_t) * bytes_in_bit));
 
     uint8_t byte = array[arr_pos];
 
-    return TritSet::get_two_bits(byte, byte_pos);
+    Trit trit = TritSet::get_two_bits(byte, byte_pos);
+
+    return trit;
 }
 
-Trit get_two_bits(uint8_t byte, int pbit_index) {
+Trit TritSet::get_two_bits(uint8_t byte, int pbit_index) {
     uint8_t mask = 0b00000011;
 
     mask <<= (3 - pbit_index) * 2;
@@ -66,8 +70,8 @@ size_t TritSet::get_capacity() {
 
 TritSet::TritProxy::TritProxy(TritSet& parent, int position): parent_set {parent}  {
     //parent_set = parent;
-    arr_pos = position / sizeof(uint8_t); // Counting position in tritset
-    byte_pos = (position % sizeof(uint8_t)) / 2;
+    arr_pos = position / (sizeof(uint8_t) * bytes_in_bit); // Counting position in tritset
+    byte_pos = (position % (sizeof(uint8_t) * bytes_in_bit)) / 2;
 }
 
 void TritSet::TritProxy::operator= (Trit n) {
@@ -95,4 +99,8 @@ void TritSet::TritProxy::operator= (Trit n) {
 
         parent_set.array[arr_pos] |= mask_trit;
     }
+
+    /*bool operator== (Trit n) {
+
+    }*/
 }
