@@ -1,22 +1,15 @@
 #include <fstream>
-#include <iostream>
 #include <cmath>
-#include <cstdint>
 
 #include "trit.h"
 
 using namespace std;
 
-int plus_ten(int n) {
-    return n + 10;
-}
 
-enum class Trit{False = 0, Unknown = 2, True = 3};   // false - 00, true - 11, unknown - 01
-
-// TritSet functions
+//  ###################################################### TritSet methods ######################################################
 
 TritSet::TritSet(int n) {
-    array = (uint8_t*)malloc(sizeof(uint8_t) * (n / 8));
+    array = (uint8_t*)malloc(sizeof(uint8_t) * (n / sizeof(uint8_t)));
     capacity = n;
     
     // filling with 01 -- unknown
@@ -31,19 +24,53 @@ TritSet::~TritSet() {
     capacity = 0;
 }
 
-TritSet::size_t get_capacity() {
+Trit TritSet::operator[] (int position) const
+{
+    int byte_pos = position / sizeof(uint8_t);
+    int arr_pos = (position % sizeof(uint8_t)) / 2;
+
+    uint8_t byte = array[arr_pos];
+
+    return TritSet::get_two_bits(byte, byte_pos);
+}
+
+Trit get_two_bits(uint8_t byte, int pbit_index) {
+    uint8_t mask = 0b00000011;
+
+    mask <<= (3 - pbit_index) * 2;
+    mask &= byte;
+
+    mask >>= (3 - pbit_index) * 2;
+
+    int number = (int) mask;
+
+    if (number == 3) {
+        return Trit::True;
+    }
+    if (number == 0) {
+        return Trit::False;
+    }
+    if (number == 1) {
+        return Trit::Unknown;
+    }
+}
+
+size_t TritSet::get_capacity() {
     return capacity;
 }
 
-// TritProxy functions
 
-TritSet::TritProxy::TritProxy(TritSet& parent, int position) {
-    parent_set = parent;
+
+
+//  ################################################### TritProxy methods #######################################################
+
+TritSet::TritProxy::TritProxy(TritSet& parent, int position): parent_set {parent}  {
+    //parent_set = parent;
     arr_pos = position / sizeof(uint8_t); // Counting position in tritset
-    byte_pos = position % sizeof(uint8_t);
+    byte_pos = (position % sizeof(uint8_t)) / 2;
 }
 
-TritSet::TritProxy::void operator= (int n) {
+void TritSet::TritProxy::operator= (Trit n) {
     uint8_t mask_tmp = 0b11000000;
     mask_tmp >>= byte_pos;
     uint8_t mask = 0b11111111;
@@ -51,7 +78,7 @@ TritSet::TritProxy::void operator= (int n) {
 
     parent_set.array[arr_pos] &= mask;
 
-    if (n == Trit::True) {}
+    if (n == Trit::True) {
         uint8_t mask_trit = 0b11000000;
         mask_tmp >>= byte_pos;
 
@@ -69,4 +96,3 @@ TritSet::TritProxy::void operator= (int n) {
         parent_set.array[arr_pos] |= mask_trit;
     }
 }
-

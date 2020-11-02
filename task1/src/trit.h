@@ -1,7 +1,7 @@
 //#include <string>
+#include <cstdint>
+#include <iostream>
 
-
-int plus_ten(int n);
 
 enum class Trit{False = 0, Unknown = 2, True = 3};   // false - 00, true - 11, unknown - 01
 
@@ -13,11 +13,15 @@ class TritSet{
         friend class TritProxy;
 
     public:
-        TritSet(int n) {}
+        TritSet(int n);
 
-        ~TritSet() {}
+        ~TritSet();
 
-        size_t get_capacity() {}
+        Trit operator[] (int position) const;
+
+        Trit get_two_bits(uint8_t byte, int pbit_index);
+
+        size_t get_capacity();
 
         class TritProxy{
             private:
@@ -31,5 +35,5 @@ class TritSet{
                 void operator= (Trit n);
                 bool operator== (Trit n);
                 bool operator!= (Trit n);
-        }
+        };
 };
