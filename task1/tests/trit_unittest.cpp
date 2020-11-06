@@ -12,7 +12,7 @@ TEST(TritSet_get_two_bits, simple_test) {
 TEST(TritSet_index, simple_test) {
     // arrange
     TritSet set(4);
-    Trit res = set[1];
+    Trit res = set.get_trit(1);
 
     //assert
     EXPECT_EQ(res, Trit::Unknown);
@@ -21,7 +21,7 @@ TEST(TritSet_index, simple_test) {
 TEST(TritSet_index, second_bit) {
     // arrange
     TritSet set(6);
-    Trit res = set[5];
+    Trit res = set.get_trit(5);
 
     //assert
     EXPECT_EQ(res, Trit::Unknown);
@@ -39,13 +39,25 @@ TEST(TritSet_index, unknowngs_test) {
     EXPECT_EQ(res, Trit::True);
 }
 
+/*TEST(TritProxy_operator, compare_1) {
+    // arrange
+    uint8_t array[2];
+    array[0] = 0b01110101;
+
+    // act
+    bool res = ()
+
+    //assert
+    EXPECT_EQ(res, Trit::True);
+}*/
+
 TEST(tritSet_class, tritSet_constructor) {
     // arrange
     TritSet set(1);
 
-    // act
-    uint8_t result_mask1 = 0b01010101;
-
     //assert
-    //EXPECT_EQ(set.array[0], result_mask1);        // tak blin peregruzi
+    EXPECT_EQ(set.get_trit(0), Trit::Unknown);
+    EXPECT_EQ(set.get_trit(1), Trit::Unknown);
+    EXPECT_EQ(set.get_trit(2), Trit::Unknown);
+    EXPECT_EQ(set.get_trit(3), Trit::Unknown);
 }

@@ -13,21 +13,28 @@ class TritSet{
         friend class TritProxy;
 
     public:
-        TritSet(int n);
+        class TritProxy;
+
+        TritSet(int size);
 
         ~TritSet();
 
-        Trit operator[] (int position) const;
+        //Trit get_trit(int index) const;
+        Trit get_trit(int index);
+
+        //Trit operator[] (int index) const;
+        TritProxy operator[] (int index);
 
         static Trit get_two_bits(uint8_t byte, int pbit_index);
 
         size_t get_capacity();
 
+        void expand(int new_size);
+
         class TritProxy{
             private:
                 TritSet& parent_set;
-                int byte_pos;
-                int arr_pos;
+                int index;
             
             public:
                 TritProxy(TritSet& parent, int position);
@@ -35,5 +42,7 @@ class TritSet{
                 void operator= (Trit n);
                 bool operator== (Trit n);
                 bool operator!= (Trit n);
+
+                operator Trit();
         };
 };
