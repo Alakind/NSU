@@ -31,6 +31,8 @@ class TritSet{
 
         void expand(int new_size);
 
+        void shrink(int new_size);
+
         class TritProxy{
             private:
                 TritSet& parent_set;

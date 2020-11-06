@@ -41,6 +41,12 @@ void TritSet::expand(int new_size) {
     capacity = new_size;
 }
 
+void TritSet::shrink(int new_size) {
+    array = (uint8_t*)realloc(array, sizeof(uint8_t) * (new_size / (sizeof(uint8_t) * bytes_in_bit)));
+
+    capacity = new_size;
+}
+
 Trit TritSet::get_trit(int index) {
     if (index > capacity) {
         return Trit::Unknown;
