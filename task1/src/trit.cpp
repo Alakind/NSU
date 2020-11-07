@@ -11,12 +11,16 @@ const int bytes_in_bit = 8;
 //  ###################################################### TritSet methods ######################################################
 
 TritSet::TritSet(int size) {
-    array = (uint8_t*)malloc(sizeof(uint8_t) * (size / (sizeof(uint8_t) * bytes_in_bit)));
+    int array_size = (ceil((double)size / 4));
+
+    array = (uint8_t*)malloc(sizeof(uint8_t) * array_size);
     capacity = size;
     
     // filling with 01 -- unknown
+    uint8_t all_zeros = 0b00000000;
     uint8_t all_ones = 0b01010101;
-    for (int i = 0; i < ceil((double) (size * 2) / (sizeof(uint8_t) * bytes_in_bit)); i++) {
+    for (int i = 0; i < array_size; i++) {
+        array[i] &= all_zeros;
         array[i] |= all_ones;
     }
 }
@@ -27,14 +31,22 @@ TritSet::~TritSet() {
 }
 
 void TritSet::expand(int new_size) {
-    array = (uint8_t*)realloc(array, sizeof(uint8_t) * (new_size / (sizeof(uint8_t) * bytes_in_bit)));
+    if (capacity / 4 == new_size / 4) {
+        capacity = new_size;
+        return;
+    }
+
+    int new_array_size = ceil((double) new_size / 4);
+    array = (uint8_t*)realloc(array, sizeof(uint8_t) * new_array_size);
 
     // to start filling with unknown from new bytes
-    int start = (capacity * 2 / (sizeof(uint8_t) * bytes_in_bit)) + 1;
+    int start = ceil((double) capacity / 4);
 
     // filling with 01 -- unknown
     uint8_t all_ones = 0b01010101;
-    for (int i = start; i < ceil((double) (new_size * 2) / (sizeof(uint8_t) * bytes_in_bit)); i++) {
+    uint8_t all_zeros = 0b00000000;
+    for (int i = start; i < new_array_size; i++) {
+        array[i] &= all_zeros;
         array[i] |= all_ones;
     }
 
@@ -42,13 +54,18 @@ void TritSet::expand(int new_size) {
 }
 
 void TritSet::shrink(int new_size) {
-    array = (uint8_t*)realloc(array, sizeof(uint8_t) * (new_size / (sizeof(uint8_t) * bytes_in_bit)));
+    if (new_size / 4 >= capacity / 4) {
+        return;
+    }
+
+    int new_array_size = ceil((double) new_size / 4);
+    array = (uint8_t*)realloc(array, sizeof(uint8_t) * new_array_size);
 
     capacity = new_size;
 }
 
 Trit TritSet::get_trit(int index) {
-    if (index > capacity) {
+    if (index > capacity - 1) {
         return Trit::Unknown;
     }
 
@@ -94,32 +111,24 @@ size_t TritSet::get_capacity() {
     return capacity;
 }
 
-TritSet TritSet::operator& (TritSet other_set) {
-    int size = min(capacity, other_set.capacity);
+void TritSet::operator& (TritSet other_set) {
+    int size = min((*this).get_capacity(), other_set.get_capacity());
 
-    TritSet new_set(size * 2 / (sizeof(uint8_t) * bytes_in_bit));
-
-    for (int i = 0; i < size; i++) {
-        new_set.array[i] = array[i] & other_set.array[i];
+    for (int i = 0; i < (ceil((double)size / 4)); i++) {
+        array[i] = array[i] & other_set.array[i];
     }
-
-    return new_set;
 }
 
-TritSet TritSet::operator| (TritSet other_set) {
-    int size = min(capacity, other_set.capacity);
+void TritSet::operator| (TritSet other_set) {
+    int size = min((*this).get_capacity(), other_set.get_capacity());
 
-    TritSet new_set(size * 2 / (sizeof(uint8_t) * bytes_in_bit));
-
-    for (int i = 0; i < size; i++) {
-        new_set.array[i] = array[i] | other_set.array[i];
+    for (int i = 0; i < (ceil((double)size / 4)); i++) {
+        array[i] = array[i] | other_set.array[i];
     }
-
-    return new_set;
 }
 
-void TritSet::operator! (){
-    for (int i = 0; i < capacity; i++) {
+void TritSet::operator~ (){
+    for (int i = 0; i < (ceil((double)capacity / 4)); i++) {
         array[i] = ~array[i];
     }
 }
@@ -135,11 +144,11 @@ TritSet::TritProxy::TritProxy(TritSet& parent, int position): parent_set {parent
 void TritSet::TritProxy::operator= (Trit n) {
 
     // if expending is needed
-    if (n != Trit::Unknown && index > parent_set.capacity) {
-        parent_set.expand(index);
+    if (n != Trit::Unknown && index > parent_set.capacity - 1) {
+        parent_set.expand(index + 1);
     }
-    // no need to expand to write down Unknown
-    else if (index > parent_set.capacity) {
+    // no need in expanding while writing down Unknown
+    else if (index > parent_set.capacity - 1) {
         return;
     }
 

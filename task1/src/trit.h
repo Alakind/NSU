@@ -28,9 +28,9 @@ class TritSet{
         void expand(int new_size);
         void shrink(int new_size);
 
-        TritSet operator& (TritSet other_set);
-        TritSet operator| (TritSet other_set);
-        void operator! ();
+        void operator& (TritSet other_set);
+        void operator| (TritSet other_set);
+        void operator~ ();
 
         class TritProxy{
             private:
