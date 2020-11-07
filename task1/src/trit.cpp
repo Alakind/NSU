@@ -53,7 +53,8 @@ Trit TritSet::get_trit(int index) {
     }
 
     int byte_pos = index % 4;    // counting position in set
-    int arr_pos = (index * 2 / (sizeof(uint8_t) * bytes_in_bit));
+    //int arr_pos = 2 * (index / (sizeof(uint8_t) * bytes_in_bit));
+    int arr_pos = index / 4;
 
     uint8_t byte = array[arr_pos];  // getting needed byte
 
@@ -61,10 +62,6 @@ Trit TritSet::get_trit(int index) {
 
     return trit;
 }
-
-/*Trit TritSet::operator[] (int index) const {
-    return (*this).get_trit(index);
-}*/
 
 TritSet::TritProxy TritSet::operator[] (int index) {
     //TritSet::TritProxy proxy = new TritSet::TritProxy((*this), index);
@@ -88,7 +85,7 @@ Trit TritSet::get_two_bits(uint8_t byte, int pbit_index) {
     if (number == 0) {
         return Trit::False;
     }
-    if (number == 1) {
+    if (number == 1 || number == 2) {
         return Trit::Unknown;
     }
 }
@@ -97,7 +94,35 @@ size_t TritSet::get_capacity() {
     return capacity;
 }
 
+TritSet TritSet::operator& (TritSet other_set) {
+    int size = min(capacity, other_set.capacity);
 
+    TritSet new_set(size * 2 / (sizeof(uint8_t) * bytes_in_bit));
+
+    for (int i = 0; i < size; i++) {
+        new_set.array[i] = array[i] & other_set.array[i];
+    }
+
+    return new_set;
+}
+
+TritSet TritSet::operator| (TritSet other_set) {
+    int size = min(capacity, other_set.capacity);
+
+    TritSet new_set(size * 2 / (sizeof(uint8_t) * bytes_in_bit));
+
+    for (int i = 0; i < size; i++) {
+        new_set.array[i] = array[i] | other_set.array[i];
+    }
+
+    return new_set;
+}
+
+void TritSet::operator! (){
+    for (int i = 0; i < capacity; i++) {
+        array[i] = ~array[i];
+    }
+}
 
 
 //  ################################################### TritProxy methods #######################################################
@@ -108,34 +133,38 @@ TritSet::TritProxy::TritProxy(TritSet& parent, int position): parent_set {parent
 }
 
 void TritSet::TritProxy::operator= (Trit n) {
+
+    // if expending is needed
     if (n != Trit::Unknown && index > parent_set.capacity) {
         parent_set.expand(index);
     }
+    // no need to expand to write down Unknown
+    else if (index > parent_set.capacity) {
+        return;
+    }
 
-    int arr_pos = index / (sizeof(uint8_t) * bytes_in_bit);     // Counting position in tritset
-    int byte_pos = (index % (sizeof(uint8_t) * bytes_in_bit)) / 2;
+    int byte_pos = index % 4;    // counting position in set
+    int arr_pos = index / 4;
 
+
+    // making mask to make needed bits zero
     uint8_t mask_tmp = 0b11000000;
-    mask_tmp >>= byte_pos;
+    mask_tmp >>= byte_pos * 2;
     uint8_t mask = 0b11111111;
     mask ^= mask_tmp;
 
     parent_set.array[arr_pos] &= mask;
 
+    // setting needed trit
     if (n == Trit::True) {
         uint8_t mask_trit = 0b11000000;
-        mask_tmp >>= byte_pos;
-
-        parent_set.array[arr_pos] |= mask_trit;
-    }
-    if (n == Trit::False) {
-        uint8_t mask_trit = 0b00000000;
+        mask_trit >>= byte_pos * 2;
 
         parent_set.array[arr_pos] |= mask_trit;
     }
     else if (n == Trit::Unknown) {
         uint8_t mask_trit = 0b01000000;
-        mask_tmp >>= byte_pos;
+        mask_trit >>= byte_pos * 2;
 
         parent_set.array[arr_pos] |= mask_trit;
     }
@@ -153,4 +182,8 @@ bool TritSet::TritProxy::operator!= (Trit n) {
         return true;
     }
     return false;
+}
+
+TritSet::TritProxy::operator Trit() {
+    return parent_set.get_trit(index);
 }
