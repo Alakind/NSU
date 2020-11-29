@@ -80,6 +80,59 @@ TEST(Grep, simple_test) {
     }
 }
 
+TEST(Sort, simple_test) {
+    // arrange
+    std::vector<std::string> text = {"a bc a fs", "heh aaa", "lookn for a a a", "parkour! aa", "a", "hm baaab"};
+
+    Sort sorter;
+
+    // act
+    sorter.execute(text);
+
+    // assert
+    if (text.at(0).compare("a")) {
+        FAIL();
+    }if (text.at(1).compare("a bc a fs")) {
+        FAIL();
+    }if (text.at(2).compare("heh aaa")) {
+        FAIL();
+    }if (text.at(3).compare("hm baaab")) {
+        FAIL();
+    }if (text.at(4).compare("lookn for a a a")) {
+        FAIL();
+    }if (text.at(5).compare("parkour! aa")) {
+        FAIL();
+    }
+}
+
+TEST(Replace, simple_test) {
+    // arrange
+    std::vector<std::string> text = {"a bc a fs", "heh aaa", "lookn for a a a", "parkour! aa", "a", "hm baaab"};
+
+    char* word_from = (char*) "aaa";
+    char* word_to = (char*) "lol";
+
+    Replace replacer(word_from, word_to);
+
+    // act
+    replacer.execute(text);
+
+    // assert
+    if (text.at(0).compare("a bc a fs")) {
+        FAIL();
+    }if (text.at(1).compare("heh lol")) {
+        FAIL();
+    }if (text.at(2).compare("lookn for a a a")) {
+        FAIL();
+    }if (text.at(3).compare("parkour! aa")) {
+        FAIL();
+    }if (text.at(4).compare("a")) {
+        FAIL();
+    }if (text.at(5).compare("hm blolb")) {
+        FAIL();
+    }
+}
+
 TEST(Executor_index, simple_test) {
     // arrange
 

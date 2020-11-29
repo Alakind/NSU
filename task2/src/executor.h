@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 static int max_line = 1000;
 
@@ -38,3 +39,19 @@ class Grep: public Iworker {
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
 
+class Sort: public Iworker {
+    public:
+        Sort();
+
+        virtual std::vector<std::string> execute(std::vector<std::string> &text);
+};
+
+class Replace: public Iworker {
+    public:
+        std::string word_from;
+        std::string word_to;
+
+        Replace(char* word_fr, char* word_t);
+
+        virtual std::vector<std::string> execute(std::vector<std::string> &text);
+};
