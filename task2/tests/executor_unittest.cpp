@@ -61,6 +61,25 @@ TEST(Writefile, text_in_file) {
     remove(filename);
 }
 
+TEST(Grep, simple_test) {
+    // arrange
+    std::vector<std::string> text = {"a bc a fs", "heh aaa", "lookn for a a a", "parkour! aa", "a", "hm baaab"};
+
+    char* word = (char*) "aaa";
+
+    Grep greper(word);
+
+    // act
+    greper.execute(text);
+
+    // assert
+    if (text.at(0).compare("heh aaa")) {
+        FAIL();
+    }if (text.at(1).compare("hm baaab")) {
+        FAIL();
+    }
+}
+
 TEST(Executor_index, simple_test) {
     // arrange
 

@@ -38,3 +38,20 @@ std::vector<std::string> Writefile::execute(std::vector<std::string> &text) {
 
     return text;
 }
+
+Grep::Grep(char* word_to_grep) {
+    std::string word_str = word_to_grep;
+    word = word_str;
+}
+
+std::vector<std::string> Grep::execute(std::vector<std::string> &text) {
+
+    for(int i = 0; i < text.size(); i++) {
+        if (text.at(i).find(word) == std::string::npos) {
+            text.erase(text.begin() + i);
+            i--;
+        }
+    }
+
+    return text;
+}

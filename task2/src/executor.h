@@ -29,3 +29,12 @@ class Writefile: public Iworker {
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
 
+class Grep: public Iworker {
+    public:
+        std::string word;
+
+        Grep(char* word_to_grep);
+
+        virtual std::vector<std::string> execute(std::vector<std::string> &text);
+};
+
