@@ -35,9 +35,30 @@ TEST(Writefile, text_in_file) {
     std::ofstream fout;
     char* filename = (char*) "text.txt";
     fout.open(filename);
+
+    Writefile writer(filename);
+
     // act
+    writer.execute(text);
+
+    fout.close();
 
     // assert
+    std::ifstream fin;
+    fin.open(filename);
+    std::string tmp_string;
+
+    getline(fin, tmp_string, '\n');
+    if (tmp_string.compare("Hello, i am text massage checking testing bip-bop")) {
+        FAIL();
+    }
+    getline(fin, tmp_string, '\n');
+    if (tmp_string.compare("Haha new line")) {
+        FAIL();
+    }
+
+    fin.close();
+    remove(filename);
 }
 
 TEST(Executor_index, simple_test) {
