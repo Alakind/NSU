@@ -133,10 +133,10 @@ TEST(Replace, simple_test) {
     }
 }
 
-TEST(Executor_index, simple_test) {
+/*TEST(Executor_index, simple_test) {
     // arrange
 
     // act
 
     // assert
-}
+}*/

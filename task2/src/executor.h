@@ -55,3 +55,12 @@ class Replace: public Iworker {
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
+
+class Dump: public Iworker {
+    public:
+        std::string file_name;
+        
+        Dump(char* filename);
+
+        virtual std::vector<std::string> execute(std::vector<std::string> &text);
+};
