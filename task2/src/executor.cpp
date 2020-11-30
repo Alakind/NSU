@@ -102,3 +102,53 @@ std::vector<std::string> Dump::execute(std::vector<std::string> &text) {
 
     return text;
 }
+
+std::pair<int, std::string> get_block(std::string string) {
+    int i = 0;
+    while (string.at(i) != ' ') {
+        i++;
+    }
+
+    std::string str_number = string.substr(0, i);
+    int number = stoi(str_number);
+
+    i++;
+    while (string.at(i) != ' ') {
+        i++;
+    }
+    i++;
+
+    int start = i;
+    while (string.at(i) != '\n') {
+        i++;
+    }
+
+    std::string command = string.substr(start, i - start);
+
+    std::pair<int, std::string> result (number, command);
+    return result;
+}
+
+
+
+void workflow_execute(char* filename) {
+    std::ifstream fin;
+    fin.open(filename);
+
+    std::string tmp_string;
+
+    getline(fin, tmp_string, '\n');
+    getline(fin, tmp_string, '\n');
+
+    std::map<int, std::string> commands_map;
+
+    while (tmp_string.compare("csed")) {
+        std::pair<int, std::string> to_map = get_block(tmp_string);
+
+        commands_map.insert(to_map);
+
+        getline(fin, tmp_string, '\n');
+    }
+
+    getline(fin, tmp_string, '\n');
+}

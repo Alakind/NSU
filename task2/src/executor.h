@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <utility>
+#include <map>
 
 static int max_line = 1000;
 
@@ -59,8 +61,10 @@ class Replace: public Iworker {
 class Dump: public Iworker {
     public:
         std::string file_name;
-        
+
         Dump(char* filename);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
+
+void workflow_execute(char* filename);

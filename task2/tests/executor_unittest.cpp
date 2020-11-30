@@ -133,6 +133,18 @@ TEST(Replace, simple_test) {
     }
 }
 
+TEST(Executor_index, simple_test) {
+    // arrange
+    std::string string = "25 = commander haha hehe\n";
+
+    // act
+    std::pair<int, std::string> res_pair = get_block(string);
+
+    // assert
+    EXPECT_EQ(25, res_pair.first);
+    EXPECT_EQ("commander haha hehe", res_pair.second);
+}
+
 /*TEST(Executor_index, simple_test) {
     // arrange
 
