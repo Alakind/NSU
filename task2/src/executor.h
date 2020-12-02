@@ -67,4 +67,8 @@ class Dump: public Iworker {
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
 
+std::vector<int> get_sequence(std::string string);
+
+void do_command(std::string line, std::vector<std::string>& text);
+
 void workflow_execute(char* filename);
