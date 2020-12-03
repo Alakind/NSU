@@ -302,6 +302,7 @@ void Validator::is_valid(char* filename) {
     const int max_commands = 1000;
     int commands = 0;
     getline(fin, tmp_string, '\n');
+    std::vector<int> numbers;
     while (tmp_string.compare("csed\n") && tmp_string.compare("csed\r") && tmp_string.compare("csed") && commands < max_commands) {
         // checking for number
 
@@ -310,6 +311,10 @@ void Validator::is_valid(char* filename) {
             i++;
         }
         std::string str_number = tmp_string.substr(0, i);
+        if (isdigit(str_number.at(0))) {
+            int number = stoi(str_number);
+            numbers.push_back(number);
+        }
         for(int j = 0; j < str_number.size(); j++) {
             if (!isdigit(str_number.at(j))) {
                 throw (char*) "error: sequence is not all numbers";
@@ -340,7 +345,8 @@ void Validator::is_valid(char* filename) {
         }
         std::string command = tmp_string.substr(start, i - start);
 
-        if (!command.compare("readfile") || !command.compare("writefile") || !command.compare("grep") || !command.compare("sort") || !command.compare("replace") || !command.compare("dump")) {
+        //std::cout << command << std::endl;
+        if (command.compare("readfile") && command.compare("writefile") && command.compare("grep") && command.compare("sort") && command.compare("replace") && command.compare("dump")) {
             throw (char*) "error: invalid command";
             return;
         }
@@ -362,6 +368,19 @@ void Validator::is_valid(char* filename) {
             throw (char*) "error: invalid sequence";
         }
         else if (!isdigit(tmp_string.at(j)) && tmp_string.at(j) != ' ' && tmp_string.at(j) != '\r' && tmp_string.at(j) != '\n' && tmp_string.at(j) != '-' && tmp_string.at(j) != '>') {
+            throw (char*) "error: invalid sequence";
+        }
+    }
+
+    std::vector<int> seq = get_sequence(tmp_string);
+    for (int j = 0; j < seq.size(); j++) {
+        bool is_in = false;
+        for (int k = 0; k < numbers.size(); k++) {
+            if (numbers.at(k) == seq.at(j)) {
+                is_in = true;
+            }
+        }
+        if(!is_in) {
             throw (char*) "error: invalid sequence";
         }
     }
