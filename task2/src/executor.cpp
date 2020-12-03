@@ -301,9 +301,9 @@ void Validator::is_valid(char* filename) {
     // reading commands
     const int max_commands = 1000;
     int commands = 0;
+    getline(fin, tmp_string, '\n');
     while (tmp_string.compare("csed\n") && tmp_string.compare("csed\r") && tmp_string.compare("csed") && commands < max_commands) {
         // checking for number
-        getline(fin, tmp_string, '\n');
 
         int i = 0;
         while (i < tmp_string.size() && tmp_string.at(i) != ' ') {
@@ -312,7 +312,6 @@ void Validator::is_valid(char* filename) {
         std::string str_number = tmp_string.substr(0, i);
         for(int j = 0; j < str_number.size(); j++) {
             if (!isdigit(str_number.at(j))) {
-                std::cout << tmp_string << std::endl;
                 throw (char*) "error: sequence is not all numbers";
                 return;
             }
@@ -350,6 +349,8 @@ void Validator::is_valid(char* filename) {
             throw (char*) "error: no csed";
             return;
         }
+
+        getline(fin, tmp_string, '\n');
     }
 
 
@@ -359,7 +360,7 @@ void Validator::is_valid(char* filename) {
         if (tmp_string.at(j) == '>' && tmp_string.at(j - 1) != '-') {
             throw (char*) "error: invalid sequence";
         }
-        if (!isdigit(tmp_string.at(j)) && tmp_string.at(j) != ' ' && tmp_string.at(j) != '\r' && tmp_string.at(j) != '\n') {
+        else if (!isdigit(tmp_string.at(j)) && tmp_string.at(j) != ' ' && tmp_string.at(j) != '\r' && tmp_string.at(j) != '\n' && tmp_string.at(j) != '-' && tmp_string.at(j) != '>') {
             throw (char*) "error: invalid sequence";
         }
     }
