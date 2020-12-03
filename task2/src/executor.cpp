@@ -324,6 +324,7 @@ void Validator::is_valid(char* filename) {
             return;
         }
         i++;
+        i++;
 
         // checking for proper command
         int start = i;

@@ -6,9 +6,11 @@
 #include "executor.h"
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
-    std::cout << "Privet!" << std::endl;
+    if (argc > 1) {
+        workflow_execute(argv[1]);
+    }
 
     return 0;
 }
