@@ -166,7 +166,7 @@ TEST(Test_workflow, simple_test) {
     
 
     // act
-    workflow_execute((char*)"workflow.txt");
+    workflow_execute((char*)"workflow0.txt");
 
     // assert
     

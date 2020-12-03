@@ -72,3 +72,8 @@ std::vector<int> get_sequence(std::string string);
 void do_command(std::string line, std::vector<std::string>& text);
 
 void workflow_execute(char* filename);
+
+class Validator {
+    public:
+        void is_valid(char* filename);
+};

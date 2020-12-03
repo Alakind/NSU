@@ -159,10 +159,14 @@ std::vector<int> get_sequence(std::string string) {
 }
 
 void do_command(std::string line, std::vector<std::string>& text) {
+    //std::cout << "started doing the command" << std::endl;
     // seeking for command
     int i = 0;
     while(line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r') {
         i++;
+        if (i >= line.size()) {
+            break;
+        }
     }
     std::string command = line.substr(0, i);
     
@@ -172,11 +176,14 @@ void do_command(std::string line, std::vector<std::string>& text) {
     // seeking for first argument
     int start = i + 1;
     std::string first_argument_str;
-    char* first_argument;
-    if (line.at(i) != '\n' && line.at(i) != '\r') {
+    char* first_argument = (char*) "";
+    if (i < line.size() && line.at(i) != '\n' && line.at(i) != '\r') {
         i++;
-        while(i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r') {
+        while(line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r') {
             i++;
+            if (i >= line.size()) {
+                break;
+            }
         }
         first_argument_str = line.substr(start, i - start);
     
@@ -186,38 +193,41 @@ void do_command(std::string line, std::vector<std::string>& text) {
     // seeking for second argument
     start = i + 1;
     std::string second_argument_str;
-    char* second_argument;
+    char* second_argument = (char*) "";
     if (i < line.size() && line.at(i) != '\n' && line.at(i) != '\r') {
         i++;
-        while(i < line.size() && line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r') {
+        while(line.at(i) != ' ' && line.at(i) != '\n' && line.at(i) != '\r') {
             i++;
+            if (i >= line.size()) {
+                break;
+            }
         }
         second_argument_str = line.substr(start, i - start);
 
         second_argument = (char*) second_argument_str.c_str();
     }
 
-    std::cout << command << std::endl;
-    std::cout << first_argument << std::endl;
-    std::cout << second_argument << std::endl << std::endl;
+    //std::cout << command << std::endl;
+    //std::cout << first_argument << std::endl;
+    //std::cout << second_argument << std::endl << std::endl;
 
     // calculating
-    if (command.compare("readfile")) {
+    if (!command.compare("readfile")) {
         Readfile doer(first_argument);
         doer.execute(text);
-    } else if(command.compare("writefile")) {
+    } else if(!command.compare("writefile")) {
         Writefile doer(first_argument);
         doer.execute(text);
-    } else if(command.compare("grep")) {
+    } else if(!command.compare("grep")) {
         Grep doer(first_argument);
         doer.execute(text);
-    } else if(command.compare("sort") || command.compare("sort\n") || command.compare("sort\r")) {
+    } else if(!command.compare("sort") || !command.compare("sort\n") || !command.compare("sort\r")) {
         Sort doer;
         doer.execute(text);
-    } else if(command.compare("replace") || command.compare("replace\n") || command.compare("replace\r")) {
+    } else if(!command.compare("replace") || !command.compare("replace\n") || !command.compare("replace\r")) {
         Replace doer(first_argument, second_argument);
         doer.execute(text);
-    } else if(command.compare("dump")) {
+    } else if(!command.compare("dump")) {
         Dump doer(first_argument);
         doer.execute(text);
     }
@@ -225,6 +235,16 @@ void do_command(std::string line, std::vector<std::string>& text) {
 }
 
 void workflow_execute(char* filename) {
+    // Checking if file is valid
+    Validator validator;
+    try {
+        validator.is_valid(filename);
+    }
+    catch(char* error) {
+        std::cout << error << std::endl;
+        return;
+    }
+
     // opening file
     std::ifstream fin;
     fin.open(filename);
@@ -254,8 +274,95 @@ void workflow_execute(char* filename) {
     // calculating
     std::vector<std::string> text;
     for (int i = 0; i < sequence.size(); i++) {
-        std::cout << "AIAIAIAIAIAAIAIAI" << std::endl;
         do_command(commands_map[sequence.at(i)], text);
     }
-    std::cout << "Vse tyt zashibis!" << std::endl;
+
+    return;
+}
+
+void Validator::is_valid(char* filename) {
+    // opening file
+    std::ifstream fin;
+    fin.open(filename);
+
+    std::string tmp_string;
+
+
+    // skipping desc
+    getline(fin, tmp_string, '\n');
+    std::string string_desc = tmp_string.substr(0, 4);
+
+    if (string_desc.compare("desc")) {
+        throw (char*) "error: no desc";
+        return;
+    }
+
+
+    // reading commands
+    const int max_commands = 1000;
+    int commands = 0;
+    while (tmp_string.compare("csed\n") && tmp_string.compare("csed\r") && tmp_string.compare("csed") && commands < max_commands) {
+        // checking for number
+        getline(fin, tmp_string, '\n');
+
+        int i = 0;
+        while (i < tmp_string.size() && tmp_string.at(i) != ' ') {
+            i++;
+        }
+        std::string str_number = tmp_string.substr(0, i);
+        for(int j = 0; j < str_number.size(); j++) {
+            if (!isdigit(str_number.at(j))) {
+                std::cout << tmp_string << std::endl;
+                throw (char*) "error: sequence is not all numbers";
+                return;
+            }
+        }
+
+        // checking for =
+        i++;
+        if (i < tmp_string.size() && tmp_string.at(i) != '=') {
+            throw (char*) "error: no =";
+            return;
+        }
+        i++;
+
+        // checking for proper command
+        int start = i;
+        if (i >= tmp_string.size()) {
+            throw (char*) "error: no command";
+            return;
+        }
+        while(i < tmp_string.size() && tmp_string.at(i) != ' ' && tmp_string.at(i) != '\n' && tmp_string.at(i) != '\r') {
+            i++;
+            if (i >= tmp_string.size()) {
+                break;
+            }
+        }
+        std::string command = tmp_string.substr(start, i - start);
+
+        if (!command.compare("readfile") || !command.compare("writefile") || !command.compare("grep") || !command.compare("sort") || !command.compare("replace") || !command.compare("dump")) {
+            throw (char*) "error: invalid command";
+            return;
+        }
+
+        commands++;
+        if (fin.eof()) {
+            throw (char*) "error: no csed";
+            return;
+        }
+    }
+
+
+    // reading sequence
+    getline(fin, tmp_string, '\n');
+    for (int j = 0; j < tmp_string.size(); j++) {
+        if (tmp_string.at(j) == '>' && tmp_string.at(j - 1) != '-') {
+            throw (char*) "error: invalid sequence";
+        }
+        if (!isdigit(tmp_string.at(j)) && tmp_string.at(j) != ' ' && tmp_string.at(j) != '\r' && tmp_string.at(j) != '\n') {
+            throw (char*) "error: invalid sequence";
+        }
+    }
+
+    fin.close();
 }
