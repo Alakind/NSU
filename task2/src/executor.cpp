@@ -1,8 +1,8 @@
 #include "executor.h"
 
-Readfile::Readfile(char* filename) {
-    std::string filename_str = filename;
-    file_name = filename_str;
+Readfile::Readfile(std::string filename) {
+    //std::string filename_str = filename;
+    file_name = filename;
 }
 
 std::vector<std::string> Readfile::execute(std::vector<std::string> &text) {
@@ -24,9 +24,9 @@ std::vector<std::string> Readfile::execute(std::vector<std::string> &text) {
     return text;
 }
 
-Writefile::Writefile(char* filename) {
-    std::string filename_str = filename;
-    file_name = filename_str;
+Writefile::Writefile(std::string filename) {
+    //std::string filename_str = filename;
+    file_name = filename;
 }
 
 std::vector<std::string> Writefile::execute(std::vector<std::string> &text) {
@@ -43,9 +43,9 @@ std::vector<std::string> Writefile::execute(std::vector<std::string> &text) {
     return text;
 }
 
-Grep::Grep(char* word_to_grep) {
-    std::string word_str = word_to_grep;
-    word = word_str;
+Grep::Grep(std::string word_to_grep) {
+    //std::string word_str = word_to_grep;
+    word = word_to_grep;
 }
 
 std::vector<std::string> Grep::execute(std::vector<std::string> &text) {
@@ -68,11 +68,11 @@ std::vector<std::string> Sort::execute(std::vector<std::string> &text) {
     return text;
 }
 
-Replace::Replace(char* word_fr, char* word_t) {
-    std::string word_from_str = word_fr;
-    std::string word_to_str = word_t;
-    word_from = word_from_str;
-    word_to = word_to_str;
+Replace::Replace(std::string word_fr, std::string word_t) {
+    //std::string word_from_str = word_fr;
+    //std::string word_to_str = word_t;
+    word_from = word_fr;
+    word_to = word_t;
 }
 
 std::vector<std::string> Replace::execute(std::vector<std::string> &text) {
@@ -86,9 +86,9 @@ std::vector<std::string> Replace::execute(std::vector<std::string> &text) {
     return text;
 }
 
-Dump::Dump(char* filename) {
-    std::string filename_str = filename;
-    file_name = filename_str;
+Dump::Dump(std::string filename) {
+    //std::string filename_str = filename;
+    file_name = filename;
 }
 
 std::vector<std::string> Dump::execute(std::vector<std::string> &text) {
@@ -234,20 +234,20 @@ void do_command(std::string line, std::vector<std::string>& text) {
 
 }
 
-void workflow_execute(char* filename) {
+void workflow_execute(std::string filename) {
     // Checking if file is valid
     Validator validator;
     try {
         validator.is_valid(filename);
     }
-    catch(char* error) {
-        std::cout << error << std::endl;
+    catch(WorkflowException &error) {
+        std::cerr << error.what() << std::endl;
         return;
     }
 
     // opening file
     std::ifstream fin;
-    fin.open(filename);
+    fin.open(filename.c_str());
 
     std::string tmp_string;
 
@@ -280,10 +280,10 @@ void workflow_execute(char* filename) {
     return;
 }
 
-void Validator::is_valid(char* filename) {
+void Validator::is_valid(std::string filename) {
     // opening file
     std::ifstream fin;
-    fin.open(filename);
+    fin.open(filename.c_str());
 
     std::string tmp_string;
 
@@ -293,7 +293,8 @@ void Validator::is_valid(char* filename) {
     std::string string_desc = tmp_string.substr(0, 4);
 
     if (string_desc.compare("desc")) {
-        throw (char*) "error: no desc";
+        std::string str("error: no desc");
+        throw WorkflowException(str);
         return;
     }
 
@@ -317,7 +318,8 @@ void Validator::is_valid(char* filename) {
         }
         for(int j = 0; j < str_number.size(); j++) {
             if (!isdigit(str_number.at(j))) {
-                throw (char*) "error: sequence is not all numbers";
+                std::string str("error: sequence is not all numbers");
+                throw WorkflowException(str);
                 return;
             }
         }
@@ -325,7 +327,8 @@ void Validator::is_valid(char* filename) {
         // checking for =
         i++;
         if (i < tmp_string.size() && tmp_string.at(i) != '=') {
-            throw (char*) "error: no =";
+            std::string str("error: no =");
+            throw WorkflowException(str);
             return;
         }
         i++;
@@ -334,7 +337,8 @@ void Validator::is_valid(char* filename) {
         // checking for proper command
         int start = i;
         if (i >= tmp_string.size()) {
-            throw (char*) "error: no command";
+            std::string str("error: no command");
+            throw WorkflowException(str);
             return;
         }
         while(i < tmp_string.size() && tmp_string.at(i) != ' ' && tmp_string.at(i) != '\n' && tmp_string.at(i) != '\r') {
@@ -347,13 +351,15 @@ void Validator::is_valid(char* filename) {
 
         //std::cout << command << std::endl;
         if (command.compare("readfile") && command.compare("writefile") && command.compare("grep") && command.compare("sort") && command.compare("replace") && command.compare("dump")) {
-            throw (char*) "error: invalid command";
+            std::string str("error: invalid command");
+            throw WorkflowException(str);
             return;
         }
 
         commands++;
         if (fin.eof()) {
-            throw (char*) "error: no csed";
+            std::string str("error: no csed");
+            throw WorkflowException(str);
             return;
         }
 
@@ -365,10 +371,12 @@ void Validator::is_valid(char* filename) {
     getline(fin, tmp_string, '\n');
     for (int j = 0; j < tmp_string.size(); j++) {
         if (tmp_string.at(j) == '>' && tmp_string.at(j - 1) != '-') {
-            throw (char*) "error: invalid sequence";
+            std::string str("error: invalid sequence");
+            throw WorkflowException(str);
         }
         else if (!isdigit(tmp_string.at(j)) && tmp_string.at(j) != ' ' && tmp_string.at(j) != '\r' && tmp_string.at(j) != '\n' && tmp_string.at(j) != '-' && tmp_string.at(j) != '>') {
-            throw (char*) "error: invalid sequence";
+            std::string str("error: invalid sequence");
+            throw WorkflowException(str);
         }
     }
 
@@ -381,9 +389,16 @@ void Validator::is_valid(char* filename) {
             }
         }
         if(!is_in) {
-            throw (char*) "error: invalid sequence";
+            std::string str("error: invalid sequence");
+            throw WorkflowException(str);
         }
     }
 
     fin.close();
+}
+
+WorkflowException::WorkflowException(std::string &err_massage) : error{err_massage} {}
+
+const char* WorkflowException::what() {
+    return error.c_str();
 }

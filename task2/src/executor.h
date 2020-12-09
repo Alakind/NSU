@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <utility>
 #include <map>
+#include <exception>
 
 static int max_line = 1000;
 
@@ -14,11 +15,18 @@ class Iworker {
         virtual std::vector<std::string> execute(std::vector<std::string> &text) = 0;
 };
 
+class WorkflowException: std::exception {
+    public:
+        std::string error;
+        WorkflowException(std::string &err_massage);
+        const char* what();
+};
+
 class Readfile: public Iworker {
     public:
         std::string file_name;
         
-        Readfile(char* filename);
+        explicit Readfile(std::string filename);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
@@ -27,7 +35,7 @@ class Writefile: public Iworker {
     public:
         std::string file_name;
         
-        Writefile(char* filename);
+        explicit Writefile(std::string filename);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
@@ -36,14 +44,14 @@ class Grep: public Iworker {
     public:
         std::string word;
 
-        Grep(char* word_to_grep);
+        explicit Grep(std::string word_to_grep);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
 
 class Sort: public Iworker {
     public:
-        Sort();
+        explicit Sort();
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
@@ -53,7 +61,7 @@ class Replace: public Iworker {
         std::string word_from;
         std::string word_to;
 
-        Replace(char* word_fr, char* word_t);
+        explicit Replace(std::string word_fr, std::string word_t);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
@@ -62,7 +70,7 @@ class Dump: public Iworker {
     public:
         std::string file_name;
 
-        Dump(char* filename);
+        explicit Dump(std::string filename);
 
         virtual std::vector<std::string> execute(std::vector<std::string> &text);
 };
@@ -71,9 +79,9 @@ std::vector<int> get_sequence(std::string string);
 
 void do_command(std::string line, std::vector<std::string>& text);
 
-void workflow_execute(char* filename);
+void workflow_execute(std::string filename);
 
 class Validator {
     public:
-        void is_valid(char* filename);
+        void is_valid(std::string filename);
 };

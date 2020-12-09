@@ -9,7 +9,8 @@
 int main(int argc, char* argv[]) {
 
     if (argc > 1) {
-        workflow_execute(argv[1]);
+        std::string filename(argv[1]);
+        workflow_execute(filename);
     }
 
     return 0;
