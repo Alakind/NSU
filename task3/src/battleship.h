@@ -7,31 +7,44 @@
 #include <map>
 #include <exception>
 
+static int BOARD_SIZE = 10;
+
+bool is_number(const std::string s);
+
 class IPlayer {
     public:
         int health;     // max health = 20 (all ships)
         std::vector<std::vector<char>> own_matrix;
         std::vector<std::vector<char>> opponent_matrix;
         std::string name;
+
         int get_health() { return health; };
         bool is_dead();
         bool is_there(int x, int y);
-        void make_move();
+        virtual void make_move() = 0;
 };
 
 class ConsolePlayer : public IPlayer {
+    private:
+        std::pair<int, int> get_coordinates(std::string string);
     public:
-        explicit ConsolePlayer();
+        ConsolePlayer();
+
+        virtual void make_move();
 };
 
 class RandomPlayer : public IPlayer {
     public:
-        explicit RandomPlayer();
+        RandomPlayer();
+
+        virtual void make_move();
 };
 
 class OptimalPlayer : public IPlayer {
     public:
-        explicit OptimalPlayer();
+        OptimalPlayer();
+
+        virtual void make_move();
 };
 
 class IGameView {
