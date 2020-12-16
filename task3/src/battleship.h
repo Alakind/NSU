@@ -21,16 +21,19 @@ class IPlayer {
         int get_health() { return health; };
         bool is_dead();
         bool is_there(int x, int y);
-        virtual void make_move() = 0;
+        virtual bool make_move(IPlayer& enemy) = 0;
+        bool get_shot(int x, int y);
+        //virtual std::pair<int, int> get_coordinates(std::string string) = 0;
+        bool is_killed(std::vector<std::vector<char>> matrix, std::pair<int, int> coordinates);
 };
 
 class ConsolePlayer : public IPlayer {
-    private:
-        std::pair<int, int> get_coordinates(std::string string);
     public:
         ConsolePlayer();
 
-        virtual void make_move();
+        //std::pair<int, int> get_coordinates(std::string string);
+        virtual bool make_move(IPlayer& enemy);
+        
 };
 
 class RandomPlayer : public IPlayer {
