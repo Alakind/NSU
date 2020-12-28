@@ -76,7 +76,21 @@ bool IPlayer::get_shot(int x, int y) {      // returns true if ship is destroyed
         return false;
     }
 
-    if (y > 0 && own_matrix.at(y - 1).at(x) == 'X') {
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy ++) {
+            if (dx == 0 && dy == 0) continue;
+            if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9) && own_matrix.at(y + dy).at(x + dx) == 'S') {
+                return false;
+            }
+            if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9) && own_matrix.at(y + dy).at(x + dx) == 'X') {
+                return get_shot(x + dx, y + dy);
+            }
+        }
+    }
+
+    return true;
+
+    /*if (y > 0 && own_matrix.at(y - 1).at(x) == 'X') {
         int i = 2;
         while (y - i >= 0 && own_matrix.at(y - i).at(x) == 'X') i++;
         if (own_matrix.at(y - i).at(x) == 'S') {
@@ -103,9 +117,7 @@ bool IPlayer::get_shot(int x, int y) {      // returns true if ship is destroyed
         if (own_matrix.at(y).at(x + i) == 'S') {
             return true;
         }
-    }
-
-    return false;
+    }*/
 }
 
 bool IPlayer::set_ship(int x1, int y1, int x2, int y2) {
@@ -264,7 +276,8 @@ void ConsolePlayer::arrange_board() {
     std::cout << "Enter coordinates of second end: ";
     std::cin >> x2 >> y2;
     x2--; y2--;
-    while (!set_ship(x1, y1, x2, y2) || ship_len(x1, y1, x2, y2) != 4) {
+    //std::cout << x1 << y1 << x2 << y2;
+    while (ship_len(x1, y1, x2, y2) != 4 || !set_ship(x1, y1, x2, y2)) {
         std::cout << std::endl << "Invalid coordinates." << std::endl;
         std::cout << "Arrange four-deck ship" << std::endl;
         std::cout << "Enter coordinates of first end: ";
@@ -273,6 +286,7 @@ void ConsolePlayer::arrange_board() {
         std::cout << "Enter coordinates of second end: ";
         std::cin >> x2 >> y2;
         x2--; y2--;
+        std::cout << x1 << y1 << x2 << y2;
     }
 
     for (int i = 0; i < 2; i++) {
@@ -283,7 +297,7 @@ void ConsolePlayer::arrange_board() {
         std::cout << "Enter coordinates of second end: ";
         std::cin >> x2 >> y2;
         x2--; y2--;
-        while (!set_ship(x1, y1, x2, y2) || ship_len(x1, y1, x2, y2) != 3) {
+        while (ship_len(x1, y1, x2, y2) != 3 || !set_ship(x1, y1, x2, y2)) {
             std::cout << std::endl << "Invalid coordinates." << std::endl;
             std::cout << "Arrange three-deck ship" << std::endl;
             std::cout << "Enter coordinates of first end: ";
@@ -303,7 +317,7 @@ void ConsolePlayer::arrange_board() {
         std::cout << "Enter coordinates of second end: ";
         std::cin >> x2 >> y2;
         x2--; y2--;
-        while (!set_ship(x1, y1, x2, y2) || ship_len(x1, y1, x2, y2) != 2) {
+        while (ship_len(x1, y1, x2, y2) != 2 || !set_ship(x1, y1, x2, y2)) {
             std::cout << std::endl << "Invalid coordinates." << std::endl;
             std::cout << "Arrange two-deck ship" << std::endl;
             std::cout << "Enter coordinates of first end: ";

@@ -18,11 +18,29 @@ TEST(Ship_len, simple_test) {
     EXPECT_EQ(player.ship_len(0, 0, 0, 3), 4);
     EXPECT_EQ(player.ship_len(0, 0, 3, 0), 4);
 
+    EXPECT_EQ(player.ship_len(1, 1, 1, 4), 4);
+    EXPECT_EQ(player.ship_len(1, 1, 4, 1), 4);
+
+    // assert
+}
+
+TEST(Play_game, game) {
+    // arrange
+    ConsolePlayer player1;
+    player1.arrange_board();
+    ConsolePlayer player2;
+    player2.arrange_board();
+
+    Game game(&player1, &player2);
+    game.play_game();
+
+    // act
+
     // assert
 }
 
 
-TEST(Make_move, simple_test) {
+/*TEST(Make_move, simple_test) {
     // arrange
     ConsolePlayer player;
 
@@ -31,7 +49,7 @@ TEST(Make_move, simple_test) {
     player.print_matrix();
 
     // assert
-}
+}*/
 
 /*TEST(Executor_index, simple_test) {
     // arrange
