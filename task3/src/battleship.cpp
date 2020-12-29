@@ -6,6 +6,39 @@ bool is_number(const std::string s) {
     return !s.empty() && it == s.end();
 }
 
+std::pair<int, int> get_coordinates_cin() {
+    char in_string_char[100];
+    //std::cin.getline(in_string_char, 100);
+    std::string in_string;
+    std::getline(std::cin, in_string);
+
+    //std::string in_string(in_string_char);
+
+    std::pair<int, int> coordinates = {-1, -1};
+
+    int spaces = 0;
+    int second_start = 2;
+    for (int i = 0; i < in_string.length(); i++) {
+        if (in_string.at(i) == ' ') {
+            spaces++;
+            second_start = i + 1;
+            continue;
+        }
+        if (!isdigit(in_string.at(i)) || spaces > 1 || second_start - 2 < 0) {
+            return coordinates;
+        }
+    }
+    if (spaces == 0) {
+        return coordinates;
+    }
+
+    coordinates.first = stoi(in_string.substr(0, second_start - 1));
+    coordinates.second = stoi(in_string.substr(second_start));
+    coordinates.first--;
+    coordinates.second--;
+
+    return coordinates;
+}
 
 // ####################################  Game  ####################################
 
@@ -68,56 +101,28 @@ bool IPlayer::is_there(int x, int y) {
 }
 
 bool IPlayer::get_shot(int x, int y) {      // returns true if ship is destroyed
-    own_matrix.at(y).at(x) = 'X';
+    own_matrix.at(y).at(x) = 'T';
     health--;
 
-    // MAYBE THERE IS A MISTAKE
-    if ((y > 0 && own_matrix.at(y - 1).at(x) == 'S') || (y < 9 && own_matrix.at(y + 1).at(x) == 'S') || (x > 0 && own_matrix.at(y).at(x - 1) == 'S') || (x < 9 && own_matrix.at(y).at(x + 1) == 'S')) {
-        return false;
-    }
-
     for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy ++) {
+        for (int dy = -1; dy <= 1; dy++) {
             if (dx == 0 && dy == 0) continue;
-            if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9) && own_matrix.at(y + dy).at(x + dx) == 'S') {
-                return false;
-            }
-            if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9) && own_matrix.at(y + dy).at(x + dx) == 'X') {
-                return get_shot(x + dx, y + dy);
+            if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9)) {
+                if (own_matrix.at(y + dy).at(x + dx) == 'S') {
+                    own_matrix.at(y).at(x) = 'X';
+                    return false;
+                }
+                else if (own_matrix.at(y + dy).at(x + dx) == 'X') {
+                    bool result = get_shot(x + dx, y + dy);
+                    own_matrix.at(y).at(x) = 'X';
+                    return result;
+                }
             }
         }
     }
 
+    own_matrix.at(y).at(x) = 'X';
     return true;
-
-    /*if (y > 0 && own_matrix.at(y - 1).at(x) == 'X') {
-        int i = 2;
-        while (y - i >= 0 && own_matrix.at(y - i).at(x) == 'X') i++;
-        if (own_matrix.at(y - i).at(x) == 'S') {
-            return true;
-        }
-    }
-    if (y < 9 && own_matrix.at(y + 1).at(x) == 'X') {
-        int i = 2;
-        while (y + i <= 9 && own_matrix.at(y + i).at(x) == 'X') i++;
-        if (own_matrix.at(y + i).at(x) == 'S') {
-            return true;
-        }
-    }
-    if (x > 0 && own_matrix.at(y).at(x - 1) == 'X') {
-        int i = 2;
-        while (x - i >= 0 && own_matrix.at(y).at(x - i) == 'X') i++;
-        if (own_matrix.at(y).at(x - i) == 'S') {
-            return true;
-        }
-    }
-    if (x < 9 && own_matrix.at(y).at(x + 1) == 'X') {
-        int i = 2;
-        while (x + i <= 9 && own_matrix.at(y).at(x + i) == 'X') i++;
-        if (own_matrix.at(y).at(x + i) == 'S') {
-            return true;
-        }
-    }*/
 }
 
 bool IPlayer::set_ship(int x1, int y1, int x2, int y2) {
@@ -203,10 +208,12 @@ bool IPlayer::is_ship_near(int x, int y) {
 
 // ##############################   Console player  #############################
 
-ConsolePlayer::ConsolePlayer() {
+ConsolePlayer::ConsolePlayer(IGameView* game_view_in) {
     // setting name
     std::cout << "Type player name: ";
-    std::cin >> name;
+    std::getline(std::cin, name);
+
+    game_view = game_view_in;
 
     // setting health
     health = 20;
@@ -223,16 +230,16 @@ ConsolePlayer::ConsolePlayer() {
 }   
 
 bool ConsolePlayer::make_move(IPlayer& enemy) {     // return true if needs one more move
-    std::cout << name << "'s turn!" << std::endl;
+    std::cout << std::endl << name << "'s turn!" << std::endl;
+
+    game_view->draw_enemy_board(own_matrix, opponent_matrix);
 
     // getting coordinates to hit
     bool is_valid = false;
     std::pair<int, int> coordinates;
     while (!is_valid) {
         std::cout << "Fire in sector: ";
-        std::cin >> coordinates.first >> coordinates.second;
-        coordinates.first--;
-        coordinates.second--;
+        coordinates = get_coordinates_cin();
 
         if (coordinates.first >= 0 && coordinates.first <= 9 && coordinates.second >= 0 && coordinates.second <= 9) is_valid = true;
         else {
@@ -240,6 +247,10 @@ bool ConsolePlayer::make_move(IPlayer& enemy) {     // return true if needs one 
         }
     }
 
+    // if alreaydy hit here
+    if (opponent_matrix.at(coordinates.second).at(coordinates.first) == 'X' || opponent_matrix.at(coordinates.second).at(coordinates.first) == '*') {
+        return false;
+    }
     // if hit
     if (enemy.is_there(coordinates.first, coordinates.second)) {
         opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
@@ -253,7 +264,7 @@ bool ConsolePlayer::make_move(IPlayer& enemy) {     // return true if needs one 
     }
     // if missed
     else {
-        opponent_matrix.at(coordinates.second).at(coordinates.second) = '*';
+        opponent_matrix.at(coordinates.second).at(coordinates.first) = '*';
         std::cout << "Miss" << std::endl;
     }
 
@@ -268,81 +279,65 @@ void ConsolePlayer::arrange_board() {
     std::cout << "3 two-deck" << std::endl;
     std::cout << "4 single-deck" << std::endl;
 
-    int x1, x2, y1, y2;
+    std::pair<int, int> coor1, coor2;
     std::cout << "Let's start with four-deck one" << std::endl;
     std::cout << "Enter coordinates of first end: ";
-    std::cin >> x1 >> y1;
-    x1--; y1--;
+    coor1 = get_coordinates_cin();
     std::cout << "Enter coordinates of second end: ";
-    std::cin >> x2 >> y2;
-    x2--; y2--;
-    //std::cout << x1 << y1 << x2 << y2;
-    while (ship_len(x1, y1, x2, y2) != 4 || !set_ship(x1, y1, x2, y2)) {
+    coor2 = get_coordinates_cin();
+    while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 4 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
         std::cout << std::endl << "Invalid coordinates." << std::endl;
         std::cout << "Arrange four-deck ship" << std::endl;
         std::cout << "Enter coordinates of first end: ";
-        std::cin >> x1 >> y1;
-        x1--; y1--;
+        coor1 = get_coordinates_cin();
         std::cout << "Enter coordinates of second end: ";
-        std::cin >> x2 >> y2;
-        x2--; y2--;
-        std::cout << x1 << y1 << x2 << y2;
+        coor2 = get_coordinates_cin();
     }
 
     for (int i = 0; i < 2; i++) {
         std::cout << "Now set three-deck's ship" << std::endl;
         std::cout << "Enter coordinates of first end: ";
-        std::cin >> x1 >> y1;
-        x1--; y1--;
+        coor1 = get_coordinates_cin();
         std::cout << "Enter coordinates of second end: ";
-        std::cin >> x2 >> y2;
-        x2--; y2--;
-        while (ship_len(x1, y1, x2, y2) != 3 || !set_ship(x1, y1, x2, y2)) {
+        coor2 = get_coordinates_cin();
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 3 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second)) {
             std::cout << std::endl << "Invalid coordinates." << std::endl;
             std::cout << "Arrange three-deck ship" << std::endl;
             std::cout << "Enter coordinates of first end: ";
-            std::cin >> x1 >> y1;
-            x1--; y1--;
+            coor1 = get_coordinates_cin();
             std::cout << "Enter coordinates of second end: ";
-            std::cin >> x2 >> y2;
-            x2--; y2--;
+            coor2 = get_coordinates_cin();
         }
     }
 
     for (int i = 0; i < 3; i++) {
         std::cout << "Now set two-deck's ship" << std::endl;
         std::cout << "Enter coordinates of first end: ";
-        std::cin >> x1 >> y1;
-        x1--; y1--;
+        coor1 = get_coordinates_cin();
         std::cout << "Enter coordinates of second end: ";
-        std::cin >> x2 >> y2;
-        x2--; y2--;
-        while (ship_len(x1, y1, x2, y2) != 2 || !set_ship(x1, y1, x2, y2)) {
+        coor2 = get_coordinates_cin();
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 2 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second)) {
             std::cout << std::endl << "Invalid coordinates." << std::endl;
             std::cout << "Arrange two-deck ship" << std::endl;
             std::cout << "Enter coordinates of first end: ";
-            std::cin >> x1 >> y1;
-            x1--; y1--;
+            coor1 = get_coordinates_cin();
             std::cout << "Enter coordinates of second end: ";
-            std::cin >> x2 >> y2;
-            x2--; y2--;
+            coor2 = get_coordinates_cin();
         }
     }
 
     for (int i = 0; i < 4; i++) {
         std::cout << "Set single-deck ship with one coordinate" << std::endl;
         std::cout << "Enter coordinate: ";
-        std::cin >> x1 >> y1;
-        x1--; y1--;
-        y2 = y1;
-        x2 = x1;
-        while (!set_ship(x1, y1, x2, y2)) {
+        coor1 = get_coordinates_cin();
+        coor2.second = coor1.second;
+        coor2.first = coor1.first;
+        while (!set_ship(coor1.first, coor1.second, coor2.first, coor2.second)) {
             std::cout << std::endl << "Invalid coordinates." << std::endl;
             std::cout << "Enter new coordinate: ";
-            std::cin >> x1 >> y1;
-            x1--; y1--;
-            y2 = y1;
-            x2 = x1;
+            coor1 = get_coordinates_cin();
+            coor2.second = coor1.second;
+            coor2.first = coor1.first;
         }
     }
 
@@ -374,4 +369,27 @@ bool OptimalPlayer::make_move() {
 
 void OptimalPlayer::arrange_board() {
     
+}
+
+// ################################   Game View  ##############################
+
+ConsoleView::ConsoleView() {};
+
+void ConsoleView::draw_enemy_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) {
+    std::cout << std::endl;
+    for (int y = 0; y < 9; y++) {
+        for (int x = 0; x < 9; x++) {
+            std::cout << matrix_enemy.at(y).at(x) << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void ConsoleView::draw_own_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) {
+    for (int y = 0; y < 9; y++) {
+        for (int x = 0; x < 9; x++) {
+            std::cout << matrix_own.at(y).at(x) << " ";
+        }
+        std::cout << std::endl;
+    }
 }

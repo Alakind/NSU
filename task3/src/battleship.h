@@ -11,12 +11,15 @@ static int BOARD_SIZE = 10;
 
 bool is_number(const std::string s);
 
+std::pair<int, int> get_coordinates_cin();
+
 enum PlayerType {
     type_random,    // random - 0
     type_optimal,   // optimal - 1
     type_console    // console - 2
 };
 
+class IGameView;
 
 class IPlayer {
     public:
@@ -25,6 +28,8 @@ class IPlayer {
         std::vector<std::vector<char>> own_matrix;
         std::vector<std::vector<char>> opponent_matrix;
         std::string name;
+
+        IGameView* game_view;
 
         int get_health() { return health; };
         bool is_dead(); // checks if player is defeated
@@ -41,7 +46,7 @@ class IPlayer {
 
 class ConsolePlayer : public IPlayer {
     public:
-        ConsolePlayer();
+        ConsolePlayer(IGameView* game_view_in);
 
         virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
@@ -66,12 +71,16 @@ class OptimalPlayer : public IPlayer {
 
 class IGameView {
     public:
-        virtual void draw_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy);
+        virtual void draw_enemy_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) = 0;
+        virtual void draw_own_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) = 0;
 };
 
-class ConsoleView : IGameView {
+class ConsoleView : public IGameView {
     public:
-        virtual void draw_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy);
+        ConsoleView();
+
+        virtual void draw_enemy_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy);
+        virtual void draw_own_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy);
 };
 
 class Game {
@@ -81,7 +90,6 @@ class Game {
         int number_of_rounds;
     public:
         Game(IPlayer* player1_in, IPlayer* player2_in);
-
 
         IPlayer* player1;
         IPlayer* player2;

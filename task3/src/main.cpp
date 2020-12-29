@@ -8,8 +8,18 @@
 
 int main(int argc, char* argv[]) {
 
+    ConsoleView game_view;
+    ConsolePlayer player1(&game_view);
+    player1.arrange_board();
+    ConsolePlayer player2(&game_view);
+    player2.arrange_board();
 
-    PlayerType player1_type;
+    Game game(&player1, &player2);
+    game.play_game();
+
+
+
+    /*PlayerType player1_type;
     PlayerType player2_type;
 
     switch (player1_type) {
@@ -34,7 +44,7 @@ int main(int argc, char* argv[]) {
     default:    // default - random player
         //RandomPlayer* player2 = new RandomPlayer;             TODO: RANDOMPLAYER
         break;
-    }
+    }*/
 
 
     return 0;

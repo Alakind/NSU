@@ -3,7 +3,8 @@
 
 TEST(Ship_len, simple_test) {
     // arrange
-    ConsolePlayer player;
+    ConsoleView game_view;
+    ConsolePlayer player(&game_view);
 
     // act
     EXPECT_EQ(player.ship_len(0, 0, 0, 0), 1);
@@ -26,9 +27,10 @@ TEST(Ship_len, simple_test) {
 
 TEST(Play_game, game) {
     // arrange
-    ConsolePlayer player1;
+    ConsoleView game_view;
+    ConsolePlayer player1(&game_view);
     player1.arrange_board();
-    ConsolePlayer player2;
+    ConsolePlayer player2(&game_view);
     player2.arrange_board();
 
     Game game(&player1, &player2);
