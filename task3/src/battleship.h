@@ -6,12 +6,14 @@
 #include <utility>
 #include <map>
 #include <exception>
-
+#include <cstdlib>
+#include <ctime>
 static int BOARD_SIZE = 10;
 
 bool is_number(const std::string s);
 
 std::pair<int, int> get_coordinates_cin();
+std::pair<int, int> get_coordinates_rand();
 
 enum PlayerType {
     type_random,    // random - 0
@@ -55,9 +57,10 @@ class ConsolePlayer : public IPlayer {
 
 class RandomPlayer : public IPlayer {
     public:
-        RandomPlayer();
+        RandomPlayer(IGameView* game_view_in);
+        std::vector<std::vector<int, int>> shoot_matrix;
 
-        virtual bool make_move();
+        virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
 };
 

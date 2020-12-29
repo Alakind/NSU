@@ -6,13 +6,20 @@ bool is_number(const std::string s) {
     return !s.empty() && it == s.end();
 }
 
+std::pair<int, int> get_coordinates_rand() {
+    std::srand(time(0));
+    std::pair<int, int> coordinates = {-1, -1};
+    coordinates.first = (std::rand() % 10);
+    coordinates.second = (std::rand() % 10);
+
+    return coordinates;
+}
+
 std::pair<int, int> get_coordinates_cin() {
     char in_string_char[100];
-    //std::cin.getline(in_string_char, 100);
     std::string in_string;
     std::getline(std::cin, in_string);
 
-    //std::string in_string(in_string_char);
 
     std::pair<int, int> coordinates = {-1, -1};
 
@@ -345,16 +352,97 @@ void ConsolePlayer::arrange_board() {
 
 // ##############################   Random player  #############################
 
-RandomPlayer::RandomPlayer() {
+RandomPlayer::RandomPlayer(IGameView* game_view_in) {
+    std::cout << "Type random player name: ";
+    std::getline(std::cin, name);
 
+    game_view = game_view_in;
+
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        tmp_vector.push_back('~');
+    }
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        opponent_matrix.push_back(tmp_vector);
+        own_matrix.push_back(tmp_vector);
+    }
+
+    // setting health
+    health = 20;
+
+    // setting matrix / game boards
+    std::vector<char> tmp_vector;
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        tmp_vector.push_back('~');
+    }
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        opponent_matrix.push_back(tmp_vector);
+        own_matrix.push_back(tmp_vector);
+    }
 }
 
-bool RandomPlayer::make_move() {
-
+bool RandomPlayer::make_move(IPlayer& enemy) {
+    return true;
 }
 
 void RandomPlayer::arrange_board() {
+    std::srand(time(0));
 
+    std::pair<int, int> coor1, coor2;
+    coor1 = get_coordinates_rand();
+    coor2 = get_coordinates_rand();
+    if (rand() % 2 == 1) {
+        coor2.second = coor1.second;
+    }
+    else {
+        coor2.first = coor1.first;
+    }
+    while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 4 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+        coor1 = get_coordinates_rand();
+        coor2 = get_coordinates_rand();
+        if (rand() % 2 == 1) {
+            coor2.second = coor1.second;
+        }
+        else {
+            coor2.first = coor1.first;
+        }
+    }
+
+    for (int i = 0; i < 2; i++) {
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 3 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+            coor1 = get_coordinates_rand();
+            coor2 = get_coordinates_rand();
+            if (rand() % 2 == 1) {
+                coor2.second = coor1.second;
+            }
+            else {
+                coor2.first = coor1.first;
+            }
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 2 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+            coor1 = get_coordinates_rand();
+            coor2 = get_coordinates_rand();
+            if (rand() % 2 == 1) {
+                coor2.second = coor1.second;
+            }
+            else {
+                coor2.first = coor1.first;
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        coor1 = get_coordinates_rand();
+        coor2.second = coor1.second;
+        coor2.first = coor1.first;
+        while (!set_ship(coor1.first, coor1.second, coor2.first, coor2.second)) {
+            coor1 = get_coordinates_rand();
+            coor2.second = coor1.second;
+            coor2.first = coor1.first;
+        }
+    }
 }
 
 // ##############################   Optimal player  ############################

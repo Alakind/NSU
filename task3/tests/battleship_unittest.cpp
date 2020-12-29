@@ -1,6 +1,18 @@
 #include "../src/battleship.cpp"
 #include "gtest/gtest.h"
 
+TEST(random_game, game) {
+    // arrange
+    ConsoleView game_view;
+    RandomPlayer player(&game_view);
+    player.arrange_board();
+    player.print_matrix();
+
+    // act
+
+    // assert
+}
+
 TEST(Ship_len, simple_test) {
     // arrange
     ConsoleView game_view;
