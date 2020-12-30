@@ -58,7 +58,7 @@ class ConsolePlayer : public IPlayer {
 class RandomPlayer : public IPlayer {
     public:
         RandomPlayer(IGameView* game_view_in);
-        std::vector<std::vector<int, int>> shoot_matrix;
+        std::vector<std::vector<char>> shoot_matrix;
 
         virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
@@ -66,9 +66,14 @@ class RandomPlayer : public IPlayer {
 
 class OptimalPlayer : public IPlayer {
     public:
-        OptimalPlayer();
+        OptimalPlayer(IGameView* game_view_in);
+        std::pair<int, int> last_hit;
+        char orientation;
+        bool made_one_side;
 
-        virtual bool make_move();
+        std::vector<std::vector<char>> shoot_matrix;
+
+        virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
 };
 

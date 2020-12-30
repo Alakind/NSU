@@ -1,7 +1,7 @@
 #include "../src/battleship.cpp"
 #include "gtest/gtest.h"
 
-TEST(random_game, game) {
+/*TEST(random_game, game) {
     // arrange
     ConsoleView game_view;
     RandomPlayer player(&game_view);
@@ -11,7 +11,7 @@ TEST(random_game, game) {
     // act
 
     // assert
-}
+}*/
 
 TEST(Ship_len, simple_test) {
     // arrange
@@ -40,7 +40,7 @@ TEST(Ship_len, simple_test) {
 TEST(Play_game, game) {
     // arrange
     ConsoleView game_view;
-    ConsolePlayer player1(&game_view);
+    OptimalPlayer player1(&game_view);
     player1.arrange_board();
     ConsolePlayer player2(&game_view);
     player2.arrange_board();

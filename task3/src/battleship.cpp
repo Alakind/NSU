@@ -358,14 +358,6 @@ RandomPlayer::RandomPlayer(IGameView* game_view_in) {
 
     game_view = game_view_in;
 
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        tmp_vector.push_back('~');
-    }
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        opponent_matrix.push_back(tmp_vector);
-        own_matrix.push_back(tmp_vector);
-    }
-
     // setting health
     health = 20;
 
@@ -377,11 +369,39 @@ RandomPlayer::RandomPlayer(IGameView* game_view_in) {
     for (int i = 0; i < BOARD_SIZE; i++) {
         opponent_matrix.push_back(tmp_vector);
         own_matrix.push_back(tmp_vector);
+        shoot_matrix.push_back(tmp_vector);
     }
 }
 
 bool RandomPlayer::make_move(IPlayer& enemy) {
-    return true;
+    std::cout << std::endl << name << "'s turn!" << std::endl;
+
+    // getting coordinates to hit
+    bool is_valid = false;
+    std::pair<int, int> coordinates = get_coordinates_rand();
+    while (!is_valid && shoot_matrix.at(coordinates.second).at(coordinates.first) != '~') {
+        coordinates = get_coordinates_rand();
+    }
+
+    std::cout << "Fire in sector " << coordinates.first << " " << coordinates.second << std::endl;
+    shoot_matrix.at(coordinates.second).at(coordinates.first) = 'X';
+    // if hit
+    if (enemy.is_there(coordinates.first, coordinates.second)) {
+        opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
+        if (enemy.get_shot(coordinates.first, coordinates.second)) {
+            std::cout << "Ship is destroyed!" << std::endl;
+        }
+        else {
+            std::cout << "Hit!" << std::endl;
+        }
+        return true;
+    }
+    // if missed
+    else {
+        std::cout << "Miss" << std::endl;
+    }
+
+    return false;
 }
 
 void RandomPlayer::arrange_board() {
@@ -401,9 +421,11 @@ void RandomPlayer::arrange_board() {
         coor2 = get_coordinates_rand();
         if (rand() % 2 == 1) {
             coor2.second = coor1.second;
+            coor2.first = coor1.first + 3;
         }
         else {
             coor2.first = coor1.first;
+            coor2.second = coor1.second + 3;
         }
     }
 
@@ -413,9 +435,11 @@ void RandomPlayer::arrange_board() {
             coor2 = get_coordinates_rand();
             if (rand() % 2 == 1) {
                 coor2.second = coor1.second;
+                coor2.first = coor1.first + 2;
             }
             else {
                 coor2.first = coor1.first;
+                coor2.second = coor1.second + 2;
             }
         }
     }
@@ -426,9 +450,11 @@ void RandomPlayer::arrange_board() {
             coor2 = get_coordinates_rand();
             if (rand() % 2 == 1) {
                 coor2.second = coor1.second;
+                coor2.first = coor1.first + 1;
             }
             else {
                 coor2.first = coor1.first;
+                coor2.second = coor1.second + 1;
             }
         }
     }
@@ -447,16 +473,210 @@ void RandomPlayer::arrange_board() {
 
 // ##############################   Optimal player  ############################
 
-OptimalPlayer::OptimalPlayer() {
+OptimalPlayer::OptimalPlayer(IGameView* game_view_in) {
+    std::cout << "Type optimal player name: ";
+    std::getline(std::cin, name);
 
+    game_view = game_view_in;
+
+    last_hit = {-1, -1};
+    orientation = 'n';
+    made_one_side = false;
+
+    // setting health
+    health = 20;
+
+    // setting matrix / game boards
+    std::vector<char> tmp_vector;
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        tmp_vector.push_back('~');
+    }
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        opponent_matrix.push_back(tmp_vector);
+        own_matrix.push_back(tmp_vector);
+        shoot_matrix.push_back(tmp_vector);
+    }
 }
 
-bool OptimalPlayer::make_move() {
-    
+bool OptimalPlayer::make_move(IPlayer& enemy) {
+    std::cout << std::endl << name << "'s turn!" << std::endl;
+
+    // getting coordinates to hit
+    std::pair<int, int> coordinates = get_coordinates_rand();
+    while (shoot_matrix.at(coordinates.second).at(coordinates.first) != '~') {
+        coordinates = get_coordinates_rand();
+    }
+
+    int x = coordinates.first;
+    int y = coordinates.second;
+
+    if (last_hit.first != -1) {
+        if (orientation == 'n') {
+            if (last_hit.first - 1 >= 0 && shoot_matrix.at(last_hit.second).at(last_hit.first - 1) == '~') {
+                coordinates.first = last_hit.first - 1;
+                coordinates.second = last_hit.second;
+                if (enemy.is_there(coordinates.first - 1, coordinates.second)) {
+                    orientation = 'h';
+                }
+            }
+            else if (last_hit.first + 1 <= 9 && shoot_matrix.at(last_hit.second).at(last_hit.first + 1) == '~') {
+                coordinates.first = last_hit.first + 1;
+                coordinates.second = last_hit.second;
+                if (enemy.is_there(coordinates.first + 1, coordinates.second)) {
+                    orientation = 'h';
+                }
+            }
+            else if (last_hit.second - 1 >= 0 && shoot_matrix.at(last_hit.second - 1).at(last_hit.first) == '~') {
+                coordinates.first = last_hit.first;
+                coordinates.second = last_hit.second - 1;
+                if (enemy.is_there(coordinates.first, coordinates.second - 1)) {
+                    orientation = 'v';
+                }
+            }
+            else if (last_hit.second + 1 <= 9 && shoot_matrix.at(last_hit.second + 1).at(last_hit.first) == '~') {
+                coordinates.first = last_hit.first;
+                coordinates.second = last_hit.second + 1;
+                if (enemy.is_there(coordinates.first, coordinates.second + 1)) {
+                    orientation = 'v';
+                }
+            }
+        }
+        if (orientation = 'h') {
+            if (last_hit.first - 1 >= 0 && shoot_matrix.at(last_hit.second).at(last_hit.first - 1) == '~' && !made_one_side) {
+                coordinates.first = last_hit.first - 1;
+                coordinates.second = last_hit.second;
+                if (!enemy.is_there(coordinates.first - 1, coordinates.second)) {
+                    made_one_side = true;
+                }
+            }
+            else if (last_hit.first + 1 <= 9 && shoot_matrix.at(last_hit.second).at(last_hit.first + 1) == '~') {
+                coordinates.first = last_hit.first + 1;
+                coordinates.second = last_hit.second;
+                if (!enemy.is_there(coordinates.first + 1, coordinates.second)) {
+                    last_hit = {-1, -1};
+                    orientation = 'n';
+                    made_one_side = false;
+                }
+            }
+        }
+        if (orientation = 'v') {
+            if (last_hit.second - 1 >= 0 && shoot_matrix.at(last_hit.second - 1).at(last_hit.first) == '~' && !made_one_side) {
+                coordinates.first = last_hit.first;
+                coordinates.second = last_hit.second - 1;
+                if (!enemy.is_there(coordinates.first, coordinates.second - 1)) {
+                    made_one_side = true;
+                }
+            }
+            else if (last_hit.second + 1 <= 9 && shoot_matrix.at(last_hit.second + 1).at(last_hit.first) == '~') {
+                coordinates.first = last_hit.first;
+                coordinates.second = last_hit.second + 1;
+                if (!enemy.is_there(coordinates.first, coordinates.second + 1)) {
+                    last_hit = {-1, -1};
+                    orientation = 'n';
+                    made_one_side = false;
+                }
+            }
+        }
+    }
+
+    std::cout << "Fire in sector " << coordinates.first << " " << coordinates.second << std::endl;
+    shoot_matrix.at(coordinates.second).at(coordinates.first) = 'X';
+    // if hit
+    if (enemy.is_there(coordinates.first, coordinates.second)) {
+        last_hit = coordinates;
+        opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
+        if (enemy.get_shot(coordinates.first, coordinates.second)) {
+            std::cout << "Ship is destroyed!" << std::endl;
+            last_hit = {-1, -1};
+            orientation = 'n';
+            made_one_side = false;
+        }
+        else {
+            std::cout << "Hit!" << std::endl;
+            /*for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if ((dx == 0 && dy == 0) || (dx != 0 && dy != 0)) continue;
+                    if ((y + dy >= 0 && y + dy <= 9 && x + dx >= 0 && x + dx <= 9)) {
+                        
+                    }
+                }
+            }*/
+        }
+        return true;
+    }
+    // if missed
+    else {
+        std::cout << "Miss" << std::endl;
+    }
+
+    return false;
 }
 
 void OptimalPlayer::arrange_board() {
-    
+    std::srand(time(0));
+
+    std::pair<int, int> coor1, coor2;
+    coor1 = get_coordinates_rand();
+    coor2 = get_coordinates_rand();
+    if (rand() % 2 == 1) {
+        coor2.second = coor1.second;
+    }
+    else {
+        coor2.first = coor1.first;
+    }
+    while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 4 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+        coor1 = get_coordinates_rand();
+        coor2 = get_coordinates_rand();
+        if (rand() % 2 == 1) {
+            coor2.second = coor1.second;
+            coor2.first = coor1.first + 3;
+        }
+        else {
+            coor2.first = coor1.first;
+            coor2.second = coor1.second + 3;
+        }
+    }
+
+    for (int i = 0; i < 2; i++) {
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 3 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+            coor1 = get_coordinates_rand();
+            coor2 = get_coordinates_rand();
+            if (rand() % 2 == 1) {
+                coor2.second = coor1.second;
+                coor2.first = coor1.first + 2;
+            }
+            else {
+                coor2.first = coor1.first;
+                coor2.second = coor1.second + 2;
+            }
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        while (ship_len(coor1.first, coor1.second, coor2.first, coor2.second) != 2 || !set_ship(coor1.first, coor1.second, coor2.first, coor2.second) || coor1.first == -1 || coor2.first == -1) {
+            coor1 = get_coordinates_rand();
+            coor2 = get_coordinates_rand();
+            if (rand() % 2 == 1) {
+                coor2.second = coor1.second;
+                coor2.first = coor1.first + 1;
+            }
+            else {
+                coor2.first = coor1.first;
+                coor2.second = coor1.second + 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        coor1 = get_coordinates_rand();
+        coor2.second = coor1.second;
+        coor2.first = coor1.first;
+        while (!set_ship(coor1.first, coor1.second, coor2.first, coor2.second)) {
+            coor1 = get_coordinates_rand();
+            coor2.second = coor1.second;
+            coor2.first = coor1.first;
+        }
+    }
 }
 
 // ################################   Game View  ##############################
@@ -465,8 +685,15 @@ ConsoleView::ConsoleView() {};
 
 void ConsoleView::draw_enemy_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) {
     std::cout << std::endl;
-    for (int y = 0; y < 9; y++) {
-        for (int x = 0; x < 9; x++) {
+    std::cout << "  1 2 3 4 5 6 7 8 9 10" << std::endl;
+    for (int y = 0; y < BOARD_SIZE; y++) {
+        if (y < BOARD_SIZE - 1) {
+            std::cout << y + 1 << " ";
+        }
+        else {
+            std::cout << y + 1;
+        }
+        for (int x = 0; x < BOARD_SIZE; x++) {
             std::cout << matrix_enemy.at(y).at(x) << " ";
         }
         std::cout << std::endl;
@@ -474,8 +701,8 @@ void ConsoleView::draw_enemy_board(std::vector<std::vector<char>> matrix_own, st
 }
 
 void ConsoleView::draw_own_board(std::vector<std::vector<char>> matrix_own, std::vector<std::vector<char>> matrix_enemy) {
-    for (int y = 0; y < 9; y++) {
-        for (int x = 0; x < 9; x++) {
+    for (int y = 0; y < BOARD_SIZE; y++) {
+        for (int x = 0; x < BOARD_SIZE; x++) {
             std::cout << matrix_own.at(y).at(x) << " ";
         }
         std::cout << std::endl;
