@@ -65,9 +65,7 @@ IPlayer* make_player(PlayerType player_type, ConsoleView* game_view) {
 int main(int argc, char* argv[]) {
     argc -= (argc > 0); argv += (argc > 0); // skip program name argv[0] if present
     option::Stats stats(usage, argc, argv);
-    //std::cout << stats.options_max << std::endl;
     std::vector<option::Option> options(10);
-    //std::cout << "HAGHAHAHAHAHAHAHA" << std::endl;
     std::vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
     if (parse.error()) return 1;
@@ -75,35 +73,46 @@ int main(int argc, char* argv[]) {
     PlayerType player1_type;
     PlayerType player2_type;
 
-
-    switch (options[PLAYER1].arg[0]) {
-    case 'c':
-        player1_type = PlayerType::type_console;
-        break;
-    case 'o':
-        player1_type = PlayerType::type_optimal;
-        break;
-    case 'r':
+    if (sizeof(options[PLAYER1].arg) > 0) { 
+        switch (options[PLAYER1].arg[0]) {
+        case 'c':
+            player1_type = PlayerType::type_console;
+            break;
+        case 'o':
+            player1_type = PlayerType::type_optimal;
+            break;
+        case 'r':
+            player1_type = PlayerType::type_random;
+            break;
+        default:
+            std::cout << "invalid input" << std::endl;
+            return 0;
+        }
+    }
+    else {
         player1_type = PlayerType::type_random;
-        break;
-    default:
-        std::cout << "invalid input" << std::endl;
-        return 0;
     }
-    switch (options[PLAYER2].arg[0]) {
-    case 'c':
-        player2_type = PlayerType::type_console;
-        break;
-    case 'o':
-        player2_type = PlayerType::type_optimal;
-        break;
-    case 'r':
+
+    if (sizeof(options[PLAYER2].arg) > 0) { 
+        switch (options[PLAYER2].arg[0]) {
+        case 'c':
+            player2_type = PlayerType::type_console;
+            break;
+        case 'o':
+            player2_type = PlayerType::type_optimal;
+            break;
+        case 'r':
+            player2_type = PlayerType::type_random;
+            break;
+        default:
+            std::cout << "invalid input" << std::endl;
+            return 0;
+        }
+    }
+    else {
         player2_type = PlayerType::type_random;
-        break;
-    default:
-        std::cout << "invalid input" << std::endl;
-        return 0;
     }
+
 
     ConsoleView game_view;
 

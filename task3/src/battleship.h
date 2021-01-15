@@ -26,15 +26,15 @@ class IGameView;
 class IPlayer {
     public:
 
-        int health;     // max health = 20 (all ships)
+        //int health;     // max health = 20 (all ships)
         std::vector<std::vector<char>> own_matrix;
         std::vector<std::vector<char>> opponent_matrix;
         std::string name;
 
-        IGameView* game_view;
+        //IGameView* game_view;
 
-        int get_health() { return health; };
-        bool is_dead(); // checks if player is defeated
+        //int get_health() { return health; };
+        //bool is_dead(); // checks if player is defeated
         bool is_there(int x, int y); // checks if there a ship at own_matrix
         bool get_shot(int x, int y); // get damage on own_matrix, returns true if ship is destroyed
         bool is_killed(std::vector<std::vector<char>> matrix, std::pair<int, int> coordinates); // checks if ship is destroyed
@@ -50,6 +50,11 @@ class ConsolePlayer : public IPlayer {
     public:
         ConsolePlayer(IGameView* game_view_in);
 
+        IGameView* game_view;
+        //int enemy_health;     // max health = 20 (all ships)
+
+        //bool is_dead(); // checks if player is defeated
+        //int get_health() { return enemy_health; };
         virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
         
@@ -58,8 +63,13 @@ class ConsolePlayer : public IPlayer {
 class RandomPlayer : public IPlayer {
     public:
         RandomPlayer(IGameView* game_view_in);
-        std::vector<std::vector<char>> shoot_matrix;
 
+        std::vector<std::vector<char>> shoot_matrix;
+        IGameView* game_view;
+        //int enemy_health;     // max health = 20 (all ships)
+
+        //bool is_dead(); // checks if player is defeated
+        //int get_health() { return enemy_health; };
         virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
 };
@@ -67,12 +77,17 @@ class RandomPlayer : public IPlayer {
 class OptimalPlayer : public IPlayer {
     public:
         OptimalPlayer(IGameView* game_view_in);
+
+        IGameView* game_view;
+        //int enemy_health;     // max health = 20 (all ships)
         std::pair<int, int> last_hit;
         char orientation;
         bool made_one_side;
 
         std::vector<std::vector<char>> shoot_matrix;
 
+        //bool is_dead(); // checks if player is defeated
+        //int get_health() { return enemy_health; };
         virtual bool make_move(IPlayer& enemy);
         virtual void arrange_board();
 };

@@ -83,33 +83,28 @@ void Game::play_game() {
 
 bool Game::play_round() {
     std::cout << "New round started" << std::endl;
-    while (!player1->is_dead() && !player2->is_dead()) {
-        while (player1->make_move(*player2));
-        if (player2->is_dead()) break;
-        while (player2->make_move(*player1));
+    int p1_health = 20;
+    int p2_health = 20;
+    while (p1_health > 0 && p2_health > 0) {
+        while (player1->make_move(*player2)) p2_health--;
+        if (p2_health <= 0) break;
+        while (player2->make_move(*player1)) p1_health--;
     }
 }
 
 
 // ##############################   Interface player  #############################
 
-bool IPlayer::is_dead() {
-    if (health <= 0) {
-        return true;
-    }
-    return false;
-}
+//bool IPlayer::is_dead() { return (enemy_health <= 0); }
+//bool ConsolePlayer::is_dead() { return (enemy_health <= 0); }
+//bool RandomPlayer::is_dead() { return (enemy_health <= 0); }
+//bool OptimalPlayer::is_dead() { return (enemy_health <= 0); }
 
-bool IPlayer::is_there(int x, int y) {
-    if (own_matrix.at(y).at(x) == 'S') {
-        return true;
-    }
-    return false;
-}
+bool IPlayer::is_there(int x, int y) { own_matrix.at(y).at(x) == 'S'; }
 
 bool IPlayer::get_shot(int x, int y) {      // returns true if ship is destroyed
     own_matrix.at(y).at(x) = 'T';
-    health--;
+    //health--;
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
@@ -223,7 +218,7 @@ ConsolePlayer::ConsolePlayer(IGameView* game_view_in) {
     game_view = game_view_in;
 
     // setting health
-    health = 20;
+    //enemy_health = 20;
 
     // setting matrix / game boards
     std::vector<char> tmp_vector;
@@ -262,6 +257,7 @@ bool ConsolePlayer::make_move(IPlayer& enemy) {     // return true if needs one 
     if (enemy.is_there(coordinates.first, coordinates.second)) {
         opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
         if (enemy.get_shot(coordinates.first, coordinates.second)) {
+            //enemy_health--;
             std::cout << "Ship is destroyed!" << std::endl;
         }
         else {
@@ -359,7 +355,7 @@ RandomPlayer::RandomPlayer(IGameView* game_view_in) {
     game_view = game_view_in;
 
     // setting health
-    health = 20;
+    //enemy_health = 20;
 
     // setting matrix / game boards
     std::vector<char> tmp_vector;
@@ -389,6 +385,7 @@ bool RandomPlayer::make_move(IPlayer& enemy) {
     if (enemy.is_there(coordinates.first, coordinates.second)) {
         opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
         if (enemy.get_shot(coordinates.first, coordinates.second)) {
+            //enemy_health--;
             std::cout << "Ship is destroyed!" << std::endl;
         }
         else {
@@ -484,7 +481,7 @@ OptimalPlayer::OptimalPlayer(IGameView* game_view_in) {
     made_one_side = false;
 
     // setting health
-    health = 20;
+    //enemy_health = 20;
 
     // setting matrix / game boards
     std::vector<char> tmp_vector;
@@ -586,6 +583,7 @@ bool OptimalPlayer::make_move(IPlayer& enemy) {
         last_hit = coordinates;
         opponent_matrix.at(coordinates.second).at(coordinates.first) = 'X';
         if (enemy.get_shot(coordinates.first, coordinates.second)) {
+            //enemy_health--;
             std::cout << "Ship is destroyed!" << std::endl;
             last_hit = {-1, -1};
             orientation = 'n';
