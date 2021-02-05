@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/d/Projects/study/C++/NSU/task2/src/executor.h
+iostream
+-
+fstream
+-
+cmath
+-
+vector
+-
+string
+-
+algorithm
+-
+utility
+-
+map
+-
+exception
+-
+
+/mnt/d/Projects/study/C++/NSU/task2/src/main.cpp
+iostream
+-
+string
+-
+cstring
+-
+iomanip
+-
+exception
+-
+executor.h
+/mnt/d/Projects/study/C++/NSU/task2/src/executor.h
+

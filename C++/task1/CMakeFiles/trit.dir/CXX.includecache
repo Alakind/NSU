@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/d/Projects/study/C++/NSU/task1/src/main.cpp
+iostream
+-
+string
+-
+cstring
+-
+iomanip
+-
+exception
+-
+trit.h
+/mnt/d/Projects/study/C++/NSU/task1/src/trit.h
+
+/mnt/d/Projects/study/C++/NSU/task1/src/trit.h
+cstdint
+-
+iostream
+-
+
