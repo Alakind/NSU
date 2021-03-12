@@ -22,6 +22,14 @@ void malloc_zero_matrix(double** matrix, int n) {
     }
 }
 
+void matrix_copy(double** matrix1, double** matrix2, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            matrix1[i][j] = matrix2[i][j];
+        }
+    }
+}
+
 void make_one_two_matrix(double** matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -73,9 +81,17 @@ void vector_minus_vector(double* vector1, double* vector2, int n) {
     }
 }
 
-int is_finished(double** matrix, double* vector, double* b, double epsilon) {
+int is_finished(double** matrix, double* vector, double* b, double epsilon, int n) {
 
-    if ((scalar_mul()) / ()) {
+    double** A;
+    malloc_zero_matrix(A, n);
+    matrix_copy(A, matrix, n);
+    double* Ax = (double*)malloc(n * sizeof(double));
+
+    matrix_mul_vector(A, vector, Ax, n);
+    vector_minus_vector(Ax, b, n);
+
+    if ((scalar_mul(Ax, Ax, n) / scalar_mul(b, b, n)) < epsilon) {
         return 1;
     }
 
