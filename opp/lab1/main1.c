@@ -97,6 +97,7 @@ int is_finished(double** matrix, double* vector, double* b, double epsilon, int 
 
     double** A;
     malloc_zero_matrix(A, n);
+
     matrix_copy(A, matrix, n);
     double* Ax = (double*)malloc(n * sizeof(double));
 
