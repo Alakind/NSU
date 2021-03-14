@@ -83,7 +83,7 @@ void matrix_mul_double(double** matrix, double dub, int n) {
 
 void vector_mul_double(double* vector, double dub, int n) {
     for (int i = 0; i < n; i++) {
-        matrix[i] *= dub;
+        vector[i] *= dub;
     }
 }
 
@@ -104,24 +104,26 @@ int is_finished(double** matrix, double* vector, double* b, double epsilon, int 
     matrix_mul_vector(A, vector, Ax, n);
     vector_minus_vector(Ax, b, n);
 
-    if (sqrt(scalar_mul(Ax, Ax, n)) / sqrt(scalar_mul(b, b, n))) < epsilon) {
+    if ((sqrt(scalar_mul(Ax, Ax, n)) / sqrt(scalar_mul(b, b, n))) < epsilon) {
+        free(A);
         return 1;
     }
 
+    free(A);
     return 0;
 }
 
-void count_y(double* y, double** A, double* x_n, double* b){
-    matrix_mul_vector(A, x, y, n);
+void count_y(double* y, double** A, double* x_n, double* b, int n){
+    matrix_mul_vector(A, x_n, y, n);
 
     vector_minus_vector(y, b, n);
 }
 
-void count_tau(double** A, double* y, int n) {
+double count_tau(double** A, double* y, int n) {
     double* Ay = (double*)malloc(n * sizeof(double));
     matrix_mul_vector(A, y, Ay, n);
 
-    double tau = (scalar_mul(y, Ay) / scalar_mul(Ay, Ay));
+    double tau = (scalar_mul(y, Ay, n) / scalar_mul(Ay, Ay, n));
 
     free(Ay);
     return tau;
@@ -134,16 +136,17 @@ double* solve_eq(double** matrix, double* values, int n) {
     double* x_i = (double*)malloc(n * sizeof(double));
     vector_copy(x_i, values, n);
 
-    while (!is_finished(matrix, )) {
-        count_y(y, matrix, x_i, values);
+    while (!is_finished(matrix, x_i, values, epsilon, n)) {
+        count_y(y, matrix, x_i, values, n);
 
         double tau = count_tau(matrix, y, n);
 
-        vector_mul_double(y, tau);
+        vector_mul_double(y, tau, n);
 
-        vector_minus_vector(x_i, y);
+        vector_minus_vector(x_i, y, n);
     }
 
+    return x_i;
 }
 
 int main() {
@@ -153,16 +156,24 @@ int main() {
     scanf("%d", &n);
 
     double** matrix = (double**)malloc(n * sizeof(double*));
-    for (int i = 0; i < n; i++) {
-        matrix[i] = (double*)malloc(n * sizeof(double));
-    }
+    malloc_zero_matrix(matrix, n);
 
     make_one_two_matrix(matrix, n);
 
-    // ACTION
+    double* values = (double*)malloc(n * sizeof(double));
+    for (int i = 0; i < n; i++) {
+        values[i] = 1;
+    }
 
+    // ACTION
+    double* x_n = solve_eq(matrix, values, n);
+
+    for (int i = 0; i < n; i++) {
+        printf("%f ", x_n[i]);
+    }
 
     // FREEING
+    free(values);
     for (int i = 0; i < n; i++) {
         free(matrix[i]);
     }
