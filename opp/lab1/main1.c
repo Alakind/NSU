@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
+
+double rand_double(double min, double max) {
+    return min + (rand() / (RAND_MAX / (max - min)));
+}
 
 void free_matrix(double** matrix, int size) {
     for (int i = 0; i < size; i++) {
@@ -10,7 +15,6 @@ void free_matrix(double** matrix, int size) {
 }
 
 void malloc_zero_matrix(double** matrix, int n) {
-    matrix = (double**)malloc(n * sizeof(double*));
     for (int i = 0; i < n; i++) {
         matrix[i] = (double*)malloc(n * sizeof(double));
     }
@@ -44,6 +48,18 @@ void make_one_two_matrix(double** matrix, int n) {
             }
             else {
                 matrix[i][j] = 1;
+            }
+        }
+    }
+}
+
+void make_random_matrix(double** matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = i; j < n; j++) {
+            matrix[i][j] = rand_double(0, 2000000);
+            matrix[j][i] = matrix[i][j];
+            if (i == j) {
+                matrix[i][j] += 1000;
             }
         }
     }
@@ -95,7 +111,7 @@ void vector_minus_vector(double* vector1, double* vector2, int n) {
 
 int is_finished(double** matrix, double* vector, double* b, double epsilon, int n) {
 
-    double** A;
+    double** A = (double**)malloc(n * sizeof(double*));
     malloc_zero_matrix(A, n);
 
     matrix_copy(A, matrix, n);
@@ -137,6 +153,7 @@ double* solve_eq(double** matrix, double* values, int n) {
     vector_copy(x_i, values, n);
 
     while (!is_finished(matrix, x_i, values, epsilon, n)) {
+        //printf("He");
         count_y(y, matrix, x_i, values, n);
 
         double tau = count_tau(matrix, y, n);
@@ -144,13 +161,19 @@ double* solve_eq(double** matrix, double* values, int n) {
         vector_mul_double(y, tau, n);
 
         vector_minus_vector(x_i, y, n);
+        for (int i = 0; i < n; i++) {
+
+        }
     }
+
+    //printf(")\n");
 
     return x_i;
 }
 
 int main() {
     // SETTING UP
+    srand(time(NULL));
     int n;
     printf("Enter size of matrix: ");
     scanf("%d", &n);
@@ -158,11 +181,12 @@ int main() {
     double** matrix = (double**)malloc(n * sizeof(double*));
     malloc_zero_matrix(matrix, n);
 
-    make_one_two_matrix(matrix, n);
+    //make_one_two_matrix(matrix, n);
+    make_random_matrix(matrix, n);
 
     double* values = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
-        values[i] = 1;
+        values[i] =n + 1;
     }
 
     // ACTION
@@ -171,6 +195,7 @@ int main() {
     for (int i = 0; i < n; i++) {
         printf("%f ", x_n[i]);
     }
+    printf("\n");
 
     // FREEING
     free(values);
