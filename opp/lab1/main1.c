@@ -7,29 +7,18 @@ double rand_double(double min, double max) {
     return min + (rand() / (RAND_MAX / (max - min)));
 }
 
-void free_matrix(double** matrix, int size) {
-    for (int i = 0; i < size; i++) {
-        free(matrix[i]);
-    }
-    free(matrix);
-}
-
-void malloc_zero_matrix(double** matrix, int n) {
-    for (int i = 0; i < n; i++) {
-        matrix[i] = (double*)malloc(n * sizeof(double));
-    }
-
+void make_zero_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            matrix[i][j] = 0;
+            matrix[i*n + j] = 0;
         }
     }
 }
 
-void matrix_copy(double** matrix1, double** matrix2, int n) {
+void matrix_copy(double* matrix1, double* matrix2, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            matrix1[i][j] = matrix2[i][j];
+            matrix1[i*n + j] = matrix2[i*n + j];
         }
     }
 }
@@ -40,26 +29,26 @@ void vector_copy(double* vector1, double* vector2, int n) {
     }
 }
 
-void make_one_two_matrix(double** matrix, int n) {
+void make_one_two_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (i == j) {
-                matrix[i][j] = 2;
+                matrix[i*n + j] = 2;
             }
             else {
-                matrix[i][j] = 1;
+                matrix[i*n + j] = 1;
             }
         }
     }
 }
 
-void make_random_matrix(double** matrix, int n) {
+void make_random_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
-            matrix[i][j] = rand_double(0, 2000000);
-            matrix[j][i] = matrix[i][j];
+            matrix[i*n + j] = rand_double(0, 2000000);
+            matrix[j*n + i] = matrix[i*n + j];
             if (i == j) {
-                matrix[i][j] += 1000;
+                matrix[i*n + j] += 1000;
             }
         }
     }
@@ -83,16 +72,16 @@ double scalar_mul(double* vector1, double* vector2, int n) {
     return result;
 }
 
-void matrix_mul_vector(double** matrix, double* vector, double* result, int n) {
+void matrix_mul_vector(double* matrix, double* vector, double* result, int n) {
     for (int i = 0; i < n; i++) {
-        result[i] = scalar_mul(matrix[i], vector, n);
+        result[i] = scalar_mul(matrix + i*n, vector, n);
     }
 }
 
-void matrix_mul_double(double** matrix, double dub, int n) {
+void matrix_mul_double(double* matrix, double dub, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            matrix[i][j] *= dub;
+            matrix[i*n + j] *= dub;
         }
     }
 }
@@ -109,10 +98,10 @@ void vector_minus_vector(double* vector1, double* vector2, int n) {
     }
 }
 
-int is_finished(double** matrix, double* vector, double* b, double epsilon, int n) {
+int is_finished(double* matrix, double* vector, double* b, double epsilon, int n) {
 
-    double** A = (double**)malloc(n * sizeof(double*));
-    malloc_zero_matrix(A, n);
+    double* A = (double*)malloc(n * sizeof(double));
+    make_zero_matrix(A, n);
 
     matrix_copy(A, matrix, n);
     double* Ax = (double*)malloc(n * sizeof(double));
@@ -122,20 +111,22 @@ int is_finished(double** matrix, double* vector, double* b, double epsilon, int 
 
     if ((sqrt(scalar_mul(Ax, Ax, n)) / sqrt(scalar_mul(b, b, n))) < epsilon) {
         free(A);
+        free(Ax);
         return 1;
     }
 
     free(A);
+    free(Ax);
     return 0;
 }
 
-void count_y(double* y, double** A, double* x_n, double* b, int n){
+void count_y(double* y, double* A, double* x_n, double* b, int n){
     matrix_mul_vector(A, x_n, y, n);
 
     vector_minus_vector(y, b, n);
 }
 
-double count_tau(double** A, double* y, int n) {
+double count_tau(double* A, double* y, int n) {
     double* Ay = (double*)malloc(n * sizeof(double));
     matrix_mul_vector(A, y, Ay, n);
 
@@ -145,7 +136,7 @@ double count_tau(double** A, double* y, int n) {
     return tau;
 }
 
-double* solve_eq(double** matrix, double* values, int n) {
+double* solve_eq(double* matrix, double* values, int n) {
     double epsilon = 0.001;
 
     double* y = (double*)malloc(n * sizeof(double));
@@ -167,6 +158,7 @@ double* solve_eq(double** matrix, double* values, int n) {
     }
 
     //printf(")\n");
+    free(y);
 
     return x_i;
 }
@@ -178,8 +170,8 @@ int main() {
     printf("Enter size of matrix: ");
     scanf("%d", &n);
 
-    double** matrix = (double**)malloc(n * sizeof(double*));
-    malloc_zero_matrix(matrix, n);
+    double* matrix = (double*)malloc(n * sizeof(double));
+    make_zero_matrix(matrix, n);
 
     //make_one_two_matrix(matrix, n);
     make_random_matrix(matrix, n);
@@ -199,9 +191,7 @@ int main() {
 
     // FREEING
     free(values);
-    for (int i = 0; i < n; i++) {
-        free(matrix[i]);
-    }
+    free(x_n);
     free(matrix);
     return 0;
 }
