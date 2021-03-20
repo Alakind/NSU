@@ -3,6 +3,14 @@
 #include <math.h>
 #include <time.h>
 
+void print_matrix(double* matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%d ", matrix[i*n + j]);
+        }
+        printf("\n");
+    }
+}
 
 double rand_double(double min, double max) {
     return min + (rand() / (RAND_MAX / (max - min)));
@@ -186,7 +194,7 @@ int main() {
 
     double* values = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
-        values[i] =n + 1;
+        values[i] = n + 1;
     }
 
     // ACTION
