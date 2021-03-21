@@ -81,19 +81,25 @@ double vec_len(double* vector, int n) {
     return sqrt(len);
 }
 
-double scalar_mul(double* vector1, double* vector2, int n) {
+double scalar_mul(double* vector1, double* vector2, int n, size_t proc_num, size_t rank) {
     double result = 0;
-    for (int i = 0; i < n; i++) {
-        result += vector1[i] * vector2[i];
+    double result_tmp = 0;
+    size_t lines = n / proc_num;
+    size_t offset = lines * rank;
+
+    for (int i = 0; i < lines; i++) {
+        result_tmp += vector1[i + offset] * vector2[i + offset];
     }
+
+    MPI_Allreduce(&result_tmp, &result, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
     return result;
 }
 
 void matrix_mul_vector(double* matrix, double* vector, double* result, int n, size_t proc_num, size_t rank) {
     double vec[n];
-    size_t lines = size / proc_num;
-    size_t offset = num_lines_to_count * rank;
+    size_t lines = n / proc_num;
+    size_t offset = lines * rank;
 
     for (int i = 0; i < lines; i++) {
         for (int j = 0; j < n; j++) {
@@ -108,13 +114,16 @@ void matrix_mul_vector(double* matrix, double* vector, double* result, int n, si
     free(tmp);
 }
 
-void matrix_mul_double(double* matrix, double dub, int n) {
-    for (int i = 0; i < n; i++) {
+/*void matrix_mul_double(double* matrix, double dub, int n, size_t proc_num, size_t rank) {
+    size_t lines = n / proc_num;
+    size_t offset = lines * rank;
+
+    for (int i = 0; i < lines; i++) {
         for (int j = 0; j < n; j++) {
-            matrix[i*n + j] *= dub;
+            matrix[i + offset + j] *= dub;
         }
     }
-}
+}*/
 
 void vector_mul_double(double* vector, double dub, int n) {
     for (int i = 0; i < n; i++) {
