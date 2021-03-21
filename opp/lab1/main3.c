@@ -181,7 +181,7 @@ double* solve_eq(double* matrix, double* values, int n, size_t proc_num, size_t 
     double epsilon = 0.001;
 
     double* y = (double*)malloc(n * sizeof(double));
-    double* x_i = (double*)malloc(n * sizeof(double));
+    double* x_i = (double*)malloc((n / proc_num) * sizeof(double));
     vector_copy(x_i, values, n);
 
     while (!is_finished(matrix, x_i, values, epsilon, n, proc_num, rank)) {
@@ -222,13 +222,15 @@ int main(int argc, char** argv) {
     for (int i = 0; i < n; i++) {
         values[i] = n + 1;
     }
+    double* values_part = (double*)malloc(n * sizeof(double));
 
     // MPI staff
     size_t lines = n / proc_num;
     size_t offset = lines * rank;
     double* matrix_part = (double*)malloc(lines * sizeof(double));
     MPI_Scatter(matrix, lines * n, MPI_DOUBLE, matrix_part, lines * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    //MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatter(values, n / proc_num, MPI_DOUBLE, values_part, n / proc_num, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     // ACTION
     double* x_n = solve_eq(matrix, values, n, proc_num, rank);
