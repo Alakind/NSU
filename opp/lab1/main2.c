@@ -186,8 +186,10 @@ double* solve_eq(double* matrix, double* values, int n) {
     return x_i;
 }
 
-int main() {
+int main(int argc, char** argv) {
     // SETTING UP
+    MPI_Init(&argc, &argv);
+
     srand(time(NULL));
     int n;
     printf("Enter size of matrix: ");
