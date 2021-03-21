@@ -90,14 +90,22 @@ double scalar_mul(double* vector1, double* vector2, int n) {
     return result;
 }
 
-void matrix_mul_vector(double* matrix, double* vector, double* result, int n) {
+void matrix_mul_vector(double* matrix, double* vector, double* result, int n, size_t proc_num, size_t rank) {
     double vec[n];
-    for (int i = 0; i < n; i++) {
+    size_t lines = size / proc_num;
+    size_t offset = num_lines_to_count * rank;
+
+    for (int i = 0; i < lines; i++) {
         for (int j = 0; j < n; j++) {
             vec[j] = matrix[i * n + j];
         }
-        result[i] = scalar_mul(vec, vector, n);
+        result[i + offset] = scalar_mul(vec, vector, n);
     }
+
+    double* tmp = (double*)macalloc(n * sizeof(double));
+    MPI_Allgather(result + offset, lines, MPI_DOUBLE, tmp, lines, MPI_DOUBLE, MPI_COMM_WORLD);
+    memcpy(result, tmp, n * sizeof(double));
+    free(tmp);
 }
 
 void matrix_mul_double(double* matrix, double dub, int n) {
@@ -125,7 +133,6 @@ int is_finished(double* matrix, double* vector, double* b, double epsilon, int n
     double* A = (double*)malloc(n * n * sizeof(double));
     make_zero_matrix(A, n);
 
-    //write(0, "He\n", 3);
     matrix_copy(A, matrix, n);
     double* Ax = (double*)malloc(n * sizeof(double));
 
@@ -143,8 +150,8 @@ int is_finished(double* matrix, double* vector, double* b, double epsilon, int n
     return 0;
 }
 
-void count_y(double* y, double* A, double* x_n, double* b, int n){
-    matrix_mul_vector(A, x_n, y, n);
+void count_y(double* y, double* A, double* x_n, double* b, int n, size_t proc_num, size_t rank){
+    matrix_mul_vector(A, x_n, y, n, proc_num, rank);
 
     vector_minus_vector(y, b, n);
 }
@@ -159,7 +166,7 @@ double count_tau(double* A, double* y, int n) {
     return tau;
 }
 
-double* solve_eq(double* matrix, double* values, int n) {
+double* solve_eq(double* matrix, double* values, int n, size_t proc_num, size_t rank) {
     double epsilon = 0.001;
 
     double* y = (double*)malloc(n * sizeof(double));
@@ -167,20 +174,15 @@ double* solve_eq(double* matrix, double* values, int n) {
     vector_copy(x_i, values, n);
 
     while (!is_finished(matrix, x_i, values, epsilon, n)) {
-        //print_vector(x_i, n);
-        count_y(y, matrix, x_i, values, n);
+        count_y(y, matrix, x_i, values, n, proc_num, rank);
 
         double tau = count_tau(matrix, y, n);
 
         vector_mul_double(y, tau, n);
 
         vector_minus_vector(x_i, y, n);
-        /*for (int i = 0; i < n; i++) {
-
-        }*/
     }
 
-    //printf(")\n");
     free(y);
 
     return x_i;
@@ -189,6 +191,10 @@ double* solve_eq(double* matrix, double* values, int n) {
 int main(int argc, char** argv) {
     // SETTING UP
     MPI_Init(&argc, &argv);
+    int proc_num;
+    MPI_Comm_size(MPI_COMM_WORLD, &proc_num);
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     srand(time(NULL));
     int n;
@@ -200,15 +206,21 @@ int main(int argc, char** argv) {
 
     //make_one_two_matrix(matrix, n);
     make_random_matrix(matrix, n);
-    //print_matrix(matrix, n);
 
     double* values = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
         values[i] = n + 1;
     }
 
+    // MPI staff
+    size_t lines = n / proc_num;
+    size_t offset = lines * rank;
+    double* matrix_part = (double*)malloc(lines * sizeof(double));
+    MPI_Scatter(matrix, lines * n, MPI_DOUBLE, matrix_part, lines * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
     // ACTION
-    double* x_n = solve_eq(matrix, values, n);
+    double* x_n = solve_eq(matrix, values, n, proc_num, rank);
 
     for (int i = 0; i < n; i++) {
         printf("%f ", x_n[i]);
