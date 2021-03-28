@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
 
     // MPI staff
     size_t lines = n / proc_num;
-    size_t offset = lines * rank;
+    //size_t offset = lines * rank;
     double* matrix_part = (double*)malloc(lines * sizeof(double));
     MPI_Scatter(matrix, lines * n, MPI_DOUBLE, matrix_part, lines * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);

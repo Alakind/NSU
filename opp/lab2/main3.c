@@ -1,8 +1,14 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
 #include <xmmintrin.h>
+#include <omp.h>
+
+
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+
 
 void make_one_two_matrix(float* matrix, int n) {
     for (int i = 0; i < n; i++) {
@@ -35,6 +41,7 @@ void mul_matrix_line_pillar(float* first_matrix, float* second_matrix, int raw, 
 void matrix_multiply(float* one_matrix, float* two_matrix, int n) {
     float* result_matrix = (float*)malloc(n * n * sizeof(float));
 
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j += 4) {
             mul_matrix_line_pillar(one_matrix, two_matrix, i, j, n, result_matrix);
@@ -53,6 +60,7 @@ void matrix_sum(float* one_matrix, float* two_matrix, int n) {
     float* result_matrix = (float*)malloc(n * n * sizeof(float));
 
     __m128 summary;
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         __m128 *first, *second;
         first = (__m128*)(one_matrix + i * n);
@@ -85,6 +93,7 @@ void transpose(float* matrix, int n) {
 float max_column_sum(float* matrix, int n) {
 
     float max_sum = 0;
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         float cur_sum = 0;
         for (int j = 0; j < n; j++) {
@@ -116,6 +125,7 @@ float max_raw_sum(float* matrix, int n) {
 
 void div_by_number(float* matrix, double number, int n) {
 
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             matrix[i * n + j] = matrix[i * n + j] / number;
@@ -177,12 +187,16 @@ int main() {
 
     float* matrix = (float*)malloc(n*n * sizeof(float));
 
+    //srand(time(NULL));
+    //char str[2] = "A\n";
+    //write(0, str, 2);
+    make_one_two_matrix(matrix, n);
+
     /*for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             scanf("%f", &matrix[i * n + j]);
         }
     }*/
-    make_one_two_matrix(matrix, n);
 
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);

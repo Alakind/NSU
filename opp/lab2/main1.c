@@ -1,51 +1,9 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
 
-void print_matrix(double* matrix, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%f ", matrix[i*n + j]);
-        }
-        printf("\n");
-    }
-}
-
-void print_vector(double* vector, int n) {
-    for (int i = 0; i < n; i++) {
-        printf("%f ", vector[i]);
-    }
-    printf("\n");
-}
-
-double rand_double(double min, double max) {
-    return min + (rand() / (RAND_MAX / (max - min)));
-}
-
-void make_zero_matrix(double* matrix, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            matrix[i*n + j] = 0;
-        }
-    }
-}
-
-void matrix_copy(double* matrix1, double* matrix2, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            matrix1[i*n + j] = matrix2[i*n + j];
-        }
-    }
-}
-
-void vector_copy(double* vector1, double* vector2, int n) {
-    for (int i = 0; i < n; i++) {
-        vector1[i] = vector2[i];
-    }
-}
-
-void make_one_two_matrix(double* matrix, int n) {
+void make_one_two_matrix(float* matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (i == j) {
@@ -58,164 +16,198 @@ void make_one_two_matrix(double* matrix, int n) {
     }
 }
 
-void make_random_matrix(double* matrix, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = i; j < n; j++) {
-            matrix[i*n + j] = rand_double(0, 1);
-            if (i == j) {
-                matrix[i*n + j] += 1000;
-            }
-            else {
-                matrix[j*n + i] = matrix[i*n + j];
-            }
-        }
-    }
-}
+float mul_matrix_line_pillar(float* first_matrix, float* second_matrix, int raw, int column, int n) {
+    float result = 0;
 
-double vec_len(double* vector, int n) {
-    double len = 0;
     for (int i = 0; i < n; i++) {
-        len += vector[i] * vector[i];
-    }
-
-    return sqrt(len);
-}
-
-double scalar_mul(double* vector1, double* vector2, int n) {
-    double result = 0;
-    for (int i = 0; i < n; i++) {
-        result += vector1[i] * vector2[i];
+        result += first_matrix[raw * n + i] * second_matrix[i * n + column];
     }
 
     return result;
 }
 
-void matrix_mul_vector(double* matrix, double* vector, double* result, int n) {
-    double vec[n];
+void matrix_multiply(float* one_matrix, float* two_matrix, int n) {
+    float* result_matrix = (float*)malloc(n * n * sizeof(float));
+
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            vec[j] = matrix[i * n + j];
+            result_matrix[i * n + j] = 0;
         }
-        result[i] = scalar_mul(vec, vector, n);
     }
-}
 
-void matrix_mul_double(double* matrix, double dub, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            matrix[i*n + j] *= dub;
+            result_matrix[i * n + j] = mul_matrix_line_pillar(one_matrix, two_matrix, i, j, n);
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            one_matrix[i * n + j] = result_matrix[i * n + j];
+        }
+    }
+    free(result_matrix);
+}
+
+void matrix_sum(float* one_matrix, float* two_matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            one_matrix[i * n + j] = one_matrix[i * n + j] + two_matrix[i * n + j];
         }
     }
 }
 
-void vector_mul_double(double* vector, double dub, int n) {
+void transpose(float* matrix, int n) {
+
+    for (int i = 0; i < n / 2; i++) {
+        for (int j = 0; j < n / 2; j++) {
+            float tmp = matrix[i * n + j];
+            matrix[i * n + j] = matrix[j * n + i];
+            matrix[j * n + i] = tmp;
+        }
+    }
+}
+
+float max_column_sum(float* matrix, int n) {
+
+    float max_sum = 0;
     for (int i = 0; i < n; i++) {
-        vector[i] *= dub;
+        float cur_sum = 0;
+        for (int j = 0; j < n; j++) {
+            cur_sum += fabs(matrix[j * n + i]);
+        }
+        if (cur_sum > max_sum) {
+            max_sum = cur_sum;
+        }
     }
+
+    return max_sum;
 }
 
-void vector_minus_vector(double* vector1, double* vector2, int n) {
+float max_raw_sum(float* matrix, int n) {
+
+    float max_sum = 0;
     for (int i = 0; i < n; i++) {
-        vector1[i] -= vector2[i];
+        float cur_sum = 0;
+        for (int j = 0; j < n; j++) {
+            cur_sum += fabs(matrix[i * n + j]);
+        }
+        if (cur_sum > max_sum) {
+            max_sum = cur_sum;
+        }
+    }
+
+    return max_sum;
+}
+
+void div_by_number(float* matrix, double number, int n) {
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            matrix[i * n + j] = matrix[i * n + j] / number;
+        }
     }
 }
 
-int is_finished(double* matrix, double* vector, double* b, double epsilon, int n) {
+float* make_identity(int n) {
+    float* matrix = (float*)malloc(n*n * sizeof(float));
 
-    double* A = (double*)malloc(n * n * sizeof(double));
-    make_zero_matrix(A, n);
-
-    //write(0, "He\n", 3);
-    matrix_copy(A, matrix, n);
-    double* Ax = (double*)malloc(n * sizeof(double));
-
-    matrix_mul_vector(A, vector, Ax, n);
-    vector_minus_vector(Ax, b, n);
-
-    if ((sqrt(scalar_mul(Ax, Ax, n)) / sqrt(scalar_mul(b, b, n))) < epsilon) {
-        free(A);
-        free(Ax);
-        return 1;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) {
+                matrix[i * n + j] = 1;
+            }
+            else {
+                matrix[i * n + j] = 0;
+            }
+        }
     }
 
-    free(A);
-    free(Ax);
-    return 0;
+    return matrix;
 }
 
-void count_y(double* y, double* A, double* x_n, double* b, int n){
-    matrix_mul_vector(A, x_n, y, n);
+float* make_zero(int n) {
+    float* matrix = (float*)malloc(n*n * sizeof(float));
 
-    vector_minus_vector(y, b, n);
-}
-
-double count_tau(double* A, double* y, int n) {
-    double* Ay = (double*)malloc(n * sizeof(double));
-    matrix_mul_vector(A, y, Ay, n);
-
-    double tau = (scalar_mul(y, Ay, n) / scalar_mul(Ay, Ay, n));
-
-    free(Ay);
-    return tau;
-}
-
-double* solve_eq(double* matrix, double* values, int n) {
-    double epsilon = 0.001;
-
-    double* y = (double*)malloc(n * sizeof(double));
-    double* x_i = (double*)malloc(n * sizeof(double));
-    vector_copy(x_i, values, n);
-
-    while (!is_finished(matrix, x_i, values, epsilon, n)) {
-        //print_vector(x_i, n);
-        count_y(y, matrix, x_i, values, n);
-
-        double tau = count_tau(matrix, y, n);
-
-        vector_mul_double(y, tau, n);
-
-        vector_minus_vector(x_i, y, n);
-        /*for (int i = 0; i < n; i++) {
-
-        }*/
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            matrix[i * n + j] = 0;
+        }
     }
 
-    //printf(")\n");
-    free(y);
+    return matrix;
+}
 
-    return x_i;
+void copy_matrix(float* to_matrix, float* from_matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            to_matrix[i * n + j] = from_matrix[i * n + j];
+        }
+    }
+}
+
+void print_matrix(float* matrix, int n) {
+    printf("\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%f ", matrix[i * n + j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
 int main() {
-    // SETTING UP
-    srand(time(NULL));
-    int n;
-    printf("Enter size of matrix: ");
-    scanf("%d", &n);
+    int n, m;
+    scanf("%d %d", &n, &m);
 
-    double* matrix = (double*)malloc(n * n * sizeof(double));
-    make_zero_matrix(matrix, n);
+    float* matrix = (float*)malloc(n*n * sizeof(float));
 
-    //make_one_two_matrix(matrix, n);
-    make_random_matrix(matrix, n);
-    //print_matrix(matrix, n);
+    make_one_two_matrix(matrix, n);
+    /*for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%f", &matrix[i * n + j]);
+        }
+    }*/
 
-    double* values = (double*)malloc(n * sizeof(double));
-    for (int i = 0; i < n; i++) {
-        values[i] = n + 1;
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+    float* b_matrix = make_zero(n);
+    double div = max_column_sum(matrix, n) * max_raw_sum(matrix, n);
+    copy_matrix(b_matrix, matrix, n);
+    transpose(b_matrix, n);
+    div_by_number(b_matrix, div, n);
+
+
+    float* identity_matrix = make_identity(n);
+
+    float* ba_matrix = make_identity(n);
+    matrix_multiply(ba_matrix, b_matrix, n);
+    matrix_multiply(ba_matrix, matrix, n);
+    div_by_number(ba_matrix, -1, n);
+
+    float* r_matrix = make_zero(n);
+    matrix_sum(r_matrix, ba_matrix, n);
+    matrix_sum(r_matrix, identity_matrix, n);
+
+    float* r_in_degree = make_zero(n);
+    copy_matrix(r_in_degree, r_matrix, n);
+    float* summar_matrix = make_identity(n);
+
+    for (int i = 0; i < m; i++) {
+        matrix_sum(summar_matrix, r_in_degree, n);
+        matrix_multiply(r_in_degree, r_matrix, n);
     }
 
-    // ACTION
-    double* x_n = solve_eq(matrix, values, n);
+    float* result_matrix = make_identity(n);
+    matrix_multiply(result_matrix, summar_matrix, n);
+    matrix_multiply(result_matrix, b_matrix, n);
 
-    for (int i = 0; i < n; i++) {
-        printf("%f ", x_n[i]);
-    }
-    printf("\n");
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    printf("Time taken: %lf sec.\n", end.tv_sec-start.tv_sec + 0.000000001*(end.tv_nsec-start.tv_nsec));
 
-    // FREEING
-    free(values);
-    free(x_n);
-    free(matrix);
+    print_matrix(result_matrix, n);
+
     return 0;
 }
