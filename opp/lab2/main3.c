@@ -99,8 +99,11 @@ float max_column_sum(float* matrix, int n) {
         for (int j = 0; j < n; j++) {
             cur_sum += fabs(matrix[j * n + i]);
         }
-        if (cur_sum > max_sum) {
-            max_sum = cur_sum;
+        #pragma omp critical
+        {
+            if (cur_sum > max_sum) {
+                max_sum = cur_sum;
+            }
         }
     }
 
@@ -110,13 +113,17 @@ float max_column_sum(float* matrix, int n) {
 float max_raw_sum(float* matrix, int n) {
 
     float max_sum = 0;
+    #pragma omp parallel for
     for (int i = 0; i < n; i++) {
         float cur_sum = 0;
         for (int j = 0; j < n; j++) {
             cur_sum += fabs(matrix[i * n + j]);
         }
-        if (cur_sum > max_sum) {
-            max_sum = cur_sum;
+        #pragma omp critical
+        {
+            if (cur_sum > max_sum) {
+                max_sum = cur_sum;
+            }
         }
     }
 

@@ -105,7 +105,7 @@ void matrix_mul_vector(double* matrix, double* vector, double* result, int n, si
 
     for (int i = 0; i < lines; i++) {
         for (int j = 0; j < n; j++) {
-            vec[j] = matrix[i * n + j];
+            vec[j] = matrix[i*n + j];
         }
         result[i + offset] = scalar_mul(vec, vector, n, proc_num, rank);
     }
