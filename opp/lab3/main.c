@@ -70,8 +70,6 @@ int main(int argc, char** argv) {
     dimen[1] = 0;
     MPI_Cart_sub(grid_comm, dimen, &col_comm);
 
-    // 
-
     // Creating matrixes
     double* A_matrix = (double*)malloc(n1 * n2 * sizeof(double));
     double* B_matrix = (double*)malloc(n3 * n2 * sizeof(double));
@@ -86,13 +84,28 @@ int main(int argc, char** argv) {
     int height = n1 / p1;
     int width = n3 / p2;
 
-    // Paralleling
-    double* hold_A_matrix = (double*)malloc(height * n2 * sizeof(double));
-    MPI_Scatter(A_matrix, height * n2, MPI_DOUBLE, hold_A_matrix, height * n2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    double* A_hold_matrix = (double*)malloc(height * n2 * sizeof(double));
+    double* B_hold_matrix = (double*)malloc(width * n2 * sizeof(double));
 
+    // Datatype
     MPI_Datatype col;
-    MPI_Type_vector(width, p2, n3, MPI_DOUBLE, &col);
+    MPI_Type_vector(p1, width, n3, MPI_DOUBLE, &col); // first n2?
     MPI_Type_commit(&col);
+
+    // Scattering and broadcasting
+    if (grid[1] == 0) {
+        MPI_Scatter(A_matrix, height * n2, MPI_DOUBLE, A_hold_matrix, height * n2, MPI_DOUBLE, 0, col_comm);
+    }
+
+    Bcast(A_hold_matrix, height * n2, MPI_DOUBLE, 0, row_comm);
+
+    if (grid[0] == 0) {
+        MPI_Scatter(B_matrix, 1, col, B_hold_matrix, width * n2, MPI_DOUBLE, 0, row_comm);
+    }
+
+    // Paralleling
+    /*double* hold_A_matrix = (double*)malloc(height * n2 * sizeof(double));
+    MPI_Scatter(A_matrix, height * n2, MPI_DOUBLE, hold_A_matrix, height * n2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     double* hold_B_matrix = (double*)malloc(width * n2 * sizeof(double));
     MPI_Scatter(B_matrix, width * n2, col, hold_B_matrix, width * n2, col, 0, MPI_COMM_WORLD);
@@ -102,7 +115,7 @@ int main(int argc, char** argv) {
         for (int j = (rank / p2) * width; j < (rank / p2) * (width + 1); j++) {
             C_matrix[i * n3 + j] = mul_matrix_line_pillar(A_matrix, B_matrix, i, j, n2, n3);
         }
-    }
+    }*/
 
     // Finishing
     MPI_Finalize();
