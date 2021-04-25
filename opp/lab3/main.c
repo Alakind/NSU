@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <mpi/mpi.h>
+#include <mpi.h>
 
 double rand_double(double min, double max) {
     return min + (rand() / (RAND_MAX / (max - min)));
@@ -33,17 +33,44 @@ double mul_matrix_line_pillar(double* first_matrix, double* second_matrix, int r
     return result;
 }
 
-MPI_Comm grid_comm;
-MPI_Comm col_comm;
-MPI_Comm row_comm;
+void fill_with_zero(double* matrix, int n1, int n2) {
+    for (int i = 0; i < n1; i++) {
+        for (int j = 0; j < n2; j++) {
+            matrix[i * n2 + j] = 0;
+        }
+    }
+}
+
+void make_id_matrix(double* matrix, int n1, int n2) {
+    for (int i = 0; i < n1; i++) {
+        for (int j = 0; j < n2; j++) {
+            if (i == j) {
+                matrix[i * n2 + j] = 1;
+            }
+            else {
+                matrix[i * n2 + j] = 0;
+            }
+        }
+    }
+}
+
+void multiply_matrix(double* A_matrix, double* B_matrix, double* C_matrix, int n1, int n2, int n3) {
+    for (int i = 0; i < n1; i++) {
+        for (int j = 0; j < n3; j++) {
+            for (int k = 0; k < n2; k++) {
+                C_matrix[i*n3 + j] += A_matrix[i*n2 + k] * B_matrix[k*n3 + j];
+            }
+        }
+    }
+}
 
 int grid[2];
 
-int n1 = 4;
-int n2 = 4;
-int n3 = 4;
-int p1 = 2;
-int p2 = 2;
+int n1 = 2000;
+int n2 = 1000;
+int n3 = 1500;
+int p1 = 4;
+int p2 = 4;
 
 int main(int argc, char** argv) {
     // SETTING UP
@@ -58,7 +85,15 @@ int main(int argc, char** argv) {
     dim[0] = p1;
     dim[1] = p2;
 
-    MPI_Cart_create(MPI_COMM_WORLD, 2, dim, 0, 0, &grid_comm);
+    int periodic[2];
+    periodic[0] = 1;
+    periodic[1] = 1;
+
+    MPI_Comm grid_comm;
+    MPI_Comm col_comm;
+    MPI_Comm row_comm;
+
+    MPI_Cart_create(MPI_COMM_WORLD, 2, dim, periodic, 0, &grid_comm);
     MPI_Cart_coords(grid_comm, rank, 2, grid);
 
     int dimen[2];
@@ -70,67 +105,103 @@ int main(int argc, char** argv) {
     dimen[1] = 0;
     MPI_Cart_sub(grid_comm, dimen, &col_comm);
 
+    double* A_matrix;
+    double* B_matrix;
+    double* C_matrix;
+
     // Creating matrixes
-    double* A_matrix = (double*)malloc(n1 * n2 * sizeof(double));
-    double* B_matrix = (double*)malloc(n3 * n2 * sizeof(double));
-    double* C_matrix = (double*)malloc(n1 * n3 * sizeof(double));
+    if (rank == 0) {
+        A_matrix = (double*)malloc(n1 * n2 * sizeof(double));
+        B_matrix = (double*)malloc(n3 * n2 * sizeof(double));
+        C_matrix = (double*)malloc(n1 * n3 * sizeof(double));
 
-    printf("Runnung on %d total\n", proc_num);
+        // Generating matrixies
+        make_random_matrix(A_matrix, n1, n2);
+        make_random_matrix(B_matrix, n2, n3);
+        //make_id_matrix(A_matrix, n1, n2);
+        //make_id_matrix(B_matrix, n2, n3);
 
-    // Generating matrixies
-    make_random_matrix(A_matrix, n1, n2);
-    make_random_matrix(B_matrix, n2, n3);
+        fill_with_zero(C_matrix, n1, n3);
+    }
 
     int height = n1 / p1;
     int width = n3 / p2;
 
     double* A_hold_matrix = (double*)malloc(height * n2 * sizeof(double));
     double* B_hold_matrix = (double*)malloc(width * n2 * sizeof(double));
+    double* C_hold_matrix = (double*)malloc(width * height * sizeof(double));
 
-    // Datatype
-    MPI_Datatype col;
-    MPI_Type_vector(p1, width, n3, MPI_DOUBLE, &col); // first n2?
+    fill_with_zero(C_hold_matrix, height, width);
+
+    // Datatype for columns
+    MPI_Datatype col, col_resized;
+
+    MPI_Type_vector(n2, width, n3, MPI_DOUBLE, &col);
     MPI_Type_commit(&col);
 
+    MPI_Type_create_resized(col, 0, width * sizeof(double), &col_resized);
+    MPI_Type_commit(&col_resized);
+
+    double start;
+    if (rank == 0) {
+        start = MPI_Wtime();
+    }
+
     // Scattering and broadcasting
+    // Rows
     if (grid[1] == 0) {
         MPI_Scatter(A_matrix, height * n2, MPI_DOUBLE, A_hold_matrix, height * n2, MPI_DOUBLE, 0, col_comm);
     }
 
-    Bcast(A_hold_matrix, height * n2, MPI_DOUBLE, 0, row_comm);
+    MPI_Bcast(A_hold_matrix, height * n2, MPI_DOUBLE, 0, row_comm);
 
+    // Columns
     if (grid[0] == 0) {
-        MPI_Scatter(B_matrix, 1, col, B_hold_matrix, width * n2, MPI_DOUBLE, 0, row_comm);
+        MPI_Scatter(B_matrix, 1, col_resized, B_hold_matrix, width * n2, MPI_DOUBLE, 0, row_comm);
     }
 
-    // Paralleling
-    /*double* hold_A_matrix = (double*)malloc(height * n2 * sizeof(double));
-    MPI_Scatter(A_matrix, height * n2, MPI_DOUBLE, hold_A_matrix, height * n2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    // ACTION
+    multiply_matrix(A_hold_matrix, B_hold_matrix, C_hold_matrix, n1, n2, n3);
 
-    double* hold_B_matrix = (double*)malloc(width * n2 * sizeof(double));
-    MPI_Scatter(B_matrix, width * n2, col, hold_B_matrix, width * n2, col, 0, MPI_COMM_WORLD);
+    // Type for gathering from cells in C matrix
+    MPI_Datatype cell, cell_resized;
 
-    // Action
-    for (int i = (rank % p2) * height; i < (rank % p2) * (height + 1); i++) {
-        for (int j = (rank / p2) * width; j < (rank / p2) * (width + 1); j++) {
-            C_matrix[i * n3 + j] = mul_matrix_line_pillar(A_matrix, B_matrix, i, j, n2, n3);
+    MPI_Type_vector(height, width, n3, MPI_DOUBLE, &cell);
+    MPI_Type_commit(&cell);
+
+    MPI_Type_create_resized(cell, 0, width * sizeof(double), &cell_resized);
+    MPI_Type_commit(&cell_resized);
+
+    // Gathering
+    int recv_counts[p1 * p2];
+    int displs[p1 * p2];
+    for (int i = 0; i < p1 * p2; i++) {
+        recv_counts[i] = 1;
+        displs[i] = (i / p2) * height + (i % p2) * width;
+    }
+
+    MPI_Gatherv(C_hold_matrix, height * width, MPI_DOUBLE, C_matrix, recv_counts, displs, cell_resized, 0, MPI_COMM_WORLD);
+
+    // FINISHING
+    if (rank == 0) {
+        for (int i = 0; i < n1; i++) {
+            for (int j = 0; j < n3; j++) {
+                printf("%lf ", C_matrix[i * n3 + j]);
+            }
+            printf("\n");
         }
-    }*/
+        double end = MPI_Wtime();
+        printf("Time taken: %lf seconds\n", end - start);
+    }
 
-    // Finishing
+    /*if (rank == 0) {
+        free(A_matrix);
+        free(B_matrix);
+        free(C_matrix);
+    }
+    free(A_hold_matrix);
+    free(B_hold_matrix);
+    free(C_hold_matrix);*/
     MPI_Finalize();
-
-    for (int i = 0; i < n1; i++) {
-        for (int j = 0; j < n3; j++) {
-            printf("%lf ", C_matrix[i * n3 + j]);
-        }
-        printf("\n");
-    }
-
-    free(A_matrix);
-    free(B_matrix);
-    free(C_matrix);
-    free(hold_A_matrix);
-    free(hold_B_matrix);
     return 0;
 }
