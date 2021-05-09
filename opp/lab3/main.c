@@ -13,24 +13,8 @@ void make_random_matrix(double* matrix, int n1, int n2) {
     for (int i = 0; i < n1; i++) {
         for (int j = i; j < n2; j++) {
             matrix[i*n1 + j] = rand_double(0, 1);
-            if (i == j) {
-                matrix[i*n1 + j] += 1000;
-            }
-            else {
-                matrix[j*n1 + i] = matrix[i*n1 + j];
-            }
         }
     }
-}
-
-double mul_matrix_line_pillar(double* first_matrix, double* second_matrix, int raw, int column, int n2, int n3) {
-    double result = 0;
-
-    for (int i = 0; i < n2; i++) {
-        result += first_matrix[raw * n2 + i] * second_matrix[i * n3 + column];
-    }
-
-    return result;
 }
 
 void fill_with_zero(double* matrix, int n1, int n2) {
@@ -66,11 +50,11 @@ void multiply_matrix(double* A_matrix, double* B_matrix, double* C_matrix, int n
 
 int grid[2];
 
-int n1 = 2000;
-int n2 = 1000;
-int n3 = 1500;
-int p1 = 4;
-int p2 = 4;
+int n1 = 24;
+int n2 = 8;
+int n3 = 16;
+int p1 = 2;
+int p2 = 2;
 
 int main(int argc, char** argv) {
     // SETTING UP
@@ -118,8 +102,6 @@ int main(int argc, char** argv) {
         // Generating matrixies
         make_random_matrix(A_matrix, n1, n2);
         make_random_matrix(B_matrix, n2, n3);
-        //make_id_matrix(A_matrix, n1, n2);
-        //make_id_matrix(B_matrix, n2, n3);
 
         fill_with_zero(C_matrix, n1, n3);
     }
@@ -161,7 +143,7 @@ int main(int argc, char** argv) {
     }
 
     // ACTION
-    multiply_matrix(A_hold_matrix, B_hold_matrix, C_hold_matrix, n1, n2, n3);
+    multiply_matrix(A_hold_matrix, B_hold_matrix, C_hold_matrix, height, n2, width);
 
     // Type for gathering from cells in C matrix
     MPI_Datatype cell, cell_resized;
@@ -194,14 +176,14 @@ int main(int argc, char** argv) {
         printf("Time taken: %lf seconds\n", end - start);
     }
 
-    /*if (rank == 0) {
+    if (rank == 0) {
         free(A_matrix);
         free(B_matrix);
         free(C_matrix);
     }
     free(A_hold_matrix);
     free(B_hold_matrix);
-    free(C_hold_matrix);*/
+    free(C_hold_matrix);
     MPI_Finalize();
     return 0;
 }

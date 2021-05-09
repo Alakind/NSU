@@ -1,6 +1,6 @@
  #!/bin/bash
 
-NPC=24
+NPC=16
 # NPC=mpiprocs=select*ncpus
 # 1 <= select <= 2
 
