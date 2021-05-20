@@ -144,9 +144,9 @@ int main(int argc, char** argv) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    int Nx = 100;
-    int Ny = 100;
-    int Nz = 100 / proc_num;
+    int Nx = 480;
+    int Ny = 480;
+    int Nz = 480 / proc_num;
     double** matrix = (double**)malloc(2 * sizeof(double*));
     double** rec_matrix = (double**)malloc(2 * sizeof(double*));
     for (int i = 0; i < 2; i++) {
