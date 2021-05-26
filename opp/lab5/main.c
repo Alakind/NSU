@@ -8,6 +8,9 @@
 #define L 100
 #define TASK_SETS 3
 
+pthread_mutex_t my_mutex;
+int* jobs
+
 int* make_job_list(int rank, int proc_num, int iteration) {
     int* jobs = (int*)malloc(100 * proc_num * sizof(int));
 
@@ -43,15 +46,22 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Creating mutex
+    pthread_mutex_init(&my_mutex, NULL);
 
     for (int i = 0; i < TASK_SETS; i++) {
         // Init job list
-        int* jobs = make_job_list(rank, proc_num, iteration);
+        jobs = make_job_list(rank, proc_num, iteration);
 
 
 
         free(jobs);
     }
+
+
+    pthread_mutex_destroy(&my_mutex);
+
+    MPI_Finalize();
 
     return 0;
 }
