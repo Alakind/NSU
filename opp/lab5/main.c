@@ -30,6 +30,7 @@ int num_of_tasks;
 void make_job_list(int rank, int proc_num);
 
 int ask_for_task(int who) {
+    printf("Asked\n");
     pthread_mutex_lock(&my_mutex);
     int buf = ASKFORTASKS;
 
@@ -51,7 +52,7 @@ int ask_for_task(int who) {
     return job_got;
 }
 
-void task_doer() {
+void* task_doer(void* a) {
     while (iteration < iterations_total) {
         printf("%d start tasks!\n", rank);
         double start = MPI_Wtime();
@@ -98,7 +99,13 @@ void task_doer() {
         iteration++;
         pthread_mutex_unlock(&my_mutex);
     }
+
+    pthread_mutex_lock(&my_mutex);
+    int buf = FINISH;
+    pthread_mutex_unlock(&my_mutex);
+    MPI_Send(&buf, 1, MPI_INT, rank, REQUEST, MPI_COMM_WORLD);
     
+    return NULL;
 }
 
 void* task_sender(void* a) {
@@ -109,10 +116,10 @@ void* task_sender(void* a) {
     while(iteration < iterations_total) {
         MPI_Recv(&buf, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST, MPI_COMM_WORLD, &status);
 
-        /*if (buf = FINISH) {
+        if (buf = FINISH) {
             printf("Finishing proccess\n");
             return NULL;
-        }*/
+        }
 
         pthread_mutex_lock(&my_mutex);
         
@@ -150,7 +157,6 @@ void make_job_list(int rank, int proc_num) {
 
 
 int main(int argc, char** argv) {
-    printf("Bruh\n");
     // SETTING UP
     int provided;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
@@ -165,13 +171,11 @@ int main(int argc, char** argv) {
         MPI_Finalize();
         return 1;
     }
-    printf("RANK %d\n", rank);
-    printf("NUM %d\n", proc_num);
 
     // Creating mutex
     pthread_mutex_init(&my_mutex, NULL);
     pthread_attr_t attributes;
-    pthread_t thread;
+    pthread_t thread[2];
 
     int retval = pthread_attr_init(&attributes);
     if (retval != 0) {
@@ -185,13 +189,17 @@ int main(int argc, char** argv) {
     }
 
     // Starting division
-    pthread_create(&thread, &attributes, task_sender, NULL);
-    task_doer();
-
-    pthread_join(thread, NULL);
+    pthread_create(&thread[0], &attributes, task_sender, NULL);
+    pthread_create(&thread[1], &attributes, task_doer, NULL);
+    //task_doer();
 
     pthread_attr_destroy(&attributes);
+
+    pthread_join(thread[0], NULL);
+    pthread_join(thread[1], NULL);
+
     pthread_mutex_destroy(&my_mutex);
+    
 
     MPI_Finalize();
     free(jobs);
