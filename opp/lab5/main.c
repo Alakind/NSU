@@ -15,7 +15,7 @@
 #define SUCCESS 100
 #define FAILURE 101
 #define ASKFORTASKS 200
-#define FINISH 201
+#define FINISH 300
 
 int proc_num;
 int rank;
@@ -30,17 +30,17 @@ int num_of_tasks;
 void make_job_list(int rank, int proc_num);
 
 int ask_for_task(int who) {
-    printf("Asked\n");
     pthread_mutex_lock(&my_mutex);
     int buf = ASKFORTASKS;
 
+    pthread_mutex_unlock(&my_mutex);
     // requesting
     MPI_Send(&buf, 1, MPI_INT, who, REQUEST, MPI_COMM_WORLD);
     MPI_Recv(&buf, 1, MPI_INT, who, ANSWER, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    pthread_mutex_unlock(&my_mutex);
 
     int job_got;
     if (buf == FAILURE) {
+        //printf("Can't ask\n");
         return 0;
     }
     else {
@@ -49,12 +49,13 @@ int ask_for_task(int who) {
         pthread_mutex_unlock(&my_mutex);
     }
 
+    //printf("Finished asking\n");
     return job_got;
 }
 
 void* task_doer(void* a) {
     while (iteration < iterations_total) {
-        printf("%d start tasks!\n", rank);
+        //printf("%d start tasks!\n", rank);
         double start = MPI_Wtime();
         // Making up tasks
         pthread_mutex_lock(&my_mutex);
@@ -72,7 +73,7 @@ void* task_doer(void* a) {
         }
         pthread_mutex_unlock(&my_mutex);
 
-        printf("I'm %d go ask\n", rank);
+        //printf("I'm %d go ask\n", rank);
         // Finished, asking for tasks from others
         int job;
         for (int i = 0; i < proc_num; i++) {
@@ -100,31 +101,33 @@ void* task_doer(void* a) {
         pthread_mutex_unlock(&my_mutex);
     }
 
+    //printf("Finishing proccess doer\n");
     pthread_mutex_lock(&my_mutex);
     int buf = FINISH;
     pthread_mutex_unlock(&my_mutex);
     MPI_Send(&buf, 1, MPI_INT, rank, REQUEST, MPI_COMM_WORLD);
     
+
     return NULL;
 }
 
 void* task_sender(void* a) {
-    printf("I am task sender!\n");
+    //printf("I am task sender!\n");
     MPI_Status status;
     int buf;
 
     while(iteration < iterations_total) {
         MPI_Recv(&buf, 1, MPI_INT, MPI_ANY_SOURCE, REQUEST, MPI_COMM_WORLD, &status);
 
-        if (buf = FINISH) {
-            printf("Finishing proccess\n");
+        if (buf == FINISH) {
+            //printf("Finishing proccess sender\n");
             return NULL;
         }
 
         pthread_mutex_lock(&my_mutex);
         
         if (cur_task = num_of_tasks - 1) {
-            printf("No tasks to share\n");
+            //printf("No tasks to share\n");
             pthread_mutex_unlock(&my_mutex);
             buf = FAILURE;
             MPI_Send(&buf, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
@@ -149,7 +152,7 @@ void make_job_list(int rank, int proc_num) {
 
     for (int i = 0; i < num_of_tasks; i++) {
         //jobs[i] = (long long)(abs(50 - i %100) * abs(rank - (iteration % proc_num)) * L);
-        jobs[i] = (long long)abs(rank + pow(2, iteration) * L);
+        jobs[i] = (long long)abs(rank + pow(7, iteration) * L);
     }
 
     return;
