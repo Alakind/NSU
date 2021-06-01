@@ -30,10 +30,8 @@ int num_of_tasks;
 void make_job_list(int rank, int proc_num);
 
 int ask_for_task(int who) {
-    pthread_mutex_lock(&my_mutex);
     int buf = ASKFORTASKS;
 
-    pthread_mutex_unlock(&my_mutex);
     // requesting
     MPI_Send(&buf, 1, MPI_INT, who, REQUEST, MPI_COMM_WORLD);
     MPI_Recv(&buf, 1, MPI_INT, who, ANSWER, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -44,9 +42,7 @@ int ask_for_task(int who) {
         return 0;
     }
     else {
-        pthread_mutex_lock(&my_mutex);
         MPI_Recv(&job_got, 1, MPI_INT, who, ANSWER, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        pthread_mutex_unlock(&my_mutex);
     }
 
     //printf("Finished asking\n");
@@ -55,7 +51,9 @@ int ask_for_task(int who) {
 
 void* task_doer(void* a) {
     while (iteration < iterations_total) {
-        //printf("%d start tasks!\n", rank);
+        if (rank == 0) {
+            printf("------------------\n");
+        }
         double start = MPI_Wtime();
         // Making up tasks
         pthread_mutex_lock(&my_mutex);
@@ -89,22 +87,15 @@ void* task_doer(void* a) {
         }
 
         double finish = MPI_Wtime();
-        if (rank == 0) {
-            printf("Time for iteration %d: %lf\n", iteration, finish - start);
-        }
+        printf("Time for proc %d of iteration %d: %lf\n", rank, iteration, finish - start);
 
         MPI_Barrier(MPI_COMM_WORLD);
 
-        pthread_mutex_lock(&my_mutex);
-        printf("I've done %d tasks\n", num_of_tasks);
         iteration++;
-        pthread_mutex_unlock(&my_mutex);
     }
 
     //printf("Finishing proccess doer\n");
-    pthread_mutex_lock(&my_mutex);
     int buf = FINISH;
-    pthread_mutex_unlock(&my_mutex);
     MPI_Send(&buf, 1, MPI_INT, rank, REQUEST, MPI_COMM_WORLD);
     
 
@@ -126,19 +117,22 @@ void* task_sender(void* a) {
 
         pthread_mutex_lock(&my_mutex);
         
-        if (cur_task = num_of_tasks - 1) {
-            //printf("No tasks to share\n");
-            pthread_mutex_unlock(&my_mutex);
-            buf = FAILURE;
-            MPI_Send(&buf, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
-        }
-        else {
-            num_of_tasks--;
-            pthread_mutex_unlock(&my_mutex);
-            buf = SUCCESS;
-            int new_task = jobs[num_of_tasks];
-            MPI_Send(&buf, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
-            MPI_Send(&new_task, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
+        if (buf == ASKFORTASKS) {
+            if (cur_task = num_of_tasks - 1) {
+                //printf("No tasks to share\n");
+                pthread_mutex_unlock(&my_mutex);
+                buf = FAILURE;
+                MPI_Send(&buf, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
+            }
+            else {
+                printf("Sending task\n");
+                num_of_tasks--;
+                pthread_mutex_unlock(&my_mutex);
+                buf = SUCCESS;
+                int new_task = jobs[num_of_tasks];
+                MPI_Send(&buf, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
+                MPI_Send(&new_task, 1, MPI_INT, status.MPI_SOURCE, ANSWER, MPI_COMM_WORLD);
+            }
         }
     }
 
@@ -178,7 +172,7 @@ int main(int argc, char** argv) {
     // Creating mutex
     pthread_mutex_init(&my_mutex, NULL);
     pthread_attr_t attributes;
-    pthread_t thread[2];
+    pthread_t thread;
 
     int retval = pthread_attr_init(&attributes);
     if (retval != 0) {
@@ -192,14 +186,12 @@ int main(int argc, char** argv) {
     }
 
     // Starting division
-    pthread_create(&thread[0], &attributes, task_sender, NULL);
-    pthread_create(&thread[1], &attributes, task_doer, NULL);
-    //task_doer();
+    pthread_create(&thread, &attributes, task_sender, NULL);
+    task_doer(NULL);
 
     pthread_attr_destroy(&attributes);
 
-    pthread_join(thread[0], NULL);
-    pthread_join(thread[1], NULL);
+    pthread_join(thread, NULL);
 
     pthread_mutex_destroy(&my_mutex);
     
