@@ -73,7 +73,6 @@ void make_one_matrix(double* matrix, int n) {
     }
 }
 
-
 void make_random_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
@@ -97,7 +96,7 @@ double vec_len(double* vector, int n) {
     return sqrt(len);
 }
 
-double scalar_mul(double* vector1, double* vector2, int n, size_t proc_num, size_t rank) {
+double scalar_mul_part(double* vector1, double* vector2, int n, size_t proc_num, size_t rank) {
     double result = 0;
     double result_tmp = 0;
     size_t lines = n / proc_num;
@@ -112,34 +111,32 @@ double scalar_mul(double* vector1, double* vector2, int n, size_t proc_num, size
     return result;
 }
 
-void matrix_mul_vector(double* matrix, double* vector, double* result, int n, size_t proc_num, size_t rank) {
-    double vec[n];
-    size_t lines = n / proc_num;
-    size_t offset = lines * rank;
+double scalar_mul(double* vector1, double* vector2, int n, size_t proc_num, size_t rank) {
+    double result = 0;
 
-    for (int i = 0; i < lines; i++) {
-        for (int j = 0; j < n; j++) {
-            vec[j] = matrix[i*n + j];
-        }
-        result[i + offset] = scalar_mul(vec, vector, n, proc_num, rank);
+    for (int i = 0; i < n; i++) {
+        result += vector1[i] * vector2[i];
     }
 
-    double* tmp = (double*)malloc(n * sizeof(double));
-    MPI_Allgather(result + offset, lines, MPI_DOUBLE, tmp, lines, MPI_DOUBLE, MPI_COMM_WORLD);
-    memcpy(result, tmp, n * sizeof(double));
-    free(tmp);
+    return result;
 }
 
-/*void matrix_mul_double(double* matrix, double dub, int n, size_t proc_num, size_t rank) {
+
+void matrix_mul_vector(double* matrix, double* vector, double* result, int n, size_t proc_num, size_t rank) {
     size_t lines = n / proc_num;
     size_t offset = lines * rank;
 
+    double result_tmp[n];
+
     for (int i = 0; i < lines; i++) {
+        result_tmp[i] = 0;
         for (int j = 0; j < n; j++) {
-            matrix[i + offset + j] *= dub;
+            result_tmp[i] += matrix[i * n + j] * vector[j];
         }
     }
-}*/
+
+    MPI_Allgather(result_tmp, lines, MPI_DOUBLE, result, lines, MPI_DOUBLE, MPI_COMM_WORLD);
+}
 
 void vector_mul_double(double* vector, double dub, int n) {
     for (int i = 0; i < n; i++) {
@@ -147,15 +144,20 @@ void vector_mul_double(double* vector, double dub, int n) {
     }
 }
 
-void vector_minus_vector(double* vector1, double* vector2, int n) {
-    for (int i = 0; i < n; i++) {
-        vector1[i] -= vector2[i];
+void vector_minus_vector_part_2(double* vector1, double* vector2_part, int n, size_t proc_num, size_t rank) {
+    double result_tmp[n];
+    size_t lines = n / proc_num;
+    size_t offset = lines * rank;
+
+    for (int i = 0; i < lines; i++) {
+        result_tmp[i] = vector1[offset + i] - vector2_part[i];
     }
+
+    MPI_Allgather(result_tmp, lines, MPI_DOUBLE, vector1, lines, MPI_DOUBLE, MPI_COMM_WORLD);
 }
 
-void vector_minus_vector_part(double* vector1, double* vector2, int n, int rank, int proc_num) {
-    int to_count = n / proc_num;
-    for (int i = to_count * rank; i < to_count * (rank + 1); i++) {
+void vector_minus_vector(double* vector1, double* vector2, int n) {
+    for (int i = 0; i < n; i++) {
         vector1[i] -= vector2[i];
     }
 }
@@ -171,7 +173,7 @@ int is_finished(double* matrix, double* vector, double* b, double epsilon, int n
     matrix_mul_vector(A, vector, Ax, n, proc_num, rank);
     vector_minus_vector(Ax, b, n);
 
-    if ((sqrt(scalar_mul(Ax, Ax, n, proc_num, rank)) / sqrt(scalar_mul(b, b, n, proc_num, rank))) < epsilon) {
+    if ((vec_len(Ax, n) / vec_len(b, n)) < epsilon) {
         free(A);
         free(Ax);
         return 1;
@@ -180,6 +182,12 @@ int is_finished(double* matrix, double* vector, double* b, double epsilon, int n
     free(A);
     free(Ax);
     return 0;
+}
+
+void count_y_part(double* y, double* A, double* x_n, double* b_part, int n, size_t proc_num, size_t rank){
+    matrix_mul_vector(A, x_n, y, n, proc_num, rank);
+
+    vector_minus_vector_part_2(y, b_part, n, proc_num, rank);
 }
 
 void count_y(double* y, double* A, double* x_n, double* b, int n, size_t proc_num, size_t rank){
@@ -192,7 +200,7 @@ double count_tau(double* A, double* y, int n, size_t proc_num, size_t rank) {
     double* Ay = (double*)malloc(n * sizeof(double));
     matrix_mul_vector(A, y, Ay, n, proc_num, rank);
 
-    double tau = (scalar_mul(y, Ay, n, proc_num, rank) / scalar_mul(Ay, Ay, n, proc_num, rank));
+    double tau = (sqrt(scalar_mul(y, Ay, n, proc_num, rank)) / sqrt(scalar_mul(Ay, Ay, n, proc_num, rank)));
 
     free(Ay);
     return tau;
@@ -201,40 +209,29 @@ double count_tau(double* A, double* y, int n, size_t proc_num, size_t rank) {
 double* solve_eq(double* matrix, double* values, int n, size_t proc_num, size_t rank) {
     double epsilon = 0.001;
 
-    size_t lines = n / proc_num;
-    //size_t offset = lines * rank;
-
     double* y = (double*)malloc(n * sizeof(double));
     double* x_i = (double*)malloc(n * sizeof(double));
-    double* x_i_part = (double*)malloc(lines * sizeof(double));
-    double* values_part = (double*)malloc(lines * sizeof(double));
-
     vector_copy(x_i, values, n);
 
-    MPI_Scatter(x_i, lines, MPI_DOUBLE, x_i_part, lines, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Scatter(values, lines, MPI_DOUBLE, values_part, lines, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
+    int vec_part = (n / proc_num);
+    double* x_i_part = (double*)malloc(vec_part * sizeof(double));
+    double* values_part = (double*)malloc(vec_part * sizeof(double));
+    MPI_Scatter(values, vec_part, MPI_DOUBLE, values_part, vec_part, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     while (!is_finished(matrix, x_i, values, epsilon, n, proc_num, rank)) {
-        count_y(y, matrix, x_i_part, values_part, n, proc_num, rank);
-        //printf("AHAHAHHAHAHHHAHAHAH\n");
-        for (int i = 0; i < n; i++) {
+        /*for (int i = 0; i < n; i++) {
             printf("%lf ", x_i[i]);
         }
-        printf("\n");
+        printf("\n");*/
+        count_y_part(y, matrix, x_i, values, n, proc_num, rank);
 
         double tau = count_tau(matrix, y, n, proc_num, rank);
 
         vector_mul_double(y, tau, n);
 
-        MPI_Allgather(x_i_part, lines, MPI_DOUBLE, x_i, lines, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Allgather(values_part, lines, MPI_DOUBLE, values, lines, MPI_DOUBLE, MPI_COMM_WORLD);
-
         vector_minus_vector(x_i, y, n);
 
-        MPI_Barrier(MPI_COMM_WORLD);
     }
-
 
     free(y);
 
@@ -250,29 +247,24 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     srand(time(NULL));
-    int n = 8;
-    //printf("Enter size of matrix: ");
-    //scanf("%d", &n);
+    int n = 16;
 
     double* matrix = (double*)malloc(n * n * sizeof(double));
     make_zero_matrix(matrix, n);
 
-    make_one_matrix(matrix, n);
     //make_one_two_matrix(matrix, n);
     //make_random_matrix(matrix, n);
+    make_one_matrix(matrix, n);
 
     double* values = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
         values[i] = n + 1;
     }
-    //double* values_part = (double*)malloc(n * sizeof(double));
 
     // MPI staff
     size_t lines = n / proc_num;
-    //size_t offset = lines * rank;
-    double* matrix_part = (double*)malloc(lines * sizeof(double));
+    double* matrix_part = (double*)malloc(lines * n * sizeof(double));
     MPI_Scatter(matrix, lines * n, MPI_DOUBLE, matrix_part, lines * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    //MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     // ACTION
     double* x_n = solve_eq(matrix_part, values, n, proc_num, rank);
@@ -283,6 +275,7 @@ int main(int argc, char** argv) {
     printf("\n");
 
     // FREEING
+    MPI_Finalize();
     free(values);
     free(x_n);
     free(matrix);
