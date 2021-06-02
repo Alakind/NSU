@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <mpi/mpi.h>
+#include <mpi.h>
 
 void print_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
@@ -59,6 +59,20 @@ void make_one_two_matrix(double* matrix, int n) {
         }
     }
 }
+
+void make_one_matrix(double* matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) {
+                matrix[i*n + j] = 1;
+            }
+            else {
+                matrix[i*n + j] = 0;
+            }
+        }
+    }
+}
+
 
 void make_random_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
@@ -139,6 +153,13 @@ void vector_minus_vector(double* vector1, double* vector2, int n) {
     }
 }
 
+void vector_minus_vector_part(double* vector1, double* vector2, int n, int rank, int proc_num) {
+    int to_count = n / proc_num;
+    for (int i = to_count * rank; i < to_count * (rank + 1); i++) {
+        vector1[i] -= vector2[i];
+    }
+}
+
 int is_finished(double* matrix, double* vector, double* b, double epsilon, int n, size_t proc_num, size_t rank) {
 
     double* A = (double*)malloc(n * n * sizeof(double));
@@ -180,19 +201,40 @@ double count_tau(double* A, double* y, int n, size_t proc_num, size_t rank) {
 double* solve_eq(double* matrix, double* values, int n, size_t proc_num, size_t rank) {
     double epsilon = 0.001;
 
+    size_t lines = n / proc_num;
+    //size_t offset = lines * rank;
+
     double* y = (double*)malloc(n * sizeof(double));
-    double* x_i = (double*)malloc((n / proc_num) * sizeof(double));
+    double* x_i = (double*)malloc(n * sizeof(double));
+    double* x_i_part = (double*)malloc(lines * sizeof(double));
+    double* values_part = (double*)malloc(lines * sizeof(double));
+
     vector_copy(x_i, values, n);
 
+    MPI_Scatter(x_i, lines, MPI_DOUBLE, x_i_part, lines, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Scatter(values, lines, MPI_DOUBLE, values_part, lines, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+
     while (!is_finished(matrix, x_i, values, epsilon, n, proc_num, rank)) {
-        count_y(y, matrix, x_i, values, n, proc_num, rank);
+        count_y(y, matrix, x_i_part, values_part, n, proc_num, rank);
+        //printf("AHAHAHHAHAHHHAHAHAH\n");
+        for (int i = 0; i < n; i++) {
+            printf("%lf ", x_i[i]);
+        }
+        printf("\n");
 
         double tau = count_tau(matrix, y, n, proc_num, rank);
 
         vector_mul_double(y, tau, n);
 
+        MPI_Allgather(x_i_part, lines, MPI_DOUBLE, x_i, lines, MPI_DOUBLE, MPI_COMM_WORLD);
+        MPI_Allgather(values_part, lines, MPI_DOUBLE, values, lines, MPI_DOUBLE, MPI_COMM_WORLD);
+
         vector_minus_vector(x_i, y, n);
+
+        MPI_Barrier(MPI_COMM_WORLD);
     }
+
 
     free(y);
 
@@ -208,32 +250,32 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     srand(time(NULL));
-    int n = 5;
+    int n = 8;
     //printf("Enter size of matrix: ");
     //scanf("%d", &n);
 
     double* matrix = (double*)malloc(n * n * sizeof(double));
     make_zero_matrix(matrix, n);
 
+    make_one_matrix(matrix, n);
     //make_one_two_matrix(matrix, n);
-    make_random_matrix(matrix, n);
+    //make_random_matrix(matrix, n);
 
     double* values = (double*)malloc(n * sizeof(double));
     for (int i = 0; i < n; i++) {
         values[i] = n + 1;
     }
-    double* values_part = (double*)malloc(n * sizeof(double));
+    //double* values_part = (double*)malloc(n * sizeof(double));
 
     // MPI staff
     size_t lines = n / proc_num;
-    size_t offset = lines * rank;
+    //size_t offset = lines * rank;
     double* matrix_part = (double*)malloc(lines * sizeof(double));
     MPI_Scatter(matrix, lines * n, MPI_DOUBLE, matrix_part, lines * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     //MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Scatter(values, n / proc_num, MPI_DOUBLE, values_part, n / proc_num, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     // ACTION
-    double* x_n = solve_eq(matrix, values, n, proc_num, rank);
+    double* x_n = solve_eq(matrix_part, values, n, proc_num, rank);
 
     for (int i = 0; i < n; i++) {
         printf("%f ", x_n[i]);

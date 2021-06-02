@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <string.h>
-#include <mpi/mpi.h>
+#include <mpi.h>
 
 void print_matrix(double* matrix, int n) {
     for (int i = 0; i < n; i++) {
@@ -111,7 +111,7 @@ void matrix_mul_vector(double* matrix, double* vector, double* result, int n, si
     }
 
     double* tmp = (double*)malloc(n * sizeof(double));
-    MPI_Allgather(result + offset, lines, MPI_DOUBLE, tmp, lines, MPI_DOUBLE, MPI_COMM_WORLD);
+    MPI_Allgather(result, lines, MPI_DOUBLE, tmp, lines, MPI_DOUBLE, MPI_COMM_WORLD);
     memcpy(result, tmp, n * sizeof(double));
     free(tmp);
 }
@@ -185,6 +185,10 @@ double* solve_eq(double* matrix, double* values, int n, size_t proc_num, size_t 
     vector_copy(x_i, values, n);
 
     while (!is_finished(matrix, x_i, values, epsilon, n, proc_num, rank)) {
+        /*for (int i = 0; i < n; i++) {
+            printf("%lf ", x_i[i]);
+        }
+        printf("\n");*/
         count_y(y, matrix, x_i, values, n, proc_num, rank);
 
         double tau = count_tau(matrix, y, n, proc_num, rank);
@@ -231,7 +235,7 @@ int main(int argc, char** argv) {
     MPI_Bcast(values, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     // ACTION
-    double* x_n = solve_eq(matrix, values, n, proc_num, rank);
+    double* x_n = solve_eq(matrix_part, values, n, proc_num, rank);
 
     for (int i = 0; i < n; i++) {
         printf("%f ", x_n[i]);
