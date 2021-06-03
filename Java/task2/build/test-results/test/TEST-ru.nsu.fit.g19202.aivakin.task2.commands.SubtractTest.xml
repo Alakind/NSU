@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ru.nsu.fit.g19202.aivakin.task2.commands.SubtractTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-06-03T18:59:24" hostname="DESKTOP-KLBI3PT" time="0.021">
+  <properties/>
+  <testcase name="testSub()" classname="ru.nsu.fit.g19202.aivakin.task2.commands.SubtractTest" time="0.019"/>
+  <testcase name="testSubEmpty()" classname="ru.nsu.fit.g19202.aivakin.task2.commands.SubtractTest" time="0.001"/>
+  <testcase name="testSubNeg()" classname="ru.nsu.fit.g19202.aivakin.task2.commands.SubtractTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
