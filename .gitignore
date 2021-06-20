@@ -4,6 +4,5 @@
 *.cmake
 *CMakeCache.txt
 *Makefile
-*main
 *.txt
 .vscode
