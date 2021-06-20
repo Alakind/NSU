@@ -10,11 +10,11 @@ public class Model {
     private final static int WIDTH = 800;
     private final static int RADIUS = 25;
 
-    private static int framesShoot = 0;
-    private static int framesPlayerShoot = 0;
-    private static int framesTurn = 0;
-    private static int framesSpawn = 0;
-    private static int framesShootSpeed = 300;
+    private int framesShoot = 0;
+    private int framesPlayerShoot = 0;
+    private int framesTurn = 0;
+    private int framesSpawn = 0;
+    private int framesShootSpeed = 300;
 
 
 
