@@ -1,0 +1,14 @@
+ru/nsu/fit/g19202/aivakin/task2/commands/MulTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.MulTest
+ru/nsu/fit/g19202/aivakin/task2/commands/AddTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.AddTest
+ru/nsu/fit/g19202/aivakin/task2/commands/PushTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.PushTest
+ru/nsu/fit/g19202/aivakin/task2/commands/DefineTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.DefineTest
+ru/nsu/fit/g19202/aivakin/task2/commands/DivTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.DivTest
+ru/nsu/fit/g19202/aivakin/task2/commands/SqrtTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.SqrtTest
+ru/nsu/fit/g19202/aivakin/task2/commands/SubtractTest.java
+ ru.nsu.fit.g19202.aivakin.task2.commands.SubtractTest

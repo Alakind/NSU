@@ -1,8 +1,5 @@
 *.out
-*/build/*
 */CMakeFiles/*
 *.cmake
 *CMakeCache.txt
-*Makefile
-*.txt
 .vscode

@@ -1,0 +1,21 @@
+ru/nsu/fit/g19202/aivakin/game/actors/Actor.java
+ ru.nsu.fit.g19202.aivakin.game.actors.Actor
+ru/nsu/fit/g19202/aivakin/game/actors/Player.java
+ ru.nsu.fit.g19202.aivakin.game.actors.Player
+ru/nsu/fit/g19202/aivakin/game/controller/GameController.java
+ ru.nsu.fit.g19202.aivakin.game.controller.GameController
+ ru.nsu.fit.g19202.aivakin.game.controller.GameController$1
+ru/nsu/fit/g19202/aivakin/game/Model.java
+ ru.nsu.fit.g19202.aivakin.game.Model
+ru/nsu/fit/g19202/aivakin/game/controller/Window.java
+ ru.nsu.fit.g19202.aivakin.game.controller.Window
+ru/nsu/fit/g19202/aivakin/game/views/GameView.java
+ ru.nsu.fit.g19202.aivakin.game.views.GameView
+ru/nsu/fit/g19202/aivakin/game/views/Canvas.java
+ ru.nsu.fit.g19202.aivakin.game.views.Canvas
+ru/nsu/fit/g19202/aivakin/game/Text.java
+ ru.nsu.fit.g19202.aivakin.game.Text
+ru/nsu/fit/g19202/aivakin/game/Game.java
+ ru.nsu.fit.g19202.aivakin.game.Game
+ru/nsu/fit/g19202/aivakin/game/views/CanvasView.java
+ ru.nsu.fit.g19202.aivakin.game.views.CanvasView
