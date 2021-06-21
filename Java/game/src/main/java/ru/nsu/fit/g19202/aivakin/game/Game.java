@@ -71,12 +71,13 @@ public class Game {
     private static int getRecord() {
         int record = -1;
 
-        URL path = Game.class.getClassLoader().getResource("record.txt");
-        File file = new File(path.getPath());
+        //URL path = Game.class.getClassLoader().getResource("record.txt");
+        //File file = new File(path.getPath());
+        File fl = new File(System.getProperty("user.dir") + "/record1.txt");
 
         Scanner scanner = null;
         try {
-            scanner = new Scanner(file);
+            scanner = new Scanner(fl);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -87,11 +88,12 @@ public class Game {
     }
 
     private static void setRecord(int record) {
-        URL path = Game.class.getClassLoader().getResource("record.txt");
-        File file = new File(path.getPath());
+        //URL path = Game.class.getClassLoader().getResource("record.txt");
+        //File file = new File(path.getPath());
+        File fl = new File(System.getProperty("user.dir") + "/record1.txt");
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fl));
             writer.write(String.valueOf(record));
             writer.newLine();
             writer.flush();
