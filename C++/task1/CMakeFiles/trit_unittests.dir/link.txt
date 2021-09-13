@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/trit_unittests.dir/tests/main.cpp.o CMakeFiles/trit_unittests.dir/tests/trit_unittest.cpp.o  -o trit_unittests libtritlib.a -lpthread 

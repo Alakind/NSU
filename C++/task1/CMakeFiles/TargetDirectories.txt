@@ -1,0 +1,5 @@
+/mnt/d/Projects/study/C++/NSU/task1/CMakeFiles/rebuild_cache.dir
+/mnt/d/Projects/study/C++/NSU/task1/CMakeFiles/trit_unittests.dir
+/mnt/d/Projects/study/C++/NSU/task1/CMakeFiles/edit_cache.dir
+/mnt/d/Projects/study/C++/NSU/task1/CMakeFiles/tritlib.dir
+/mnt/d/Projects/study/C++/NSU/task1/CMakeFiles/trit.dir

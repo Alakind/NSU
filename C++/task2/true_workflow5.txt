@@ -1,0 +1,10 @@
+desc
+0 = readfile in.txt
+5 = grep ddd
+3 = dump out2.txt
+1 = grep aaa
+4 = grep ccc
+2 = grep bbb
+6 = writefile out.txt
+csed
+0 -> 4 -> 5 -> 3 -> 2 -> 3 -> 6

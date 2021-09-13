@@ -1,0 +1,5 @@
+/mnt/d/Projects/study/C++/NSU/task2/CMakeFiles/rebuild_cache.dir
+/mnt/d/Projects/study/C++/NSU/task2/CMakeFiles/edit_cache.dir
+/mnt/d/Projects/study/C++/NSU/task2/CMakeFiles/executor_unittests.dir
+/mnt/d/Projects/study/C++/NSU/task2/CMakeFiles/executorlib.dir
+/mnt/d/Projects/study/C++/NSU/task2/CMakeFiles/executor.dir

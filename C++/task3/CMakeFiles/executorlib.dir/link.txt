@@ -1,0 +1,2 @@
+/usr/bin/ar qc libexecutorlib.a  CMakeFiles/executorlib.dir/src/main.cpp.o CMakeFiles/executorlib.dir/src/executor.cpp.o
+/usr/bin/ranlib libexecutorlib.a

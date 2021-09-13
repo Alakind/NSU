@@ -1,0 +1,4 @@
+desc
+0 = readfile in.txt
+csed
+0

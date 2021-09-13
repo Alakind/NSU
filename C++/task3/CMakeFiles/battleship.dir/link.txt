@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/battleship.dir/src/main.cpp.o  -o battleship libbattleship_game.a 

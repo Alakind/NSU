@@ -1,0 +1,5 @@
+/mnt/d/Projects/study/C++/NSU/task3/CMakeFiles/rebuild_cache.dir
+/mnt/d/Projects/study/C++/NSU/task3/CMakeFiles/edit_cache.dir
+/mnt/d/Projects/study/C++/NSU/task3/CMakeFiles/battleship_unittests.dir
+/mnt/d/Projects/study/C++/NSU/task3/CMakeFiles/battleship_game.dir
+/mnt/d/Projects/study/C++/NSU/task3/CMakeFiles/battleship.dir

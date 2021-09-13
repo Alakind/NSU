@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/trit.dir/src/main.cpp.o  -o trit libtritlib.a 

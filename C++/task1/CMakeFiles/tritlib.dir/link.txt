@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtritlib.a  CMakeFiles/tritlib.dir/src/main.cpp.o CMakeFiles/tritlib.dir/src/trit.cpp.o
+/usr/bin/ranlib libtritlib.a
