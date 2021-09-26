@@ -8,10 +8,11 @@
 #include <sys/types.h>
 #include <vector>
 #include <algorithm>
+#include <net/if.h>
 
 #include "functions.h"
 
-int main4(int argc, char** argv) {
+int main6(int argc, char** argv) {
     srand(time(NULL));
 
     if (argc < 2) {
@@ -25,7 +26,7 @@ int main4(int argc, char** argv) {
     int optval = 1;
 
     // INPUT
-    int in_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    int in_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     if (in_socket < 0) {
         std::cout << "Error making an in socket" << std::endl;
         return 0;
@@ -38,26 +39,41 @@ int main4(int argc, char** argv) {
         std::cout << "Error reuse port" << std::endl;
         return 0;
     }
+    if (setsockopt(in_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) {
+            std::cout << "setsockopt SOL_SOCKET" << std::endl;
+            return 1;
+        }
+    int hops = 255;
+    if (setsockopt(in_socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, sizeof(hops))) {
+        std::cout << "setsockopt" << std::endl;
+        return 1;
+    }
 
-    struct sockaddr_in mcast_group;
-    mcast_group.sin_family = AF_INET;
-    mcast_group.sin_port = htons(PORT);
-    mcast_group.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    struct sockaddr_in6 mcast_group{};
+    mcast_group.sin6_family = AF_INET6;
+    mcast_group.sin6_port = htons(PORT);
+    mcast_group.sin6_addr = in6addr_any;
     if (bind(in_socket, (const struct sockaddr*) &mcast_group, sizeof(mcast_group)) < 0) {
         std::cout << "Error bind" << std::endl;
         return 0;
     }
 
-    struct ip_mreq mreq;
-    mreq.imr_multiaddr.s_addr = inet_addr(argv[1]);
-    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-    if (setsockopt(in_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
+    struct ipv6_mreq mreq;
+    mreq.ipv6mr_interface = if_nametoindex("eth0");
+    inet_pton(AF_INET6, argv[1], &mreq.ipv6mr_multiaddr);
+    if (setsockopt(in_socket, IPPROTO_IPV6, IPV6_JOIN_GROUP, &mreq, sizeof(mreq)) < 0) {
         std::cout << "Error adding to membership" << std::endl;
         return 0;
     }
 
     // OUTPUT
-    int out_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in6 bcast_addr{};
+    bcast_addr.sin6_family = AF_INET;
+    bcast_addr.sin6_port = htons(PORT);
+    inet_pton(AF_INET6, argv[1], &bcast_addr.sin6_addr);
+
+    int out_socket = socket(AF_INET6, SOCK_DGRAM, 0);
     if (out_socket < 0) {
         std::cout << "Error making an out socket" << std::endl;
     }
