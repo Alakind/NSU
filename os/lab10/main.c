@@ -33,6 +33,7 @@ void eat_food(int philosopher, int part_to_eat) {
     eaten[philosopher] += part_to_eat;
     printf("Philosopher %d has eaten %d food\n",
         philosopher, part_to_eat);
+    printf("Food left: %d\n", food);
 
     usleep(DELAY);
     
@@ -46,7 +47,7 @@ void* philosopher(void* phil_id) {
     int right_fork = id + 1;
 
     while (food > 0) {
-        if (id % 2 == 0) {
+        if (id == 0 || id == 2) {
             take_fork(id, left_fork, "left");
             take_fork(id, right_fork, "right");
 
@@ -82,5 +83,9 @@ int main(int argc, char** argv) {
     for (int i = 0; i < PHILO; i++) {
         pthread_mutex_init(&forks[i], NULL);
         pthread_create(&phils[i], NULL, philosopher, (void*) i);
+    }
+
+    for (int i = 0; i < PHILO; i++) {
+        pthread_join(&phils[i], NULL);
     }
 }
