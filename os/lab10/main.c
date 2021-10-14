@@ -86,6 +86,6 @@ int main(int argc, char** argv) {
     }
 
     for (int i = 0; i < PHILO; i++) {
-        pthread_join(&phils[i], NULL);
+        pthread_join(phils[i], NULL);
     }
 }
