@@ -7,8 +7,6 @@
 #define DELAY 3000
 #define FOOD 100
 
-static int food = FOOD;
-
 pthread_mutex_t forks[PHILO];
 pthread_mutex_t foodlock;
 pthread_t phils[PHILO];
@@ -25,56 +23,44 @@ void drop_forks(int left_fork, int right_fork) {
     pthread_mutex_unlock(&forks[right_fork]);
 }
 
-void eat_food(int philosopher, int part_to_eat) {
-    pthread_mutex_lock(&foodlock);
-
-    food =- part_to_eat;
-
-    eaten[philosopher] += part_to_eat;
-    printf("Philosopher %d has eaten %d food\n",
-        philosopher, part_to_eat);
-    printf("Food left: %d\n", food);
-
-    usleep(DELAY);
-    
-    pthread_mutex_unlock(&foodlock);
-}
-
 void* philosopher(void* phil_id) {
     int id = (int) phil_id;
 
     int left_fork = id;
     int right_fork = id + 1;
 
-    while (food > 0) {
-        if (id == 0 || id == 2) {
-            take_fork(id, left_fork, "left");
-            take_fork(id, right_fork, "right");
+    int food_left = -100;
 
-            eat_food(id, 10);
+    while (food_left = food_on_table()) {
+        printf("Philosopher %d gets dish with %d\n", id, food_left);
 
-            drop_forks(left_fork, right_fork);
-            usleep(DELAY * 2);
-        } else if (id == 1 || id == 3) {
-            usleep(DELAY);
+        take_fork(id, left_fork, "left");
+        take_fork(id, right_fork, "right");
 
-            take_fork(id, left_fork, "left");
-            take_fork(id, right_fork, "right");
+        drop_forks(left_fork, right_fork);
 
-            eat_food(id, 10);
+        usleep(DELAY);
 
-            drop_forks(left_fork, right_fork);
-        } else {
-            usleep(DELAY * 2);
-
-            take_fork(id, left_fork, "left");
-            take_fork(id, right_fork, "right");
-
-            eat_food(id, 10);
-
-            drop_forks(left_fork, right_fork);
-        }
+        eaten[id] += 1;
     }
+
+    return (void*) 0;
+}
+
+int food_on_table() {
+  static int food = FOOD;
+  int myfood;
+
+  pthread_mutex_lock(&foodlock);
+
+  if (food > 0) {
+    food--;
+  }
+  myfood = food;
+
+  pthread_mutex_unlock(&foodlock);
+
+  return myfood;
 }
 
 int main(int argc, char** argv) {
@@ -88,4 +74,10 @@ int main(int argc, char** argv) {
     for (int i = 0; i < PHILO; i++) {
         pthread_join(phils[i], NULL);
     }
+
+    for (int i = 0; i < PHILO; i++) {
+        printf("\nPhilosother %d ate %d\n", i + 1, eaten[i]);
+    }
+
+    return 0;
 }
