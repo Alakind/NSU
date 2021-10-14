@@ -18,6 +18,16 @@ void take_fork(int phil, int fork, char* hand) {
         phil, fork, hand);
 }
 
+int try_take_fork(int phil, int fork, char* hand) {
+    if (pthread_mutex_trylock(&forks[fork])) {
+        printf("Philosopher %d: got %d fork to his %s hand\n",
+            phil, fork, hand);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 void drop_forks(int left_fork, int right_fork) {
     pthread_mutex_unlock(&forks[left_fork]);
     pthread_mutex_unlock(&forks[right_fork]);
@@ -32,11 +42,16 @@ void* philosopher(void* phil_id) {
     int food_left = -100;
 
     while (food_left = food_on_table()) {
-        printf("Philosopher %d gets dish with %d\n", id, food_left);
 
         take_fork(id, left_fork, "left");
-        take_fork(id, right_fork, "right");
+        try_take_fork(id, right_fork, "right");
+        // if (!try_take_fork(id, right_fork, "right")) {
+        //     drop_forks(left_fork, right_fork);
+        //     food_return();
+        //     continue;
+        // }
 
+        printf("Philosopher %d eats dish with %d\n", id, food_left);
         drop_forks(left_fork, right_fork);
 
         usleep(DELAY);
