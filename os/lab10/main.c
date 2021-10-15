@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define PHILO 5
-#define DELAY 3000
+#define DELAY 100
 #define FOOD 1000
 
 pthread_mutex_t forks[PHILO];
@@ -14,14 +14,14 @@ int eaten[PHILO];
 
 void take_fork(int phil, int fork, char* hand) {
     pthread_mutex_lock(&forks[fork]);
-    // printf("Philosopher %d: got %d fork to his %s hand\n",
-    //     phil, fork, hand);
+    printf("Philosopher %d: got %d fork to his %s hand\n",
+        phil, fork, hand);
 }
 
 int try_take_fork(int phil, int fork, char* hand) {
     if (pthread_mutex_trylock(&forks[fork])) {
-        //printf("Philosopher %d: got %d fork to his %s hand\n",
-        //    phil, fork, hand);
+        printf("Philosopher %d: got %d fork to his %s hand\n",
+           phil, fork, hand);
         return 1;
     } else {
         return 0;
@@ -31,6 +31,10 @@ int try_take_fork(int phil, int fork, char* hand) {
 void drop_forks(int left_fork, int right_fork) {
     pthread_mutex_unlock(&forks[left_fork]);
     pthread_mutex_unlock(&forks[right_fork]);
+}
+
+void drop_fork(int fork) {
+    pthread_mutex_unlock(&forks[fork]);
 }
 
 int food_on_table(int eat) {
@@ -50,7 +54,7 @@ int food_on_table(int eat) {
 }
 
 void* philosopher(void* phil_id) {
-    int id = (int) phil_id;
+    int id = *((int*) phil_id);
 
     int left_fork = id;
     int right_fork = (id + 1) % PHILO;
@@ -62,14 +66,15 @@ void* philosopher(void* phil_id) {
         take_fork(id, left_fork, "left");
         //try_take_fork(id, right_fork, "right");
         if (!try_take_fork(id, right_fork, "right")) {
-            drop_forks(left_fork, right_fork);
+            //drop_forks(left_fork, right_fork);
+            drop_fork(left_fork);
             usleep(DELAY);
             continue;
         }
 
         food_on_table(1);
 
-        //printf("Philosopher %d eats dish with %d\n", id, food_left);
+        printf("Philosopher %d eats dish with %d\n", id, food_left);
         drop_forks(left_fork, right_fork);
 
         eaten[id] += 1;
@@ -83,9 +88,13 @@ void* philosopher(void* phil_id) {
 int main(int argc, char** argv) {
     pthread_mutex_init(&foodlock, NULL);
 
+    int indexes[] = {0, 1, 2, 3, 4};
+
     for (int i = 0; i < PHILO; i++) {
         pthread_mutex_init(&forks[i], NULL);
-        pthread_create(&phils[i], NULL, philosopher, (void*) i);
+    }
+    for (int i = 0; i < PHILO; i++) {
+        pthread_create(&phils[i], NULL, philosopher, (void*) &indexes[i]);
     }
 
     for (int i = 0; i < PHILO; i++) {
