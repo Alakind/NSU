@@ -37,38 +37,40 @@ void* philosopher(void* phil_id) {
     int id = (int) phil_id;
 
     int left_fork = id;
-    int right_fork = id + 1;
+    int right_fork = (id + 1) % PHILO;
 
-    int food_left = -100;
+    int food_left;
 
-    while (food_left = food_on_table()) {
+    while (food_left = food_on_table(0)) {
 
         take_fork(id, left_fork, "left");
-        try_take_fork(id, right_fork, "right");
-        // if (!try_take_fork(id, right_fork, "right")) {
-        //     drop_forks(left_fork, right_fork);
-        //     food_return();
-        //     continue;
-        // }
+        //try_take_fork(id, right_fork, "right");
+        if (!try_take_fork(id, right_fork, "right")) {
+            drop_forks(left_fork, right_fork);
+            usleep(DELAY);
+            continue;
+        }
+
+        food_on_table(1);
 
         printf("Philosopher %d eats dish with %d\n", id, food_left);
         drop_forks(left_fork, right_fork);
 
-        usleep(DELAY);
-
         eaten[id] += 1;
+
+        usleep(DELAY);
     }
 
     return (void*) 0;
 }
 
-int food_on_table() {
+int food_on_table(int eat) {
   static int food = FOOD;
   int myfood;
 
   pthread_mutex_lock(&foodlock);
 
-  if (food > 0) {
+  if (food > 0 && eat) {
     food--;
   }
   myfood = food;
