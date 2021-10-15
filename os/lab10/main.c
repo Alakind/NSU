@@ -5,7 +5,7 @@
 
 #define PHILO 5
 #define DELAY 3000
-#define FOOD 100
+#define FOOD 1000
 
 pthread_mutex_t forks[PHILO];
 pthread_mutex_t foodlock;
@@ -14,14 +14,14 @@ int eaten[PHILO];
 
 void take_fork(int phil, int fork, char* hand) {
     pthread_mutex_lock(&forks[fork]);
-    printf("Philosopher %d: got %d fork to his %s hand\n",
-        phil, fork, hand);
+    // printf("Philosopher %d: got %d fork to his %s hand\n",
+    //     phil, fork, hand);
 }
 
 int try_take_fork(int phil, int fork, char* hand) {
     if (pthread_mutex_trylock(&forks[fork])) {
-        printf("Philosopher %d: got %d fork to his %s hand\n",
-            phil, fork, hand);
+        //printf("Philosopher %d: got %d fork to his %s hand\n",
+        //    phil, fork, hand);
         return 1;
     } else {
         return 0;
@@ -31,6 +31,22 @@ int try_take_fork(int phil, int fork, char* hand) {
 void drop_forks(int left_fork, int right_fork) {
     pthread_mutex_unlock(&forks[left_fork]);
     pthread_mutex_unlock(&forks[right_fork]);
+}
+
+int food_on_table(int eat) {
+  static int food = FOOD;
+  int myfood;
+
+  pthread_mutex_lock(&foodlock);
+
+  if (food > 0 && eat) {
+    food--;
+  }
+  myfood = food;
+
+  pthread_mutex_unlock(&foodlock);
+
+  return myfood;
 }
 
 void* philosopher(void* phil_id) {
@@ -53,7 +69,7 @@ void* philosopher(void* phil_id) {
 
         food_on_table(1);
 
-        printf("Philosopher %d eats dish with %d\n", id, food_left);
+        //printf("Philosopher %d eats dish with %d\n", id, food_left);
         drop_forks(left_fork, right_fork);
 
         eaten[id] += 1;
@@ -62,22 +78,6 @@ void* philosopher(void* phil_id) {
     }
 
     return (void*) 0;
-}
-
-int food_on_table(int eat) {
-  static int food = FOOD;
-  int myfood;
-
-  pthread_mutex_lock(&foodlock);
-
-  if (food > 0 && eat) {
-    food--;
-  }
-  myfood = food;
-
-  pthread_mutex_unlock(&foodlock);
-
-  return myfood;
 }
 
 int main(int argc, char** argv) {
