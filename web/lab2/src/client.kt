@@ -18,5 +18,5 @@ fun main(args: Array<String>) {
 
     val ip: InetAddress = InetAddress.getByName(adress);
 
-    val client = Socket();
+    val client = Socket(adress, port);
 }
