@@ -37,7 +37,11 @@ fun main(args: Array<String>) {
 
     val buffer = ByteArray(BUFF);
     while(inputStream.read(buffer, 0, BUFF) != -1) {
+
         output.write(buffer);
+        output.flush();
     }
     output.write(buffer);
+    output.flush();
+
 }

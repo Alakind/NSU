@@ -5,7 +5,7 @@ import java.net.*
 import java.util.*
 import java.io.*
 
-val BUFF = 100;
+val BUFF = 1;
 const val backlog = 10;
 
 // USE
@@ -43,8 +43,10 @@ fun main(args: Array<String>) {
     val buffer = ByteArray(BUFF);
     while(inputStream.read(buffer, 0, BUFF) != -1) {
         fileStream.write(buffer);
+        fileStream.flush();
     }
     fileStream.write(buffer);
+    fileStream.flush();
 
     println("I'm done");
 }
