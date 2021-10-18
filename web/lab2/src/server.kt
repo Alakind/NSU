@@ -5,7 +5,8 @@ import java.net.*
 import java.util.*
 import java.io.*
 
-val BUFF = 1;
+val BUFF = 4096;
+
 const val backlog = 10;
 
 // USE
@@ -19,6 +20,8 @@ fun main(args: Array<String>) {
 
     val adress = args[0];
     val port = args[1];
+    val buffer = ByteArray(BUFF);
+    val charset = Charsets.UTF_8;
 
     val ip: InetAddress = InetAddress.getByName(adress);
 
@@ -28,11 +31,15 @@ fun main(args: Array<String>) {
     println("Client connected");
 
     // reading name and size
-    val input = BufferedReader(InputStreamReader(client.getInputStream()));
+    val input = client.getInputStream();
 
-    val filename = input.readLine();
+    input.read(buffer, 0, BUFF);
+    val size: Long = (buffer.toString(charset).split("\n"))[0].toLong();
+    println(size);
+
+    input.read(buffer, 0, BUFF);
+    val filename: String = (buffer.toString(charset).split("\n"))[0];
     println(filename);
-    println(input.readLine());
 
     // making file
     val fileStream: OutputStream = File(filename + "hehe").outputStream();
@@ -40,13 +47,13 @@ fun main(args: Array<String>) {
     // reading file
     val inputStream = client.getInputStream();
 
-    val buffer = ByteArray(BUFF);
-    while(inputStream.read(buffer, 0, BUFF) != -1) {
-        fileStream.write(buffer);
-        fileStream.flush();
+    var left: Long = size;
+    while(left > 0) {
+        var readed: Int = inputStream.read(buffer, 0, BUFF);
+        left -= readed;
+
+        fileStream.write(buffer, 0, readed);
     }
-    fileStream.write(buffer);
-    fileStream.flush();
 
     println("I'm done");
 }
