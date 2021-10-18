@@ -33,16 +33,21 @@ fun main(args: Array<String>) {
     // reading name and size
     val input = client.getInputStream();
 
+    // reading size
     input.read(buffer, 0, BUFF);
     val size: Long = (buffer.toString(charset).split("\n"))[0].toLong();
     println(size);
 
+    // readin name
+    val curDir: String = (System.getProperty("user.dir"));
+
     input.read(buffer, 0, BUFF);
-    val filename: String = (buffer.toString(charset).split("\n"))[0];
+    val filenameCome: String = (buffer.toString(charset).split("\n"))[0];
+    val filename: String = curDir + "/downloads/" + (filenameCome.split("/")).last();
     println(filename);
 
     // making file
-    val fileStream: OutputStream = File(filename + "hehe").outputStream();
+    val fileStream: OutputStream = File(filename).outputStream();
 
     // reading file
     val inputStream = client.getInputStream();
