@@ -66,8 +66,7 @@ fun clientRun(server: ServerSocket){
     // reading file
     val inputStream = client.getInputStream();
 
-
-
+    // downloading
     var left: Long = size;
     while(left > 0) {
         var readed: Int = inputStream.read(buffer, 0, BUFF);
@@ -101,13 +100,17 @@ fun main(args: Array<String>) {
 
     var threads: Vector<Thread> = Vector<Thread>();
 
-    while (true) {
-        for (i in 1..backlog) {
-            threads.add(Thread(Runnable {
+    for (i in 1..backlog) {
+        threads.add(Thread(Runnable {
+            while (true) {
                 clientRun(server);
-            }));
+            }
+        }));
 
-            threads.lastElement().start();
-        }
+        threads.lastElement().start();
+    }
+
+    for (i in 1..backlog) {
+        threads.elementAt(i).join();
     }
 }
