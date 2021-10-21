@@ -1,7 +1,7 @@
-function InputText({ onSubmit }) {
+function InputText({ onSubmit, handleChange }) {
     return (
         <form onSubmit={onSubmit}>
-            <input type="text" />
+            <input type="text" name="input" onChange={handleChange} />
             <button type="submit">Search!</button>
         </form>
 
