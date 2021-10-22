@@ -19,7 +19,7 @@ void take_fork(int phil, int fork, char* hand) {
 }
 
 int try_take_fork(int phil, int fork, char* hand) {
-    if (pthread_mutex_trylock(&forks[fork])) {
+    if (!pthread_mutex_trylock(&forks[fork])) {
         printf("Philosopher %d: got %d fork to his %s hand\n",
            phil, fork, hand);
         return 1;
