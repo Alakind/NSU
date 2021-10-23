@@ -11,11 +11,11 @@ function App() {
       <h1>
         lab3
       </h1>
-      <h3>
-        {weather.name}
-        {console.log(weather)}
-      </h3>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
+      <h3>
+        {console.log(weather)}
+        {console.log(places)}
+      </h3>
     </>
   );
 }

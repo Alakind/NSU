@@ -2,17 +2,15 @@ import { useState } from "react";
 import { InputText } from "../components";
 import { openTripApi, openWeatherApi } from "../utils";
 import consts from "../consts";
+import { getFullInfo } from "../utils";
 
-async function InputTextContainer({setWeather, setPlaces}) {
+function InputTextContainer({setWeather, setPlaces}) {
     const [input, setInput] = useState("");
 
     const onSubmit = (event) => {
         event.preventDefault();
 
-        let place = openWeatherApi.fetchOpenWeatherByName(input, consts.API_KEY_OPEN_WEATHER);
-
-        // openTripApi.fetchOpenTripRadius(consts.API_KEY_OPEN_TRIP, place.coord.lon, place.coord.lat, consts.RADIUS)
-        //     .then();
+        const { weather, places } = getFullInfo(input);
     }
 
     const handleChange = (event) => {

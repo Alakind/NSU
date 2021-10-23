@@ -1,9 +1,9 @@
 
 function fetchOpenTripRadius(apiKey, lon, lat, radius) {
-    const lon_min = lon - radius;
-    const lon_max = lon + radius;
-    const lat_min = lat - radius;
-    const lat_max = lat + radius;
+    const lon_min = lon - radius / 111000;
+    const lon_max = lon + radius / 111000;
+    const lat_min = lat - radius / 111000;
+    const lat_max = lat + radius / 111000;
 
     return fetch(` http://api.opentripmap.com/0.1/ru/places/bbox` +
         `?lon_min=${lon_min}` +
