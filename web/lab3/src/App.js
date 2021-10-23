@@ -4,7 +4,7 @@ import { InputTextContainer } from "./containers/InputTextContainer";
 function App() {
 
   const [weather, setWeather] = useState({});
-  const [places, setPlaces] = useState({});
+  const [places, setPlaces] = useState([]);
 
   return (
     <>
@@ -13,7 +13,11 @@ function App() {
       </h1>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
       <h3>
-        {console.log(weather)}
+        {(weather !== undefined)
+          ?
+        <div>{weather.name}</div>
+          :
+        <div>City</div>}
         {console.log(places)}
       </h3>
     </>

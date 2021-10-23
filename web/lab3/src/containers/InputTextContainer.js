@@ -10,7 +10,7 @@ function InputTextContainer({setWeather, setPlaces}) {
     const onSubmit = (event) => {
         event.preventDefault();
 
-        const { weather, places } = getFullInfo(input);
+        getFullInfo(input, setWeather, setPlaces);
     }
 
     const handleChange = (event) => {

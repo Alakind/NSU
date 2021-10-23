@@ -1,8 +1,8 @@
 import consts from "../consts";
 import { openTripApi, openWeatherApi } from ".";
 
-const getFullInfo = async function(input) {
-    const promiseWeather = openWeatherApi.fetchOpenWeatherByName(input, consts.API_KEY_OPEN_WEATHER);
+const getFullInfo = async function(city, setWeather, setPlaces) {
+    const promiseWeather = openWeatherApi.fetchOpenWeatherByName(city, consts.API_KEY_OPEN_WEATHER);
     
     const responseW = await promiseWeather;
     const weather = await responseW.json();
@@ -12,10 +12,8 @@ const getFullInfo = async function(input) {
     const responseP = await promisePlaces;
     const places = await responseP.json();
 
-    return {
-        weather,
-        places,
-    };
+    setWeather(weather);
+    setPlaces(places);
 }
 
 export {
