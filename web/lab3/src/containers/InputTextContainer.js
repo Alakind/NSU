@@ -3,18 +3,16 @@ import { InputText } from "../components";
 import { openTripApi, openWeatherApi } from "../utils";
 import consts from "../consts";
 
-function InputTextContainer({setWeather, setPlaces}) {
+async function InputTextContainer({setWeather, setPlaces}) {
     const [input, setInput] = useState("");
 
     const onSubmit = (event) => {
         event.preventDefault();
 
-        console.log(input);
+        let place = openWeatherApi.fetchOpenWeatherByName(input, consts.API_KEY_OPEN_WEATHER);
 
-        openWeatherApi.fetchOpenWeatherByName(input, consts.API_KEY_OPEN_WEATHER)
-            .then(response => response.json())
-            .then(console.log)
-            .catch(console.log);
+        // openTripApi.fetchOpenTripRadius(consts.API_KEY_OPEN_TRIP, place.coord.lon, place.coord.lat, consts.RADIUS)
+        //     .then();
     }
 
     const handleChange = (event) => {

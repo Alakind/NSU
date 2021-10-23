@@ -12,7 +12,8 @@ function App() {
         lab3
       </h1>
       <h3>
-        {weather.xid}
+        {weather.name}
+        {console.log(weather)}
       </h3>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
     </>
