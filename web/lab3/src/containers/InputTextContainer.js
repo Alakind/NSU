@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { InputText } from "../components";
-import { openTripApi, openWeatherApi } from "../utils";
-import consts from "../consts";
 import { getFullInfo } from "../utils";
 
 function InputTextContainer({setWeather, setPlaces}) {
@@ -17,7 +15,6 @@ function InputTextContainer({setWeather, setPlaces}) {
         setInput(event.target.value);
     }
 
-    
     return (
         <InputText onSubmit={onSubmit} handleChange={handleChange}/>
     );

@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { WeatherDescription } from "./components";
 import { InputTextContainer } from "./containers/InputTextContainer";
 
 function App() {
 
-  const [weather, setWeather] = useState({});
-  const [places, setPlaces] = useState([]);
+  const [weather, setWeather] = useState(undefined);
+  const [places, setPlaces] = useState(undefined);
 
   return (
     <>
@@ -12,14 +13,16 @@ function App() {
         lab3
       </h1>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
-      <h3>
+      <div>
         {(weather !== undefined)
           ?
-        <div>{weather.name}</div>
+        <WeatherDescription weather={weather} />
           :
-        <div>City</div>}
+        <div>Make a request</div>
+        }
+        {console.log(weather)}
         {console.log(places)}
-      </h3>
+      </div>
     </>
   );
 }
