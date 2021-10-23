@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 function WeatherDescription({ weather }) {
 
     const icon = `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`;
@@ -10,7 +8,7 @@ function WeatherDescription({ weather }) {
             <div>{Math.round(weather.main.temp - 273)}</div>
             {(icon !== undefined)
                 ?
-            <img src={icon} />
+            <img src={icon} alt="weather icon"/>
                 :
             <div>here should've been icon</div>}
         </>
