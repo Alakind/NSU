@@ -7,7 +7,7 @@ const getFullInfo = async function(city, setWeather, setPlaces) {
     const responseW = await promiseWeather;
     const weather = await responseW.json();
 
-    const promisePlaces = openTripApi.fetchOpenTripRadius(consts.API_KEY_OPEN_TRIP, weather.coord.lon, weather.coord.lat, consts.RADIUS);
+    const promisePlaces = openTripApi.fetchOpenTripRadius(weather.coord.lon, weather.coord.lat, consts.RADIUS);
 
     const responseP = await promisePlaces;
     const places = await responseP.json();

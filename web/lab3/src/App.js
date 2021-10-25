@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { WeatherDescription } from "./components";
 import { InputTextContainer } from "./containers/InputTextContainer";
+import { PlaceCardContainer } from "./containers/PlaceCardContainer";
 
 function App() {
 
@@ -14,14 +15,20 @@ function App() {
       </h1>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
       <div>
-        {(weather !== undefined)
+        {// WEATHER
+        (weather !== undefined)
           ?
         <WeatherDescription weather={weather} />
           :
         <div>Make a request</div>
         }
-        {console.log(weather)}
-        {console.log(places)}
+        {// PLACES
+        (places !== undefined)
+          ?
+        <PlaceCardContainer id={places.features[0].properties.xid} />
+          :
+        <div>Here will be places shown</div>
+        }
       </div>
     </>
   );
