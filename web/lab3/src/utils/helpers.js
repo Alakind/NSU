@@ -16,6 +16,16 @@ const getFullInfo = async function(city, setWeather, setPlaces) {
     setPlaces(places);
 }
 
+const fetchPlace = async function(id, setPlace) {
+    const promise = openTripApi.fetchOpenTripPlace(id);
+
+    const response = await promise;
+    const place = await response.json();
+
+    setPlace(place);
+}
+
 export {
     getFullInfo,
+    fetchPlace,
 };

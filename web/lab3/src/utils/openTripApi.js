@@ -5,7 +5,7 @@ function fetchOpenTripRadius(apiKey, lon, lat, radius) {
     const lat_min = lat - radius / 111000;
     const lat_max = lat + radius / 111000;
 
-    return fetch(` http://api.opentripmap.com/0.1/ru/places/bbox` +
+    return fetch(`http://api.opentripmap.com/0.1/ru/places/bbox` +
         `?lon_min=${lon_min}` +
         `&lat_min=${lat_min}` +
         `&lon_max=${lon_max}` +
@@ -15,6 +15,13 @@ function fetchOpenTripRadius(apiKey, lon, lat, radius) {
     );
 }
 
+function fetchOpenTripPlace(xid) {
+    return fetch(`http://api.opentripmap.com/0.1/ru/places/xid` +
+        `?xid=${xid}`
+    );
+}
+
 export const openTripApi = {
     fetchOpenTripRadius,
+    fetchOpenTripPlace,
 };
