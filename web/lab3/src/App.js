@@ -1,7 +1,8 @@
+import React from "react";
 import { useState } from "react";
 import { WeatherDescription } from "./components";
 import { InputTextContainer } from "./containers/InputTextContainer";
-import { PlaceCardContainer } from "./containers/PlaceCardContainer";
+import { CardsListContainer } from "./containers/CardsListContainer";
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
 
   return (
     <>
+      {console.log("HEHE")}
       <h1>
         lab3
       </h1>
@@ -25,7 +27,7 @@ function App() {
         {// PLACES
         (places !== undefined)
           ?
-        <PlaceCardContainer id={places.features[0].properties.xid} />
+        <CardsListContainer places={places.features} maxShown={10} />
           :
         <div>Here will be places shown</div>
         }
