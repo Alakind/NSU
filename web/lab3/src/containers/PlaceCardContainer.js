@@ -11,7 +11,6 @@ function PlaceCardContainer({ id }) {
 
     return (
         <>
-            {console.log(place)}
             {
             (place === undefined)
                 ?

@@ -5,8 +5,7 @@ function CardsListContainer({ places, maxShown }) {
         <div>
             {
             [places.slice(0, maxShown).map((place) => {
-                console.log(place.properties.xid);
-                return <PlaceCardContainer id={place.properties.xid} />;
+                return <PlaceCardContainer key={place.properties.xid} id={place.properties.xid} />;
             })]
             }
         </div>

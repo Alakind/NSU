@@ -11,9 +11,8 @@ function App() {
 
   return (
     <>
-      {console.log("HEHE")}
       <h1>
-        lab3
+        Trip explorer
       </h1>
       <InputTextContainer setWeather={setWeather} setPlaces={setPlaces} />
       <div>
