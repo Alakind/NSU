@@ -1,0 +1,118 @@
+import lingo/pegcode/driver;
+
+ArExpr ::= ArSum, ArMult, ArInt;
+ArSum(lhs : ArExpr, rhs : ArExpr);
+ArMult(lhs : ArExpr, rhs : ArExpr);
+ArInt(val : int);
+
+s2ar(str : string) -> ArExpr {
+	e_gr = "#include D:\Programs\flow9\demos\labs\lab5\arith.lingo";
+	parsic(
+		compilePegGrammar(e_gr), 
+		str,
+		SemanticActions(setTree(defaultPegActions.t, "createArInt", \s -> ArInt(s2i(s[0]))))
+	)
+}
+
+ar2s(expr : ArExpr) -> string {
+	switch (expr : ArExpr) {
+		ArInt(val): {
+			i2s(val);
+		}
+		ArSum(lhs, rhs): {
+			str = ["(", ar2s(lhs), "+", ar2s(rhs), ")"];
+			strGlue(str, "");
+		}
+		ArMult(lhs, rhs): {
+			str = ["(", ar2s(lhs), "*", ar2s(rhs), ")"];
+			strGlue(str, "");
+		}
+	}
+}
+
+ar2rpn(expr : ArExpr) -> [string] {
+	switch (expr : ArExpr) {
+		ArInt(val): {
+			[i2s(val)];
+		}
+		ArSum(lhs, rhs): {
+			concat3(ar2rpn(lhs), ar2rpn(rhs), ["+"]);
+		}
+		ArMult(lhs, rhs): {
+			concat3(ar2rpn(lhs), ar2rpn(rhs), ["*"]);
+		}
+	}
+}
+
+rpn2ar(rpn : [string]) -> ArExpr {
+	pair : [ArExpr] = [ArInt(-1), ArInt(-1)];
+
+	new_pair = fold(rpn, pair, \acc, cur -> {
+		left = acc[0];
+		right = acc[1];
+
+		if (cur == "+") {
+			[ArSum(left, right), right];
+		} else if (cur == "*") {
+			[ArMult(left, right), right];
+		} else {
+			if (left == ArInt(-1)) {
+				[ArInt(s2i(cur)), right];
+			} else {
+				[left, ArInt(s2i(cur))];
+			}
+		}
+	});
+
+	new_pair[0]
+}
+
+calculate(expr : ArExpr) -> int {
+	switch (expr : ArExpr) {
+		ArInt(val): {
+			val;
+		}
+		ArSum(lhs, rhs): {
+			calculate(lhs) + calculate(rhs);
+		}
+		ArMult(lhs, rhs): {
+			calculate(lhs) * calculate(rhs);
+		}
+	}
+}
+
+calculateRPN(array : [string]) -> int {
+	pair : [int] = [-1, -1];
+
+	new_pair = fold(array, pair, \acc, cur -> {
+		left = acc[0];
+		right = acc[1];
+
+		if (cur == "+") {
+			[left + right, right];
+		} else if (cur == "*") {
+			[left * right, right];
+		} else {
+			if (left == -1) {
+				[s2i(cur), right];
+			} else {
+				[left, s2i(cur)];
+			}
+		}
+	});
+
+	new_pair[0]
+}
+
+main() {
+	expr = "((3+2)*5)";
+	ast = s2ar(expr);
+	resStr = ar2s(ast);
+	println(resStr);
+	println(calculate(ast));
+
+	println(strGlue(ar2rpn(ast), " "));
+
+	println(calculateRPN(ar2rpn(ast)));
+	println(calculate(rpn2ar(ar2rpn(ast))));
+}

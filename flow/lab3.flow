@@ -1,0 +1,31 @@
+import runtime;
+import string;
+
+fib_b(n : int) -> [int] {
+    if (n == 1) {
+        [1];
+    } else if (n == 2) {
+        [1, 1];
+    } else {
+        array : [int] = fib_b(n - 1);
+        new_array = concat(array, [array[length(array) - 1] + array[length(array) - 2]]);
+        new_array;
+    }
+}
+
+fib_c(n : int) -> [int] {
+    if (n == 1) {
+        [1];
+    } else if (n == 2) {
+        [1, 1];
+    } else {
+        array : ref [int] = ref fib_c(n - 1);
+        refArrayPush(array, ^array[length(^array) - 1] + ^array[length(^array) - 2]);
+        ^array;
+    }
+}
+
+main() {
+    println(fib_b(10));
+}
+

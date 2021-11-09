@@ -1,0 +1,33 @@
+import ds/tree;
+
+couples1(arr: [int], m: int) -> [Pair<int, int>] {
+    foldi(arr, [], \i, acc, a ->
+        foldi(arr, acc, \j, bcc, b ->
+            if (a + b == m) {
+                concat(bcc, [Pair(i, j)])
+            } else {
+                bcc
+            }
+        )
+    )
+}
+
+couples2(arr: [int], m: int) -> [Pair<int, int>] {
+    tree: Tree = foldi(arr, makeTree(), \i, tree_acc, cur_value -> 
+        setTree(tree_acc, cur_value, arrayPush(getTreeArrayValue(tree_acc, cur_value), i))
+    );
+
+    foldi(arr, [], \i, acc, cur ->
+        switch(lookupTree(tree, m - cur)) {
+            Some(index): concat(acc, map(index, \j -> Pair(j, i)));
+            None(): acc;
+        }
+    );
+}
+
+main() {
+    array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    println(couples1(array, 10));
+    println(couples2(array, 10));
+}
