@@ -1,0 +1,14 @@
+import runtime;
+import string;
+
+sum_array(array : [int]) -> int {
+    sum = fold(array, 0, \acc, cur -> { acc + cur });
+
+    sum;
+}
+
+main() {
+    array = [1, 2, 3];
+    
+    println(sum_array(array));
+}

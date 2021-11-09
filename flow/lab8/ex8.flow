@@ -1,0 +1,214 @@
+import lingo/pegcode/driver;
+import math/math;
+import string;
+
+ArExpr ::= ArSum, ArMult, ArInt, ArSub, ArDiv, ArInv, ArRat, ArVar;
+
+ArSum(lhs : ArExpr, rhs : ArExpr);
+ArMult(lhs : ArExpr, rhs : ArExpr);
+ArInt(val : int);
+ArSub(lhs : ArExpr, rhs : ArExpr);
+ArDiv(lhs : ArExpr, rhs : ArExpr);
+ArInv(arg : ArExpr);
+ArRat(num : int, denum : int);
+ArVar(name : string);
+
+ZERO_DIV = "Divison by zero";
+INVALID_INPUT = "Invalid input";
+
+s2ar(str : string) -> ArExpr {
+	e_gr = "#include D:\Programs\flow9\demos\labs\lab7\arith.lingo";
+	parsic(
+		compilePegGrammar(e_gr), 
+		str,
+		SemanticActions(setTree(defaultPegActions.t, "createArInt", \s -> ArInt(s2i(s[0]))))
+	)
+}
+
+ar2s(expr : ArExpr) -> Maybe<string> {
+	switch (expr : ArExpr) {
+		ArInt(val): Some(i2s(val));
+		ArSum(lhs, rhs): {
+			left = ar2s(lhs);
+			right = ar2s(rhs);
+			str = ["(", left??left:ZERO_DIV, "+", right??right:ZERO_DIV, ")"];
+			Some(strGlue(str, ""));
+		}
+		ArMult(lhs, rhs): {
+			left = ar2s(lhs);
+			right = ar2s(rhs);
+			str = ["(", left??left:ZERO_DIV, "*", right??right:ZERO_DIV, ")"];
+			Some(strGlue(str, ""));
+		}
+		ArSub(lhs, rhs): {
+			left = ar2s(lhs);
+			right = ar2s(rhs);
+			str = ["(", left??left:ZERO_DIV, "-", right??right:ZERO_DIV, ")"];
+			Some(strGlue(str, ""));
+		}
+		ArDiv(lhs, rhs): {
+			left = ar2s(lhs);
+			right = ar2s(rhs);
+			str = ["(", left??left:ZERO_DIV, "/", right??right:ZERO_DIV, ")"];
+			Some(strGlue(str, ""));
+		}
+		ArInv(value): {
+			res = ar2s(value);
+			Some(strGlue(["-", res??res:ZERO_DIV], ""));
+		}
+		ArRat(num, denum): {
+			if (denum == 0) {
+				None();
+			} else if (denum / gcd(num, denum) == 1) {
+				Some(i2s(num / gcd(num, denum)));
+			} else {
+				str = ["(", i2s(num / gcd(num, denum)), "/", i2s(denum / gcd(num, denum)), ")"];
+				Some(strGlue(str, ""));
+			}
+		}
+		ArVar(variable): Some(variable);
+	}
+}
+
+varLookup(variable: string, variables: [Pair<string, ArRat>]) -> ArRat {
+	fold(variables, ArRat(0, 0), \acc, cur_pair -> {
+		if (firstOfPair(cur_pair) == variable) {
+			ArRat(secondOfPair(cur_pair).num, secondOfPair(cur_pair).denum);
+		} else {
+			acc
+		}
+	})
+}
+
+calculate(expr : ArExpr, variables: [Pair<string, ArRat>]) -> Maybe<ArRat> {
+	switch (expr : ArExpr) {
+		ArVar(variable): {
+			value = varLookup(variable, variables);
+
+			if (value.denum == 0) {
+				None()
+			} else {
+				Some(value)
+			}
+		}
+		ArInt(val): {
+			Some(ArRat(val, 1))
+		}
+		ArSum(lhs, rhs): {
+			leftOrNone = calculate(lhs, variables);
+			rightOrNone = calculate(rhs, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None()
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.denum == right.denum) {
+						Some(ArRat(left.num + right.num, left.denum))
+					} else {
+						lcm = lcm(left.denum, right.denum);
+						Some(ArRat((left.num * (lcm / left.denum)) + (right.num * (lcm / right.denum)), lcm))
+					}
+				}
+			}
+		}
+		ArSub(lhs, rhs): {
+			leftOrNone = calculate(lhs, variables);
+			rightOrNone = calculate(rhs, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.denum == right.denum) {
+						Some(ArRat(left.num - right.num, left.denum))
+					} else {
+						lcm = lcm(left.denum, right.denum);
+						Some(ArRat((left.num * (lcm / left.denum)) - (right.num * (lcm / right.denum)), lcm))
+					}
+				}
+			}
+		}
+		ArMult(lhs, rhs): {
+			leftOrNone = calculate(lhs, variables);
+			rightOrNone = calculate(rhs, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					gcd = iabs(gcd(left.num * right.num, left.denum * right.denum));
+					Some(ArRat((left.num * right.num) / gcd, (left.denum * right.denum) / gcd))
+				}
+			}
+		}
+		ArDiv(lhs, rhs): {
+			leftOrNone = calculate(lhs, variables);
+			rightOrNone = calculate(rhs, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					gcd = iabs(gcd(left.num * right.denum, left.denum * right.num));
+					Some(ArRat(((left.num * right.denum) / gcd), ((left.denum * right.num) / gcd)))
+				}
+			}
+		}
+		ArInv(income): {
+			valueOrNone = calculate(income, variables);
+
+			if (isNone(valueOrNone)) {
+				None()
+			} else {
+				value = valueOrNone??valueOrNone:ArRat(0, 0);
+				if (value.denum == 0) {
+					None()
+				} else {
+					Some(ArRat(-1 * value.num, value.denum))
+				}
+			}
+		}
+		ArRat(num, denum): {
+			Some(ArRat(num, denum))
+		}
+	}
+}
+
+resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
+	result = calculate(arrExpr, variables);
+	
+	result ?? println(result) : println(INVALID_INPUT)
+}
+
+main() {
+	expr = "((3+2)*5)";
+	ast = s2ar(expr);
+	resStr = ar2s(ast);
+
+	println(resStr);
+
+	array = [];
+
+	println(resStr);
+	resolve(ast, array);
+}

@@ -1,0 +1,14 @@
+import runtime;
+import string;
+
+int_to_str(array : [int]) -> [string] {
+    new_array = map(array, i2s);
+
+    new_array;
+}
+
+main() {
+    array = [1, 2, 3];
+    
+    println(strGlue(int_to_str(array), " "));
+}

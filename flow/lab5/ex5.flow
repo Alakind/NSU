@@ -1,0 +1,53 @@
+import lingo/pegcode/driver;
+
+ArExpr ::= ArSum, ArMult, ArInt;
+ArSum(lhs : ArExpr, rhs : ArExpr);
+ArMult(lhs : ArExpr, rhs : ArExpr);
+ArInt(val : int);
+
+s2ar(str : string) -> ArExpr {
+	e_gr = "#include D:\Programs\flow9\demos\labs\lab5\arith.lingo";
+	parsic(
+		compilePegGrammar(e_gr), 
+		str,
+		SemanticActions(setTree(defaultPegActions.t, "createArInt", \s -> ArInt(s2i(s[0]))))
+	)
+}
+
+ar2s(expr : ArExpr) -> string {
+	switch (expr : ArExpr) {
+		ArInt(val): {
+			i2s(val);
+		}
+		ArSum(lhs, rhs): {
+			str = ["(", ar2s(lhs), "+", ar2s(rhs), ")"];
+			strGlue(str, "");
+		}
+		ArMult(lhs, rhs): {
+			str = ["(", ar2s(lhs), "*", ar2s(rhs), ")"];
+			strGlue(str, "");
+		}
+	}
+}
+
+calculate(expr : ArExpr) -> int {
+	switch (expr : ArExpr) {
+		ArInt(val): {
+			val;
+		}
+		ArSum(lhs, rhs): {
+			calculate(lhs) + calculate(rhs);
+		}
+		ArMult(lhs, rhs): {
+			calculate(lhs) * calculate(rhs);
+		}
+	}
+}
+
+main() {
+	expr = "((3+2)*5)";
+	ast = s2ar(expr);
+	resStr = ar2s(ast);
+	println(resStr);
+	println(calculate(ast));
+}
