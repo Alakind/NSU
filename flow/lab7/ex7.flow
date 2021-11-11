@@ -17,7 +17,7 @@ ZERO_DIV = "Divison by zero";
 INVALID_INPUT = "Invalid input";
 
 s2ar(str : string) -> ArExpr {
-	e_gr = "#include D:\Programs\flow9\demos\labs\lab7\arith.lingo";
+	e_gr = "#include arith.lingo";
 	parsic(
 		compilePegGrammar(e_gr), 
 		str,
@@ -201,7 +201,8 @@ resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
 }
 
 main() {
-	expr = "((3+2)*5)";
+	//expr = "((3+2)*5)";
+	expr = "(((3+2)*5)+2)";
 	ast = s2ar(expr);
 	resStr = ar2s(ast);
 

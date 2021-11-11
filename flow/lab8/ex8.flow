@@ -17,7 +17,7 @@ ZERO_DIV = "Divison by zero";
 INVALID_INPUT = "Invalid input";
 
 s2ar(str : string) -> ArExpr {
-	e_gr = "#include D:\Programs\flow9\demos\labs\lab7\arith.lingo";
+	e_gr = "#include arith.lingo";
 	parsic(
 		compilePegGrammar(e_gr), 
 		str,
@@ -78,6 +78,146 @@ varLookup(variable: string, variables: [Pair<string, ArRat>]) -> ArRat {
 			acc
 		}
 	})
+}
+
+differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> Maybe<ArExpr> {
+	switch (expr: ArExpr) {
+		ArVar(variable): {
+			if (var == variable) {
+				Some(ArRat(1, 1))
+			} else {
+				value = varLookup(variable, variables);
+				if (value.denum == 0) {
+					None()
+				} else {
+					Some(ArRat(0, 1))
+				}
+			}
+		}
+		ArInt(val): {
+			Some(ArRat(0, 1));
+		}
+		ArSum(lhs, rhs): {
+			leftOrNone = differentiate(lhs, var, variables);
+			rightOrNone = differentiate(rhs, var, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None()
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					newLeftOrNone = differentiate(left, var, variables);
+					newRightOrNone = differentiate(right, var, variables);
+					if (isNone(leftOrNone) || isNone(rightOrNone)) {
+						None()
+					} else {
+						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+
+						Some(ArSum(newLeft, newRight))
+					}
+
+				}
+			}
+		}
+		ArSub(lhs, rhs): {
+			leftOrNone = differentiate(lhs, var, variables);
+			rightOrNone = differentiate(rhs, var, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					newLeftOrNone = differentiate(left, var, variables);
+					newRightOrNone = differentiate(right, var, variables);
+					if (isNone(leftOrNone) || isNone(rightOrNone)) {
+						None()
+					} else {
+						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+
+						Some(ArSub(newLeft, newRight))
+					}
+				}
+			}
+		}
+		ArMult(lhs, rhs): {
+			leftOrNone = differentiate(lhs, var, variables);
+			rightOrNone = differentiate(rhs, var, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					newLeftOrNone = differentiate(left, var, variables);
+					newRightOrNone = differentiate(right, var, variables);
+					if (isNone(leftOrNone) || isNone(rightOrNone)) {
+						None()
+					} else {
+						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+
+						Some(ArSum(ArMult(newLeft, right), ArMult(left, newRight)))
+					}
+				}
+			}
+		}
+		ArDiv(lhs, rhs): {
+			leftOrNone = differentiate(lhs, var, variables);
+			rightOrNone = differentiate(rhs, var, variables);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					newNumOrNone = differentiate(ArMult(left, right), var, variables);
+					if (isNone(newNumOrNone)) {
+						None()
+					} else {
+						newNum = newNumOrNone??newNumOrNone:ArRat(0, 0);
+
+						Some(ArDiv(newNum, ArMult(right, right)))
+					}
+				}
+			}
+		}
+		ArInv(income): {
+			valueOrNone = differentiate(income, var, variables);
+
+			if (isNone(valueOrNone)) {
+				None()
+			} else {
+				value = valueOrNone??valueOrNone:ArRat(0, 0);
+				if (value.denum == 0) {
+					None()
+				} else {
+					Some(ArRat(-1 * value.num, value.denum))
+				}
+			}
+		}
+		ArRat(num, denum): {
+			Some(ArRat(0, 1))
+		}
+	}
 }
 
 calculate(expr : ArExpr, variables: [Pair<string, ArRat>]) -> Maybe<ArRat> {
@@ -200,6 +340,12 @@ resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
 	result ?? println(result) : println(INVALID_INPUT)
 }
 
+resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> void {
+	result = differentiate(arrExpr, "X", variables);
+	
+	result ?? println(result) : println(INVALID_INPUT)
+}
+
 main() {
 	expr = "((3+2)*5)";
 	ast = s2ar(expr);
@@ -211,4 +357,5 @@ main() {
 
 	println(resStr);
 	resolve(ast, array);
+	resolveDiff(ast, "x", array);
 }
