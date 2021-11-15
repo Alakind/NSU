@@ -3,3 +3,4 @@
 *.cmake
 *CMakeCache.txt
 .vscode
+*/javagen/*
