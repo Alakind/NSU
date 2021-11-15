@@ -207,6 +207,125 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 
 // #########################################################################
 
+simplify(expr: ArExpr) -> Maybe<ArExpr> {
+	switch (expr : ArExpr) {
+		ArVar(variable): {
+			Some(ArVar(variable))
+		}
+		ArInt(val): {
+			Some(ArRat(val, 1))
+		}
+		ArSum(lhs, rhs): {
+			leftOrNone = simplify(lhs);
+			rightOrNone = simplify(rhs);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None()
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.denum == right.denum) {
+						Some(ArRat(left.num + right.num, left.denum))
+					} else {
+						if (left.num == 0) {
+							Some(rhs)
+						} else if (right.num == 0) {
+							Some(lhs)	
+						} else {
+							Some(ArSub(lhs, rhs))
+						}
+					}
+				}
+			}
+		}
+		ArSub(lhs, rhs): {
+			leftOrNone = simplify(lhs);
+			rightOrNone = simplify(rhs);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.denum == right.denum) {
+						Some(ArRat(left.num - right.num, left.denum))
+					} else {
+						if (left.num == 0) {
+							Some(ArInv(rhs))
+						} else if (right.num == 0) {
+							Some(lhs)	
+						} else {
+							Some(ArSub(lhs, rhs))
+						}
+					}
+				}
+			}
+		}
+		ArMult(lhs, rhs): {
+			leftOrNone = simplify(lhs);
+			rightOrNone = simplify(rhs);
+
+			Some(ArMult(leftOrNone, rhs))
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.num == 0 || right.denum == 0) {
+						Some(ArRat(0, 1))
+					} else {
+						Some(ArMult(lhs, rhs))
+					}
+				}
+			}
+		}
+		ArDiv(lhs, rhs): {
+			leftOrNone = simplify(lhs);
+			rightOrNone = simplify(rhs);
+
+			if (isNone(leftOrNone) || isNone(rightOrNone)) {
+				None();
+			} else {
+				left = leftOrNone??leftOrNone:ArRat(0, 0);
+				right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+				if (left.denum == 0 || right.denum == 0) {
+					None()
+				} else {
+					if (left.num == 0) {
+						ArRat(0, 1)
+					} else {
+						Some(ArDiv(lhs, rhs))
+					}
+				}
+			}
+		}
+		ArInv(income): {
+			Some(ArInv(income))
+		}
+		ArRat(num, denum): {
+			gcd = iabs(gcd(num, denum));
+
+			Some(ArRat(num / gcd, denum / gcd))
+		}
+	}
+}
+
+// #########################################################################
+
 calculate(expr : ArExpr, variables: [Pair<string, ArRat>]) -> Maybe<ArRat> {
 	switch (expr : ArExpr) {
 		ArVar(variable): {
