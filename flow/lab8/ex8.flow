@@ -84,7 +84,7 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 	switch (expr: ArExpr) {
 		ArVar(variable): {
 			if (var == variable) {
-				Some(ArRat(1, 1))
+				Some(ArRat(2, 2))
 			} else {
 				value = varLookup(variable, variables);
 				if (value.denum == 0) {
@@ -107,20 +107,16 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 				left = leftOrNone??leftOrNone:ArRat(0, 0);
 				right = rightOrNone??rightOrNone:ArRat(0, 0);
 
-				if (left.denum == 0 || right.denum == 0) {
+
+				newLeftOrNone = differentiate(left, var, variables);
+				newRightOrNone = differentiate(right, var, variables);
+				if (isNone(leftOrNone) || isNone(rightOrNone)) {
 					None()
 				} else {
-					newLeftOrNone = differentiate(left, var, variables);
-					newRightOrNone = differentiate(right, var, variables);
-					if (isNone(leftOrNone) || isNone(rightOrNone)) {
-						None()
-					} else {
-						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
-						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+					newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+					newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
 
-						Some(ArSum(newLeft, newRight))
-					}
-
+					Some(ArSum(newLeft, newRight))
 				}
 			}
 		}
@@ -134,19 +130,16 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 				left = leftOrNone??leftOrNone:ArRat(0, 0);
 				right = rightOrNone??rightOrNone:ArRat(0, 0);
 
-				if (left.denum == 0 || right.denum == 0) {
+
+				newLeftOrNone = differentiate(left, var, variables);
+				newRightOrNone = differentiate(right, var, variables);
+				if (isNone(leftOrNone) || isNone(rightOrNone)) {
 					None()
 				} else {
-					newLeftOrNone = differentiate(left, var, variables);
-					newRightOrNone = differentiate(right, var, variables);
-					if (isNone(leftOrNone) || isNone(rightOrNone)) {
-						None()
-					} else {
-						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
-						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+					newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+					newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
 
-						Some(ArSub(newLeft, newRight))
-					}
+					Some(ArSub(newLeft, newRight))
 				}
 			}
 		}
@@ -160,19 +153,16 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 				left = leftOrNone??leftOrNone:ArRat(0, 0);
 				right = rightOrNone??rightOrNone:ArRat(0, 0);
 
-				if (left.denum == 0 || right.denum == 0) {
+
+				newLeftOrNone = differentiate(left, var, variables);
+				newRightOrNone = differentiate(right, var, variables);
+				if (isNone(leftOrNone) || isNone(rightOrNone)) {
 					None()
 				} else {
-					newLeftOrNone = differentiate(left, var, variables);
-					newRightOrNone = differentiate(right, var, variables);
-					if (isNone(leftOrNone) || isNone(rightOrNone)) {
-						None()
-					} else {
-						newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
-						newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+					newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+					newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
 
-						Some(ArSum(ArMult(newLeft, right), ArMult(left, newRight)))
-					}
+					Some(ArSum(ArMult(newLeft, right), ArMult(left, newRight)))
 				}
 			}
 		}
@@ -180,24 +170,18 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 			leftOrNone = differentiate(lhs, var, variables);
 			rightOrNone = differentiate(rhs, var, variables);
 
-			if (isNone(leftOrNone) || isNone(rightOrNone)) {
-				None();
+
+			left = leftOrNone??leftOrNone:ArRat(0, 0);
+			right = rightOrNone??rightOrNone:ArRat(0, 0);
+
+
+			newNumOrNone = differentiate(ArMult(left, right), var, variables);
+			if (isNone(newNumOrNone)) {
+				None()
 			} else {
-				left = leftOrNone??leftOrNone:ArRat(0, 0);
-				right = rightOrNone??rightOrNone:ArRat(0, 0);
+				newNum = newNumOrNone??newNumOrNone:ArRat(0, 0);
 
-				if (left.denum == 0 || right.denum == 0) {
-					None()
-				} else {
-					newNumOrNone = differentiate(ArMult(left, right), var, variables);
-					if (isNone(newNumOrNone)) {
-						None()
-					} else {
-						newNum = newNumOrNone??newNumOrNone:ArRat(0, 0);
-
-						Some(ArDiv(newNum, ArMult(right, right)))
-					}
-				}
+				Some(ArDiv(newNum, ArMult(right, right)))
 			}
 		}
 		ArInv(income): {
@@ -207,18 +191,21 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 				None()
 			} else {
 				value = valueOrNone??valueOrNone:ArRat(0, 0);
-				if (value.denum == 0) {
-					None()
-				} else {
-					Some(ArRat(-1 * value.num, value.denum))
-				}
+
+				Some(ArMult(ArRat(-1, 1), value))
 			}
 		}
 		ArRat(num, denum): {
-			Some(ArRat(0, 1))
+			if (num == 2 && denum == 2) {
+				Some(ArRat(1, 1))
+			} else {
+				Some(ArRat(0, 1))
+			}
 		}
 	}
 }
+
+// #########################################################################
 
 calculate(expr : ArExpr, variables: [Pair<string, ArRat>]) -> Maybe<ArRat> {
 	switch (expr : ArExpr) {
@@ -341,19 +328,21 @@ resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
 }
 
 resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> void {
-	result = differentiate(arrExpr, "X", variables);
+	result = differentiate(arrExpr, "x", variables);
 	
 	result ?? println(result) : println(INVALID_INPUT)
 }
 
 main() {
-	expr = "((3+2)*5)";
+	expr = "(3+x)";
+	expr1 = "((3+x)*5)";
 	ast = s2ar(expr);
 	resStr = ar2s(ast);
 
 	println(resStr);
 
-	array = [];
+	xVar = Pair("x", ArRat(3, 1));
+	array = [xVar];
 
 	println(resStr);
 	resolve(ast, array);
