@@ -207,119 +207,166 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 
 // #########################################################################
 
-simplify(expr: ArExpr) -> Maybe<ArExpr> {
+simplify(expr: ArExpr) -> ArExpr {
 	switch (expr : ArExpr) {
 		ArVar(variable): {
-			Some(ArVar(variable))
+			ArVar(variable)
 		}
 		ArInt(val): {
-			Some(ArRat(val, 1))
+			ArRat(val, 1)
 		}
-		ArSum(lhs, rhs): {
-			leftOrNone = simplify(lhs);
-			rightOrNone = simplify(rhs);
+		ArSum(lefths, righths): {
+			lhs = simplify(lefths);
+			rhs = simplify(righths);
 
-			if (isNone(leftOrNone) || isNone(rightOrNone)) {
-				None()
-			} else {
-				left = leftOrNone??leftOrNone:ArRat(0, 0);
-				right = rightOrNone??rightOrNone:ArRat(0, 0);
-
-				if (left.denum == 0 || right.denum == 0) {
-					None()
-				} else {
-					if (left.denum == right.denum) {
-						Some(ArRat(left.num + right.num, left.denum))
-					} else {
-						if (left.num == 0) {
-							Some(rhs)
-						} else if (right.num == 0) {
-							Some(lhs)	
-						} else {
-							Some(ArSub(lhs, rhs))
+			switch(lhs : ArExpr) {
+				ArRat(lnum, ldenum): {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (lnum == 0) {
+								rhs
+							} else if (rnum == 0) {
+								lhs
+							} else {
+								ArSum(lhs, rhs)
+							}
+						}
+						default: {
+							if (lnum == 0) {
+								rhs
+							} else {
+								ArSum(lhs, rhs)
+							}
+						}
+					}
+				}
+				default: {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (rnum == 0) {
+								lhs
+							} else {
+								ArSum(lhs, rhs)
+							}
+						}
+						default: {
+							ArSum(lhs, rhs)
 						}
 					}
 				}
 			}
 		}
-		ArSub(lhs, rhs): {
-			leftOrNone = simplify(lhs);
-			rightOrNone = simplify(rhs);
+		ArSub(lefths, righths): {
+			lhs = simplify(lefths);
+			rhs = simplify(righths);
 
-			if (isNone(leftOrNone) || isNone(rightOrNone)) {
-				None();
-			} else {
-				left = leftOrNone??leftOrNone:ArRat(0, 0);
-				right = rightOrNone??rightOrNone:ArRat(0, 0);
-
-				if (left.denum == 0 || right.denum == 0) {
-					None()
-				} else {
-					if (left.denum == right.denum) {
-						Some(ArRat(left.num - right.num, left.denum))
-					} else {
-						if (left.num == 0) {
-							Some(ArInv(rhs))
-						} else if (right.num == 0) {
-							Some(lhs)	
-						} else {
-							Some(ArSub(lhs, rhs))
+			switch(lhs : ArExpr) {
+				ArRat(lnum, ldenum): {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (lnum == 0) {
+								ArInv(rhs)
+							} else if (rnum == 0) {
+								lhs
+							} else {
+								ArSub(lhs, rhs)
+							}
+						}
+						default: {
+							if (lnum == 0) {
+								ArInv(rhs)
+							} else {
+								ArSub(lhs, rhs)
+							}
+						}
+					}
+				}
+				default: {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (rnum == 0) {
+								lhs
+							} else {
+								ArSub(lhs, rhs)
+							}
+						}
+						default: {
+							ArSub(lhs, rhs)
 						}
 					}
 				}
 			}
 		}
-		ArMult(lhs, rhs): {
-			leftOrNone = simplify(lhs);
-			rightOrNone = simplify(rhs);
+		ArMult(lefths, righths): {
+			lhs = simplify(lefths);
+			rhs = simplify(righths);
 
-			Some(ArMult(leftOrNone, rhs))
-
-			if (isNone(leftOrNone) || isNone(rightOrNone)) {
-				None();
-			} else {
-				left = leftOrNone??leftOrNone:ArRat(0, 0);
-				right = rightOrNone??rightOrNone:ArRat(0, 0);
-
-				if (left.denum == 0 || right.denum == 0) {
-					None()
-				} else {
-					if (left.num == 0 || right.denum == 0) {
-						Some(ArRat(0, 1))
-					} else {
-						Some(ArMult(lhs, rhs))
+			switch(lhs : ArExpr) {
+				ArRat(lnum, ldenum): {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (lnum == 0 || rnum == 0) {
+								ArRat(0, 1)
+							} else {
+								ArMult(lhs, rhs)
+							}
+						}
+						default: {
+							if (lnum == 0) {
+								ArRat(0, 1)
+							} else {
+								ArMult(lhs, rhs)
+							}
+						}
+					}
+				}
+				default: {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (rnum == 0) {
+								ArRat(0, 1)
+							} else {
+								ArMult(lhs, rhs)
+							}
+						}
+						default: {
+							ArMult(lhs, rhs)
+						}
 					}
 				}
 			}
 		}
-		ArDiv(lhs, rhs): {
-			leftOrNone = simplify(lhs);
-			rightOrNone = simplify(rhs);
+		ArDiv(lefths, righths): {
+			lhs = simplify(lefths);
+			rhs = simplify(righths);
 
-			if (isNone(leftOrNone) || isNone(rightOrNone)) {
-				None();
-			} else {
-				left = leftOrNone??leftOrNone:ArRat(0, 0);
-				right = rightOrNone??rightOrNone:ArRat(0, 0);
-
-				if (left.denum == 0 || right.denum == 0) {
-					None()
-				} else {
-					if (left.num == 0) {
-						ArRat(0, 1)
-					} else {
-						Some(ArDiv(lhs, rhs))
+			switch(lhs : ArExpr) {
+				ArRat(lnum, ldenum): {
+					switch(rhs : ArExpr) {
+						ArRat(rnum, rdenum): {
+							if (lnum == 0) {
+								ArRat(0, 1)
+							} else {
+								ArDiv(lhs, rhs)
+							}
+						}
+						default: {
+							ArDiv(lhs, rhs)
+						}
 					}
+				}
+				default: {
+					ArDiv(lhs, rhs)
 				}
 			}
 		}
 		ArInv(income): {
-			Some(ArInv(income))
+			ArInv(income)
 		}
 		ArRat(num, denum): {
 			gcd = iabs(gcd(num, denum));
 
-			Some(ArRat(num / gcd, denum / gcd))
+			ArRat(num / gcd, denum / gcd)
 		}
 	}
 }
