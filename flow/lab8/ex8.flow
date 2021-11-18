@@ -482,15 +482,25 @@ calculate(expr : ArExpr, variables: [Pair<string, ArRat>]) -> Maybe<ArRat> {
 			}
 		}
 		ArRat(num, denum): {
-			Some(ArRat(num, denum))
+			if (denum == 0) {
+				None()
+			} else {
+				Some(ArRat(num, denum))
+			}
 		}
 	}
 }
 
 resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
 	result = calculate(arrExpr, variables);
-	
-	result ?? println(result) : println(INVALID_INPUT)
+
+	res = result??result:ArRat(0, 0);
+
+	if (isNone(result) || isNone(ar2s(res))) {
+		println(ZERO_DIV)
+	} else {
+		result ?? println(result) : println(INVALID_INPUT)
+	}
 }
 
 resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> void {
@@ -500,14 +510,14 @@ resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> v
 }
 
 main() {
-	expr = "(3+x)";
+	expr = "((x + 2) / (x - 2))";
 	expr1 = "((3+x)*5)";
 	ast = s2ar(expr);
 	resStr = ar2s(ast);
 
 	println(resStr);
 
-	xVar = Pair("x", ArRat(3, 1));
+	xVar = Pair("x", ArRat(2, 1));
 	array = [xVar];
 
 	println(resStr);
