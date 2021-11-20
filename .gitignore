@@ -3,4 +3,6 @@
 *.cmake
 *CMakeCache.txt
 .vscode
-*/javagen/*
+*.jar
+*.zip
+*/textrpg/*
