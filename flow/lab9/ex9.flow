@@ -13,6 +13,10 @@ ArInv(arg : ArExpr);
 ArRat(num : int, denum : int);
 ArVar(name : string);
 
+Monome(monome: Tree<string, int>);
+Polinome(monomes: Tree<Monome, int>);
+RatFunc(num: Polinome, denum: Polinome);
+
 ZERO_DIV = "Divison by zero";
 INVALID_INPUT = "Invalid input";
 
@@ -79,6 +83,171 @@ varLookup(variable: string, variables: [Pair<string, ArRat>]) -> ArRat {
 		}
 	})
 }
+
+// #########################################################################
+
+ar2ArRat(expr: ArExpr) -> RatFunc {
+	switch(expr) {
+		ArVar(variable): {
+			RatFunc(
+				Polinome(makeTree1(Monome(makeTree1(variable, 1)), 1)),
+				Polinome(makeTree1(Monome(makeTree()), 1)),
+			);
+		}
+		ArInt(val): {
+			RatFunc(
+				Polinome(makeTree1(Monome(makeTree()), val)),
+				Polinome(makeTree1(Monome(makeTree()), 1)),
+			);
+		}
+		ArSum(lhs, rhs): {
+			left = ar2ArRat(lhs);
+			right = ar2ArRat(rhs);
+
+			RatFunc(
+				sumPolinomes(
+					multPolinomes(left.num, right.denum),
+					multPolinomes(right.num, left.denum)
+				),
+				multPolinomes(left.denum, right.denum)
+			);
+		}
+		ArSub(lhs, rhs): {
+			left = ar2ArRat(lhs);
+			right = invRat(ar2ArRat(rhs));
+
+			RatFunc(
+				sumPolinomes(
+					multPolinomes(left.num, right.denum),
+					multPolinomes(right.num, left.denum)
+				),
+				multPolinomes(left.denum, right.denum)
+			);
+		}
+		ArMult(lhs, rhs): {
+			left = ar2ArRat(lhs);
+			right = invRat(ar2ArRat(rhs));
+
+			RatFunc(
+				multPolinomes(left.num, right.num),
+				multPolinomes(left.denum, right.denum)
+			)
+		}
+		ArDiv(lhs, rhs): {
+			left = ar2ArRat(lhs);
+			right = invRat(ar2ArRat(rhs));
+
+			RatFunc(
+				multPolinomes(left.num, right.denum),
+				multPolinomes(left.denum, right.num)
+			);
+		}
+		ArInv(income): {
+			in = ar2ArRat(income);
+
+			invRat(in);
+		}
+		ArRat(num, denum): {
+			RatFunc(
+				Polinome(makeTree1(Monome(makeTree()), num)),
+				Polinome(makeTree1(Monome(makeTree()), denum)),
+			);
+		}
+	}
+}
+
+invRat(func: RatFunc) -> RatFunc {
+	RatFunc(
+        Polinome(mapTree(func.num.monomes, \monome -> -monome)),
+        func.denum
+    );
+}
+
+multPolinomes(left: Polinome, right: Polinome) -> Polinome {
+	Polinome(
+		foldTree(left.monomes, makeTree(), \left_monome, left_coef, left_acc -> {
+			foldTree(right.monomes, left_acc, \right_monome, right_coef, right_acc -> {
+				monome = Monome(mergeTreeCustom(left_monome.monome, right_monome.monome, \k, l, r -> l + r));
+				res = lookupTree(right_acc, monome);
+
+				res ?? setTree(right_acc, monome, res + right_coef * left_coef) : setTree(right_acc, monome, right_coef * left_coef);
+			});
+		})
+	);
+}
+
+sumPolinomes(left: Polinome, right: Polinome) -> Polinome {
+	Polinome(mergeTreeCustom(left.monomes, right.monomes, \k, left_coef, right_coef -> right_coef + left_coef));
+}
+
+ratFunc2s(func: RatFunc) -> string {
+	left = polinome2s(func.num);
+	right = polinome2s(func.denum);
+
+	if (right == "") {
+		ZERO_DIV;
+	} else if (left == "") {
+		"0";
+	} else if (right == "1") {
+		left;
+	} else if (right == "-1") {
+		func_inv = invRat(func);
+		polinome2s(func_inv.num);
+	} else {
+		concatStrings(["(", left, ")", " / ", "(", right, ")"])
+	};
+}
+
+polinome2s(polinome: Polinome) -> string {
+	foldRTree(polinome.monomes, "", \monomes, coef, res -> {
+		if (res == "") {
+			if (coef >= 0) {
+				monome2s(monomes, coef);
+			} else {
+				concatStrings(["-", monome2s(monomes, iabs(coef))]);
+			}
+		} else {
+			monome_str = monome2s(monomes, coef);
+			if (monome_str != "") {
+				if (coef >= 0) {
+        			concatStrings([res, " + ", monome2s(monomes, coef)]);
+				} else {
+					concatStrings([res, " - ", monome2s(monomes, iabs(coef))]);
+				}
+			} else {
+				concatStrings([res, monome2s(monomes, coef)]);
+			}
+		}
+	});
+}
+
+monome2s(monome: Monome, coef: int) -> string {
+	if (coef == 0) {
+		""
+	} else if (coef == 1) {
+		if (isEmptyTree(monome.monome)) {
+			"1";
+		} else {
+			foldRTree(monome.monome, "", \mon, pow, res -> {
+				if (pow == 1) {
+					concatStrings([res, mon]);
+				} else {
+					concatStrings([res, mon, "^", "(", i2s(pow), ")"]);
+				}
+			});
+		}
+	} else {
+		foldRTree(monome.monome, i2s(coef), \mon, pow, res -> {
+            if(pow == 1) {
+                concatStrings([res, mon]);
+            } else {
+                concatStrings([res, mon, "^", "(", i2s(pow), ")"]);
+            }
+        });
+	}
+}
+
+// #########################################################################
 
 differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> Maybe<ArExpr> {
 	switch (expr: ArExpr) {
@@ -510,17 +679,7 @@ resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> v
 }
 
 main() {
-	expr = "((x + 2) / (x - 2))";
-	expr1 = "((3+x)*5)";
-	ast = s2ar(expr);
-	resStr = ar2s(ast);
-
-	println(resStr);
-
-	xVar = Pair("x", ArRat(2, 1));
-	array = [xVar];
-
-	println(resStr);
-	resolve(ast, array);
-	resolveDiff(ast, "x", array);
+	s = "((((x - 6) / (6 * y)) / (((x * x) - (y * y)) / y)) * (((x * x) + ((2 * (x * y)) + (y * y))) / x))";
+    tree = s2ar(s);
+	println(ratFunc2s(ar2ArRat(tree)));
 }
