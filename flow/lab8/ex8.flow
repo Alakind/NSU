@@ -506,7 +506,13 @@ resolve(arrExpr: ArExpr, variables: [Pair<string, ArRat>]) -> void {
 resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> void {
 	result = differentiate(arrExpr, "x", variables);
 	
-	result ?? println(result) : println(INVALID_INPUT)
+	res = result??result:ArRat(0, 0);
+
+	if (isNone(result) || isNone(ar2s(res))) {
+		println(ZERO_DIV)
+	} else {
+		result ?? println(result) : println(INVALID_INPUT)
+	}
 }
 
 main() {
