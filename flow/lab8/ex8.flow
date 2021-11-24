@@ -511,12 +511,12 @@ resolveDiff(arrExpr: ArExpr, var: string, variables: [Pair<string, ArRat>]) -> v
 	if (isNone(result) || isNone(ar2s(res))) {
 		println(ZERO_DIV)
 	} else {
-		result ?? println(result) : println(INVALID_INPUT)
+		result ?? println(ar2s(simplify(result))) : println(INVALID_INPUT)
 	}
 }
 
 main() {
-	expr = "((x + 2) / (x - 2))";
+	expr = "(1 / (x - 2))";
 	expr1 = "((3+x)*5)";
 	ast = s2ar(expr);
 	resStr = ar2s(ast);

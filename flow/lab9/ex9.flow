@@ -248,7 +248,7 @@ monome2s(monome: Monome, coef: int) -> string {
 }
 
 main() {
-	s = "((((x - 6) / (6 * y)) / (((x * x) - (y * y)) / y)) * (((x * x) + ((2 * (x * y)) + (y * y))) / x))";
+	s = "((((9 * (x * x)) - 4) / ((3 * x) + 2)) - (3 * x))";
     tree = s2ar(s);
 	println(ratFunc2s(ar2ArRat(tree)));
 }
