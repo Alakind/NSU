@@ -25,33 +25,30 @@ ratFunc2arExpr(func: RatFunc) -> ArExpr {
 }
 
 polinome2arExpr(polinome: Polinome) -> ArExpr {
-	foldTree(polinome.monomes, ArInt(0), \monome, coef, acc -> {
+	foldTree(polinome.monomes, ArRat(1, 1), \monome, coef, acc -> {
 			expr = monome2arExpr(monome);
 			mult = ArMult(expr, coef);
-			ArSum(acc, mult)
-	});
-	println("");
-	ArRat(1, 2);
+			ArSum(acc, mult);
+			ArRat(1, 1)
+	})
 }
 
-makePow(pow: int, expr: arExpr, var: string) -> ArMult {
+makePow(pow: int, expr: ArExpr, var: string) -> ArExpr {
 	if (pow == 0) {
-		;
+		expr;
+	} else {
+		makePow(pow - 1, ArMult(ArVar(var), expr), var)
 	}
 }
 
 monome2arExpr(monome: Monome) -> ArExpr {
-	foldTree(monome.monome, ArInt(1), \var, pow, acc -> {
-		// println(var);
-		// println(pow);
+	foldTree(monome.monome, ArRat(1, 1), \var, pow, acc -> {
+		println(var);
+		println(pow);
 
-		map(());
-
-		expr = fold([]);
-
-		expr
+		ArRat(1, 1)
+		// makePow(pow, ArInt(0), var);
 	});
-	ArRat(1, 2)
 }
 
 s2ar(str : string) -> ArExpr {
