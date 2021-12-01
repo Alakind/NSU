@@ -162,7 +162,7 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 			left = lhs;
 			right = rhs;
 
-			newNumOrNone = differentiate(ArMult(left, right), var, variables);
+			newNumOrNone = diffSubNum(left, right, var, variables);
 			if (isNone(newNumOrNone)) {
 				None()
 			} else {
@@ -189,6 +189,19 @@ differentiate(expr : ArExpr, var: string, variables: [Pair<string, ArRat>]) -> M
 				Some(ArRat(0, 1))
 			}
 		}
+	}
+}
+
+diffSubNum(left, right, var, variables) -> Maybe<ArExpr> {
+	newLeftOrNone = differentiate(left, var, variables);
+	newRightOrNone = differentiate(right, var, variables);
+	if (isNone(newLeftOrNone) || isNone(newRightOrNone)) {
+		None()
+	} else {
+		newLeft = newLeftOrNone??newLeftOrNone:ArRat(0, 0);
+		newRight = newRightOrNone??newRightOrNone:ArRat(0, 0);
+
+		Some(ArSub(ArMult(newLeft, right), ArMult(left, newRight)))
 	}
 }
 
