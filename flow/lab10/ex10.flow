@@ -25,12 +25,14 @@ ratFunc2arExpr(func: RatFunc) -> ArExpr {
 }
 
 polinome2arExpr(polinome: Polinome) -> ArExpr {
-	foldTree(polinome.monomes, ArRat(1, 1), \monome, coef, acc -> {
+	expr = foldTree(polinome.monomes, ArRat(0, 1), \monome, coef, acc -> {
 			expr = monome2arExpr(monome);
-			mult = ArMult(expr, coef);
+			mult = ArMult(expr, ArInt(coef));
 			ArSum(acc, mult);
-			ArRat(1, 1)
-	})
+	});
+
+
+	expr
 }
 
 makePow(pow: int, expr: ArExpr, var: string) -> ArExpr {
@@ -43,11 +45,7 @@ makePow(pow: int, expr: ArExpr, var: string) -> ArExpr {
 
 monome2arExpr(monome: Monome) -> ArExpr {
 	foldTree(monome.monome, ArRat(1, 1), \var, pow, acc -> {
-		println(var);
-		println(pow);
-
-		ArRat(1, 1)
-		// makePow(pow, ArInt(0), var);
+		makePow(pow, ArInt(1), var);
 	});
 }
 
@@ -328,7 +326,7 @@ ar2ArRat(expr: ArExpr) -> RatFunc {
 		}
 		ArMult(lhs, rhs): {
 			left = ar2ArRat(lhs);
-			right = invRat(ar2ArRat(rhs));
+			right = ar2ArRat(rhs);
 
 			RatFunc(
 				multPolinomes(left.num, right.num),
@@ -337,7 +335,7 @@ ar2ArRat(expr: ArExpr) -> RatFunc {
 		}
 		ArDiv(lhs, rhs): {
 			left = ar2ArRat(lhs);
-			right = invRat(ar2ArRat(rhs));
+			right = ar2ArRat(rhs);
 
 			RatFunc(
 				multPolinomes(left.num, right.denum),
@@ -450,8 +448,10 @@ monome2s(monome: Monome, coef: int) -> string {
 }
 
 main() {
-	s = "((((9 * (x * x)) - 4) / ((3 * x) + 2)) - (3 * x))";
+	s = "(((9 * (x * x)) + 4) / (((3 * x) + 2) + (3 * x)))";
     tree = s2ar(s);
 	println(ratFunc2s(ar2ArRat(tree)));
-	println(simplify(ratFunc2arExpr(ar2ArRat(tree))));
+	println(ar2s(ratFunc2arExpr(ar2ArRat(tree))));
+	println(ar2s(simplify(ratFunc2arExpr(ar2ArRat(tree)))));
+	println(ratFunc2s(ar2ArRat(simplify(ratFunc2arExpr(ar2ArRat(tree))))));
 }
