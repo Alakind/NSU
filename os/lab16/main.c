@@ -59,5 +59,8 @@ int main() {
     sem_close(semaphore1);
     sem_close(semaphore2);
 
+    sem_unlink(name1);
+    sem_unlink(name2);
+
     return 0;
 }
