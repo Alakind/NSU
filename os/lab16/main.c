@@ -54,13 +54,13 @@ int main() {
         thread_parent_run(NULL);
     } else {
         thread_child_run(NULL);
+        sem_unlink(name1);
+        sem_unlink(name2);
     }
 
     sem_close(semaphore1);
     sem_close(semaphore2);
 
-    sem_unlink(name1);
-    sem_unlink(name2);
 
     return 0;
 }

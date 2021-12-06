@@ -7,9 +7,15 @@ void on_cancel() {
     printf("Cancel handled\n");
 }
 
+void on_cancel2() {
+    printf("Cancel SECOND\n");
+}
+
 void* thread_run(void* arg) {
 
     pthread_cleanup_push(on_cancel, NULL);
+    pthread_cleanup_push(on_cancel2, NULL);
+    pthread_cleanup_pop(1);
 
     while (1) {
         printf("I'm child!\n");
