@@ -10,14 +10,22 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.draw.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.ui.*
+import androidx.compose.material.*
 
 @Composable
 @Preview
-fun Playfield() {
-    Row {
-        Box(Modifier.size(100.dp).background(Color.Blue)) {
-            Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
+fun Playfield(size: Int) {
+    Column {
+        for (i in 1..size) {
+            Row {
+                for (j in 1..size) {
+                    // Box(Modifier.size(100.dp).background(Color.Blue)) {
+                    //     Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
+                    // }
+                    val color: Color = if (i % 2 == j % 2) Color.Red else Color.Blue;
+                    Box(Modifier.size(100.dp).background(color))
+                }
+            }
         }
-        Box(Modifier.size(100.dp).background(Color.Red))
     }
 }
