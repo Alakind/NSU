@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.falling
+package ru.ivakin.snake
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

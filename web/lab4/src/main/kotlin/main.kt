@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.falling
+package ru.ivakin.snake
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.DpSize
@@ -8,8 +8,8 @@ import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication(
-    title = "Falling Balls", state = WindowState(size = DpSize(800.dp, 800.dp))
+    title = "Snake", state = WindowState(size = DpSize(800.dp, 800.dp))
 ) {
-    FallingBallsGame()
+    SnakeGame()
 }
 

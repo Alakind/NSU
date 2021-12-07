@@ -30,10 +30,10 @@ tasks.withType<KotlinCompile>() {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.demo.falling.MainKt"
+        mainClass = "ru.ivakin.snake.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "falling_balls"
+            packageName = "snake"
             packageVersion = "1.0.0"
         }
     }
