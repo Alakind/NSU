@@ -22,7 +22,7 @@ fun Playfield(size: Int) {
                     // Box(Modifier.size(100.dp).background(Color.Blue)) {
                     //     Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
                     // }
-                    val color: Color = if (i % 2 == j % 2) Color.Red else Color.Blue;
+                    val color: Color = if (i % 2 == j % 2) Color(200, 200, 200) else Color(50, 50, 200);
                     Box(Modifier.size(100.dp).background(color))
                 }
             }
