@@ -133,7 +133,7 @@ fun SnakeGame() {
             }
         }
 
-        Playfield(3);
+        Playfield();
 
         LaunchedEffect(Unit) {
             while (true) {

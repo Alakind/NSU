@@ -12,9 +12,11 @@ import androidx.compose.foundation.shape.*
 import androidx.compose.ui.*
 import androidx.compose.material.*
 
+import ru.ivakin.snake.constants.SnakeConstants
+
 @Composable
 @Preview
-fun Playfield(size: Int) {
+fun Playfield(size: Int = 10) {
     Column {
         for (i in 1..size) {
             Row {
@@ -23,7 +25,7 @@ fun Playfield(size: Int) {
                     //     Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
                     // }
                     val color: Color = if (i % 2 == j % 2) Color(200, 200, 200) else Color(50, 50, 200);
-                    Box(Modifier.size(100.dp).background(color))
+                    Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color))
                 }
             }
         }
