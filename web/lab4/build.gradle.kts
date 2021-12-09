@@ -7,6 +7,8 @@ plugins {
     kotlin("jvm") version "1.5.31"
     // __LATEST_COMPOSE_RELEASE_VERSION__
     id("org.jetbrains.compose") version "1.0.0"
+    // Protobuf
+    id("com.google.protobuf") version "0.8.14"
 }
 
 group = "me.user"
@@ -19,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.protobuf:protobuf-java:3.19.1")
     implementation(compose.desktop.currentOs)
 }
 
