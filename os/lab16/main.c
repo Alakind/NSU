@@ -13,6 +13,17 @@ const char* name1 = "semaphore1";
 const char* name2 = "semaphore2";
 
 void* thread_child_run(void* arg) {
+    semaphore1 = sem_open(name1, O_CREAT, 0777, 0);
+    if (semaphore1 == SEM_FAILED) {
+        printf("Error openong semaphore\n");
+        return (void*) 1;
+    }
+    semaphore2 = sem_open(name2, O_CREAT, 0777, 1);
+    if (semaphore2 == SEM_FAILED) {
+        printf("Error openong semaphore\n");
+        return (void*) 1;
+    }
+
     for (int i = 0; i < 10; i++) {
         sem_wait(semaphore1);
 
@@ -21,10 +32,24 @@ void* thread_child_run(void* arg) {
         sem_post(semaphore2);
     }
 
+    sem_close(semaphore1);
+    sem_close(semaphore2);
+
     return (void*) 0;
 }
 
 void* thread_parent_run(void* arg) {
+    semaphore1 = sem_open(name1, O_CREAT, 0777, 0);
+    if (semaphore1 == SEM_FAILED) {
+        printf("Error openong semaphore\n");
+        return (void*) 1;
+    }
+    semaphore2 = sem_open(name2, O_CREAT, 0777, 1);
+    if (semaphore2 == SEM_FAILED) {
+        printf("Error openong semaphore\n");
+        return (void*) 1;
+    }
+
     for (int i = 0; i < 10; i++) {
         sem_wait(semaphore2);
 
@@ -33,20 +58,13 @@ void* thread_parent_run(void* arg) {
         sem_post(semaphore1);
     }
 
+    sem_close(semaphore1);
+    sem_close(semaphore2);
+
     return (void*) 0;
 }
 
 int main() {
-    semaphore1 = sem_open(name1, O_CREAT, 0777, 0);
-    if (semaphore1 == SEM_FAILED) {
-        printf("Error openong semaphore\n");
-        return 1;
-    }
-    semaphore2 = sem_open(name2, O_CREAT, 0777, 1);
-    if (semaphore2 == SEM_FAILED) {
-        printf("Error openong semaphore\n");
-        return 1;
-    }
 
     pid_t pid = fork();
 
@@ -58,8 +76,6 @@ int main() {
         sem_unlink(name2);
     }
 
-    sem_close(semaphore1);
-    sem_close(semaphore2);
 
 
     return 0;
