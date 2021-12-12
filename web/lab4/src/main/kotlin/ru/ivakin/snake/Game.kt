@@ -24,6 +24,7 @@ import ru.ivakin.snake.view.Playfield;
 import ru.ivakin.snake.constants.SnakeConstants
 import ru.ivakin.snake.model.SnakeModel
 import ru.ivakin.snake.model.Point
+import ru.ivakin.snake.model.GameState
 
 class Game {
     private var previousTimeNanos: Long = Long.MAX_VALUE
@@ -87,17 +88,17 @@ class Game {
 @Composable
 @Preview
 fun SnakeGame() {
+    val gameState = GameState();
+
     val head = Point(Pair<Int, Int>(1, 1), Color.Red, false, SnakeConstants.MEDIUM_POINT);
     val snake = SnakeModel(1, head, Color.Red);
-    var snakes = Vector<SnakeModel>();
-    snakes.add(snake);
+    gameState.snakes.add(snake);
 
     val food_peice = Point(Pair<Int, Int>(3, 3), Color.Green, true, SnakeConstants.SMALL_POINT);
-    var food = Vector<Point>();
-    food.add(food_peice);
+    gameState.food.add(food_peice);
 
     Column {
-        Playfield(snakes, food);
+        Playfield(gameState.snakes, gameState.food);
     }
 
     // val game = remember { Game() };
