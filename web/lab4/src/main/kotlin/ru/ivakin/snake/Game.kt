@@ -87,9 +87,6 @@ class Game {
 @Composable
 @Preview
 fun SnakeGame() {
-    val game = remember { Game() };
-    val density = LocalDensity.current;
-
     val head = Point(Pair<Int, Int>(1, 1), Color.Red, false, SnakeConstants.MEDIUM_POINT);
     val snake = SnakeModel(1, head, Color.Red);
     var snakes = Vector<SnakeModel>();
@@ -100,65 +97,70 @@ fun SnakeGame() {
     food.add(food_peice);
 
     Column {
-        Text(
-            "Snake game"
-        )
-        Text(
-            "Catch balls!${if (game.finished) " Game over!" else ""}",
-            fontSize = 50.sp,
-            color = Color(218, 120, 91)
-        )
-        Text("Score ${game.score} Time ${game.elapsed / 1_000_000} Blocks ${game.numBlocks}", fontSize = 35.sp)
-        Row {
-            if (!game.started) {
-                Slider(
-                    value = game.numBlocks / 20f,
-                    onValueChange = { game.numBlocks = (it * 20f).toInt().coerceAtLeast(1) },
-                    modifier = Modifier.width(100.dp)
-                )
-            }
-            Button(onClick = {
-                game.started = !game.started
-                if (game.started) {
-                    game.start()
-                }
-            }) {
-                Text(if (game.started) "Stop" else "Start", fontSize = 40.sp)
-            }
-            if (game.started) {
-                Spacer(Modifier.padding(5.dp))
-                Button(onClick = {
-                    game.togglePause()
-                }) {
-                    Text(if (game.paused) "Resume" else "Pause", fontSize = 40.sp)
-                }
-            }
-        }
-        if (game.started) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .onSizeChanged {
-                    with(density) {
-                        game.size = it.width.toDp() to it.height.toDp()
-                    }
-                }
-            ) {
-                game.pieces.forEachIndexed { index, piece -> Piece(index, piece) }
-            }
-        }
-
         Playfield(snakes, food);
-
-        LaunchedEffect(Unit) {
-            while (true) {
-                withFrameNanos {
-                    if (game.started && !game.paused && !game.finished)
-                        // Thread.sleep(100);
-                        game.update(it)
-                }
-            }
-        }
     }
+
+    // val game = remember { Game() };
+    // val density = LocalDensity.current;
+
+    // Column {
+    //     Text(
+    //         "Snake game"
+    //     )
+    //     Text(
+    //         "Catch balls!${if (game.finished) " Game over!" else ""}",
+    //         fontSize = 50.sp,
+    //         color = Color(218, 120, 91)
+    //     )
+    //     Text("Score ${game.score} Time ${game.elapsed / 1_000_000} Blocks ${game.numBlocks}", fontSize = 35.sp)
+    //     Row {
+    //         if (!game.started) {
+    //             Slider(
+    //                 value = game.numBlocks / 20f,
+    //                 onValueChange = { game.numBlocks = (it * 20f).toInt().coerceAtLeast(1) },
+    //                 modifier = Modifier.width(100.dp)
+    //             )
+    //         }
+    //         Button(onClick = {
+    //             game.started = !game.started
+    //             if (game.started) {
+    //                 game.start()
+    //             }
+    //         }) {
+    //             Text(if (game.started) "Stop" else "Start", fontSize = 40.sp)
+    //         }
+    //         if (game.started) {
+    //             Spacer(Modifier.padding(5.dp))
+    //             Button(onClick = {
+    //                 game.togglePause()
+    //             }) {
+    //                 Text(if (game.paused) "Resume" else "Pause", fontSize = 40.sp)
+    //             }
+    //         }
+    //     }
+    //     if (game.started) {
+    //         Box(modifier = Modifier
+    //             .fillMaxWidth()
+    //             .fillMaxHeight()
+    //             .onSizeChanged {
+    //                 with(density) {
+    //                     game.size = it.width.toDp() to it.height.toDp()
+    //                 }
+    //             }
+    //         ) {
+    //             game.pieces.forEachIndexed { index, piece -> Piece(index, piece) }
+    //         }
+    //     }
+
+    //     LaunchedEffect(Unit) {
+    //         while (true) {
+    //             withFrameNanos {
+    //                 if (game.started && !game.paused && !game.finished)
+    //                     // Thread.sleep(100);
+    //                     game.update(it)
+    //             }
+    //         }
+    //     }
+    // }
 }
 

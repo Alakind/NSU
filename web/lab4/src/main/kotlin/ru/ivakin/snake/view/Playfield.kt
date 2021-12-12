@@ -26,9 +26,6 @@ fun Playfield(snakes: Vector<SnakeModel>, food: Vector<Point>, size: Int = 10) {
             Row {
                 for (j in 1..size) {
                     var rendered = false;
-                    // Box(Modifier.size(100.dp).background(Color.Blue)) {
-                    //     Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
-                    // }
                     val color: Color = if (i % 2 == j % 2) Color(200, 200, 200) else Color(50, 50, 200);
 
                     for (snack in food) {
@@ -50,10 +47,6 @@ fun Playfield(snakes: Vector<SnakeModel>, food: Vector<Point>, size: Int = 10) {
                             }
                         }
                     }
-
-                    //
-                    // Я ЛЮБЛЮ СВОЮ ПАМПУШКУ !!!!!!
-                    //
 
                     if (!rendered) {
                         Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color))
