@@ -12,20 +12,52 @@ import androidx.compose.foundation.shape.*
 import androidx.compose.ui.*
 import androidx.compose.material.*
 
+import java.util.Vector;
+
 import ru.ivakin.snake.constants.SnakeConstants
+import ru.ivakin.snake.model.SnakeModel
+import ru.ivakin.snake.model.Point
 
 @Composable
 @Preview
-fun Playfield(size: Int = 10) {
+fun Playfield(snakes: Vector<SnakeModel>, food: Vector<Point>, size: Int = 10) {
     Column {
         for (i in 1..size) {
             Row {
                 for (j in 1..size) {
+                    var rendered = false;
                     // Box(Modifier.size(100.dp).background(Color.Blue)) {
                     //     Box(Modifier.clip(CircleShape).size(50.dp).background(Color.Green).align(Alignment.Center))
                     // }
                     val color: Color = if (i % 2 == j % 2) Color(200, 200, 200) else Color(50, 50, 200);
-                    Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color))
+
+                    for (snack in food) {
+                        if (snack.coordinates.first == j && snack.coordinates.second == i) {
+                            Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color)) {
+                                Box(Modifier.clip(CircleShape).size(SnakeConstants.SMALL_POINT.dp).background(Color.Green).align(Alignment.Center))
+                            }
+                            rendered = true;
+                        }
+                    }
+
+                    for (snake in snakes) {
+                        for (point in snake.points) {
+                            if (point.coordinates.first == j && point.coordinates.second == i) {
+                                Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color)) {
+                                    Box(Modifier.clip(CircleShape).size(SnakeConstants.MEDIUM_POINT.dp).background(snake.color).align(Alignment.Center))
+                                }
+                                rendered = true;
+                            }
+                        }
+                    }
+
+                    //
+                    // Я ЛЮБЛЮ СВОЮ ПАМПУШКУ !!!!!!
+                    //
+
+                    if (!rendered) {
+                        Box(Modifier.size(SnakeConstants.CELL_SIZE.dp).background(color))
+                    }
                 }
             }
         }

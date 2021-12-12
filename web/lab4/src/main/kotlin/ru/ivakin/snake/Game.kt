@@ -18,7 +18,12 @@ import androidx.compose.ui.draw.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.ui.*
 
+import java.util.Vector;
+
 import ru.ivakin.snake.view.Playfield;
+import ru.ivakin.snake.constants.SnakeConstants
+import ru.ivakin.snake.model.SnakeModel
+import ru.ivakin.snake.model.Point
 
 class Game {
     private var previousTimeNanos: Long = Long.MAX_VALUE
@@ -82,8 +87,18 @@ class Game {
 @Composable
 @Preview
 fun SnakeGame() {
-    val game = remember { Game() }
-    val density = LocalDensity.current
+    val game = remember { Game() };
+    val density = LocalDensity.current;
+
+    val head = Point(Pair<Int, Int>(1, 1), Color.Red, false, SnakeConstants.MEDIUM_POINT);
+    val snake = SnakeModel(1, head, Color.Red);
+    var snakes = Vector<SnakeModel>();
+    snakes.add(snake);
+
+    val food_peice = Point(Pair<Int, Int>(3, 3), Color.Green, true, SnakeConstants.SMALL_POINT);
+    var food = Vector<Point>();
+    food.add(food_peice);
+
     Column {
         Text(
             "Snake game"
@@ -133,7 +148,7 @@ fun SnakeGame() {
             }
         }
 
-        Playfield();
+        Playfield(snakes, food);
 
         LaunchedEffect(Unit) {
             while (true) {
