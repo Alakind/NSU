@@ -1,0 +1,16 @@
+program = ws declaration*:d was body:b {Program(:d, :b)};
+declaration = "var" ws var:v ws ":" ws type:t ";" ws {Declaration(:v, :t)};
+
+type = integer | array;
+integer = "int" ws {TypeInt()};
+array = "[" ws type:t "]" ws {TypeArray(:t)};
+
+body = assign | test | seqExec | choiceExec | print | while | loop;
+loop = "*" ws body:b {Loop(:b)};
+seqExec = "{" ws body:b1 ws seqExecs*:ss "}" ws {createSeqExec(:b1, :ss)};
+seqExecs = ";" ws body;
+choiceExec = "{" ws body:b1 ws choiceExecs*:ss "}" ws {createChoiceExec(:b1, :ss)};
+choiceExecs = "U" ws body;
+
+assign = ws var:v ws ":=" ws expression:e ws {Assign(:v, :e)};
+print = ws "print(" ws expression:e ws ")" ws {Print(:e)};
