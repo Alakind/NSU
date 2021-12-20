@@ -1,0 +1,114 @@
+
+Program(d: [Declaration], b: Body);
+Body ::= SeqExec, ChoiceExec, Print, Assign, Loop, While, Test;
+Print(e: ArExpr);
+Assign(v: ArVar, e: ArExpr);
+Loop(l: Body);
+While(e1: ArExpr, s: string, e2: ArExpr, b: Body);
+Test(e1: ArExpr, s: string, e2: ArExpr);
+SeqExec(body: [Body]);
+ChoiceExec(body: [Body]);
+Declaration(v: ArVar, t: VarType);
+
+VarType ::= TypeInt, TypeArray;
+TypeInt();
+TypeArray(t: VarType);
+
+ArExpr ::= ArSum, ArMult, ArSub, ArDiv, ArInv, ArInt, ArVar, ArRat, Upd, Get;
+Upd(a : ArExpr, i : ArExpr, value : ArExpr);
+Get(a : ArExpr, i : ArExpr);
+ArSub(lhs : ArExpr, rhs : ArExpr);
+ArSum(lhs : ArExpr, rhs : ArExpr);
+ArMult(lhs : ArExpr, rhs : ArExpr);
+ArDiv(lhs : ArExpr, rhs : ArExpr);
+ArRat(lhs :int, rhs : int);
+ArInv(val : ArExpr);
+ArInt(val : int);
+ArVar(val : string);
+
+s2ast(str : string) -> Program {
+  e_gr = "#include gram.lingo";
+  parsic(
+    compilePegGrammar(e_gr), 
+    str,
+      SemanticActions(
+        mergeTree(defaultPegActions.t,
+          pairs2tree([
+            Pair("createSeqExec", \s -> SeqExec(concat([s[0]], s[1]))),
+            Pair("createChoiceExec", \s -> ChoiceExec(concat([s[0]], s[1])))
+          ])
+        )
+     )
+  )
+}
+
+ar2str(expr: ArExpr) -> string {
+    switch(expr) {
+        ArInt(val) : i2s(val);
+		ArSum(lhs, rhs) : concatStrings(["(", ar2str(lhs), " + ", ar2str(rhs), ")"]);
+		ArMult(lhs, rhs) : concatStrings(["(", ar2str(lhs), " * ", ar2str(rhs), ")"]);
+		ArSub(lhs, rhs) : concatStrings(["(", ar2str(lhs), " - ", ar2str(rhs), ")"]);
+		ArInv(val) : concatStrings(["-", ar2str(val)]);
+		ArDiv(lhs, rhs) : concatStrings(["(", ar2str(lhs), " / ", ar2str(rhs), ")"]);
+		ArRat(lhs, rhs) : concatStrings([i2s(lhs), "/", i2s(rhs)]);
+		ArVar(val): val;
+        default: "";
+    }
+}
+
+typeCheck(program: Program) -> bool {
+    if (declarationCheck(program.d)) {
+        bodyCheck(program.d, program.b)
+    } else {
+        false
+    }
+}
+
+declarationCheck(declaration: [Declaration]) {
+    res = fold(d, Some(makeSet()), \varDec, decl -> {
+        switch(varDec) {
+            Some(set): {
+                if (!containsSet(set, decl.v)) {
+                    Some(insertSet(set, decl.v))
+                } else {
+                    println(decl.v.val + " var already declared");
+                    None()
+                }
+            }
+            None(): {
+                None()
+            }
+        }
+    });
+    res ?? true : false;
+}
+
+bodyCheck(declaration: [Declaration], body: Body) -> bool {
+    switch(body) {
+        Assign(v, e): {
+            res = find(declaration, \decl -> v == decl.v);
+            switch(res) {
+                Some(decl): {
+                    type = getExprType(d, e);
+                    switch(type) {
+                        Some(exprtype): {
+                            if (decl.t == exprtype) {
+                                true;
+                            } else {
+                                println("Error assigning var " + decl.v.val);
+                                false;
+                            }
+                        }
+                        None(): {
+                            println("Error assigning void to var");
+                            false;
+                        }
+                    }
+                }
+                None(): {
+                    println("Error no declaration for var " + v.val);
+                }
+            }
+        }
+    }
+}
