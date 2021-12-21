@@ -1,0 +1,39 @@
+program = ws declaration*:d ws body:b {Program(:d, :b)};
+declaration = "var" ws var:v ws ":" ws type:t ";" ws {Declaration(:v, :t)};
+
+type = integer | array;
+integer = "int" ws {TypeInt()};
+array = "[" ws type:t "]" ws {TypeArray(:t)};
+
+body = assign | test | seqExec | choiceExec| print | while | loop;
+loop = "*" ws body:b {Loop(:b)};
+seqExec = "{" ws body:b1 ws seqExecs*:ss "}" ws {createSeqExec(:b1, :ss)};
+seqExecs = ";" ws body;
+choiceExec = "{" ws body:b1 ws choiceExecs*:ss "}" ws {createChoiceExec(:b1, :ss)};
+choiceExecs = "U" ws body;
+
+assign = ws var:v ws ":=" ws expression:e ws {Assign(:v, :e)};
+print = ws "print(" ws expression:e ws ")" ws {Print(:e)};
+
+test   = ws "(" ws expression:e1 ws condition$s ws expression:e2 ")" ws "?" ws {Test(:e1, $s, :e2)};
+while  = ws "while" ws "(" ws expression:e1 ws condition$s ws expression:e2 ws ")" ws body:b ws {While(:e1, $s, :e2, :b)};
+
+expression = sub | sum | mul | int | rat | inv | div | get | set | var;
+get = ws "get" ws "(" ws expression:a ws "," ws expression:i ws ")" ws {Get(:a, :i)};
+set = ws "upd" ws "(" ws expression:a ws "," ws expression:i ws "," ws expression:value ws ")" ws {Upd(:a, :i, :value)};
+sum = "(" ws expression:l ws "+" ws expression:r ws ")" ws {ArSum(:l, :r)};
+mul = "(" ws expression:l ws "*" ws expression:r ws ")" ws {ArMult(:l, :r)};
+sub = "(" ws expression:l ws "-" ws expression:r ws ")" ws {ArSub(:l, :r)};
+rat = "(" ws int$n ws "/" ws int$d ws ")" ws {ArRat(s2i($n), s2i($d))};
+div = "(" ws expression:l ws "/" ws expression:r ws ")" ws {ArDiv(:l, :r)};
+inv =  "-" expression:val ws {ArInv(:val)};
+
+int = digit+ $s {ArInt(s2i($s))};
+digit = '0'-'9';
+
+
+var = letter+ $s {ArVar($s)};
+letter = 'a'-'z' | 'A'-'Z';
+condition   = "==" | "!=" | "<=" | ">=" | "<" | ">" ;
+
+ws = (' ' | '\t' | '\n' | '\r')*;

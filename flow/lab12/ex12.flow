@@ -1,0 +1,418 @@
+import lingo/pegcode/driver;
+import string;
+import ds/set;
+import fs/filesystem;
+import ds/array;
+import maybe;
+import ds/tuples;
+import math/math;
+import runtime;
+
+Program(d: [Declaration], b: Body);
+Body ::= SeqExec, ChoiceExec, Print, Assign, Loop, While, Test;
+Print(e: ArExpr);
+Assign(v: ArVar, e: ArExpr);
+Loop(l: Body);
+While(e1: ArExpr, s: string, e2: ArExpr, b: Body);
+Test(e1: ArExpr, s: string, e2: ArExpr);
+SeqExec(body: [Body]);
+ChoiceExec(body: [Body]);
+Declaration(v: ArVar, t: VarType);
+
+VarType ::= TypeInt, TypeArray;
+TypeInt();
+TypeArray(t: VarType);
+
+ArExpr ::= ArSum, ArMult, ArSub, ArDiv, ArInv, ArInt, ArVar, ArRat, Upd, Get;
+Upd(a : ArExpr, i : ArExpr, value : ArExpr);
+Get(a : ArExpr, i : ArExpr);
+ArSub(lhs : ArExpr, rhs : ArExpr);
+ArSum(lhs : ArExpr, rhs : ArExpr);
+ArMult(lhs : ArExpr, rhs : ArExpr);
+ArDiv(lhs : ArExpr, rhs : ArExpr);
+ArRat(lhs :int, rhs : int);
+ArInv(val : ArExpr);
+ArInt(val : int);
+ArVar(val : string);
+
+// #########################################################################
+
+s2ast(str : string) -> Program {
+  e_gr = "#include gram.lingo";
+  parsic(
+    compilePegGrammar(e_gr), 
+    str,
+      SemanticActions(
+        mergeTree(defaultPegActions.t,
+          pairs2tree([
+            Pair("createSeqExec", \s -> SeqExec(concat([s[0]], s[1]))),
+            Pair("createChoiceExec", \s -> ChoiceExec(concat([s[0]], s[1])))
+          ])
+        )
+     )
+  )
+}
+
+ar2str(expr: ArExpr) -> string {
+    switch(expr) {
+        ArInt(val) : i2s(val);
+		ArSum(lhs, rhs) : concatStrings(["(", ar2str(lhs), " + ", ar2str(rhs), ")"]);
+		ArMult(lhs, rhs) : concatStrings(["(", ar2str(lhs), " * ", ar2str(rhs), ")"]);
+		ArSub(lhs, rhs) : concatStrings(["(", ar2str(lhs), " - ", ar2str(rhs), ")"]);
+		ArInv(val) : concatStrings(["-", ar2str(val)]);
+		ArDiv(lhs, rhs) : concatStrings(["(", ar2str(lhs), " / ", ar2str(rhs), ")"]);
+		ArRat(lhs, rhs) : concatStrings([i2s(lhs), "/", i2s(rhs)]);
+		ArVar(val): val;
+        default: "";
+    }
+}
+
+typeCheck(program: Program) -> bool {
+    if (declarationCheck(program.d)) {
+        bodyCheck(program.d, program.b)
+    } else {
+        false
+    }
+}
+
+declarationCheck(declaration: [Declaration]) {
+    res = fold(declaration, Some(makeSet()), \varDec, decl -> {
+        switch(varDec) {
+            Some(set): {
+                if (!containsSet(set, decl.v)) {
+                    Some(insertSet(set, decl.v))
+                } else {
+                    println(decl.v.val + " var already declared");
+                    None()
+                }
+            }
+            None(): {
+                None()
+            }
+        }
+    });
+    res ?? true : false;
+}
+
+bodyCheck(declaration: [Declaration], body: Body) -> bool {
+    switch(body) {
+        Assign(v, e): {
+            result = find(declaration, \decl -> v == decl.v);
+            switch(result) {
+                Some(decl): {
+                    type = getExprType(declaration, e);
+                    switch(type) {
+                        Some(exprtype): {
+                            if (decl.t == exprtype) {
+                                true;
+                            } else {
+                                println("Error assigning var " + decl.v.val);
+                                false;
+                            }
+                        }
+                        None(): {
+                            println("Error assigning void to var");
+                            false;
+                        }
+                    }
+                }
+                None(): {
+                    println("Error no declaration for var " + v.val);
+                    false;
+                }
+            }
+        }
+        Test(e1, s, e2): {
+            if (getPartExprType(declaration, e1) != Some(TypeInt())) {
+                println("Error left expr in test " + ar2str(e1));
+                false
+            } else if (getPartExprType(declaration, e2) != Some(TypeInt())) {
+                println("Error left expr in test " + ar2str(e2));
+                false
+            } else {
+                true
+            }
+        }
+        While(e1, s, e2, b): {
+            if (getPartExprType(declaration, e1) != Some(TypeInt())) {
+                println("Error left expr in while " + ar2str(e1));
+                false
+            } else if (getPartExprType(declaration, e2) != Some(TypeInt())) {
+                println("Error left expr in while " + ar2str(e2));
+                false
+            } else {
+                bodyCheck(declaration, b);
+            }
+        }
+        Print(e): {
+            if (getExprType(declaration, e) != Some(TypeInt()) && getExprType(declaration, e) != Some(TypeArray(TypeInt()))) {
+                println("Error in print argument");
+                false
+            } else {
+                true
+            }
+        }
+        Loop(b): {
+            bodyCheck(declaration, b)
+        }
+        SeqExec(bodies): {
+            all(map(bodies, \b -> bodyCheck(declaration, b)))
+        }
+        ChoiceExec(bodies): {
+            all(map(bodies, \b -> bodyCheck(declaration, b)))
+        }
+    }
+}
+
+getExprType(d: [Declaration], expr: ArExpr) -> Maybe<VarType> {
+    switch(expr) {
+        Get(a, i): {
+            result = getExprType(d, a);
+            switch(result) {
+                Some(t): {
+                    Some(t);
+                }
+                None(): {
+                    None();
+                }
+            }
+        }
+        Upd(a, i, value): {
+            result = getExprType(d, a);
+            switch(result) {
+                Some(t): {
+                    Some(t);
+                }
+                None(): {
+                    None();
+                }
+            }
+        }
+        default: {
+            getPartExprType(d, expr);
+        }
+    }
+}
+
+getPartExprType(decl: [Declaration], expression: ArExpr) -> Maybe<VarType> {
+    switch(expression) {
+        ArVar(value): {
+            result = find(decl, \declaration -> value == declaration.v.val);
+            switch(result) {
+                Some(declaration): Some(declaration.t);
+                None(): {
+                    println("Error no declaration for var" + value);
+                    None()
+                }
+            }
+        }
+        default: {
+            Some(TypeInt())
+        }
+    }
+}
+
+// ######################################################################
+
+VProgram(
+    d: [Declaration],
+    b: [VBody],
+);
+
+VBody ::= VPrint, VAssign, VIf;
+VPrint(e: ArExpr, goto: [int]);
+VAssign(v: ArVar, e: ArExpr, goto: [int]);
+VIf(e1: ArExpr, c: string, e2: ArExpr, goto: [int], elseGoto : [int]);
+
+VSeqExecAcc(
+    bodies: [[VBody]],
+    maxMarker: int
+);
+
+VChoiceAcc(
+    bodies: [[VBody]],
+    starts: [int],
+    ends: [int],
+    maxMarker: int
+);
+
+maxMarker(b: [VBody]) -> int {
+    fold(b, -1, \acc, bp -> {
+    maxBody = switch (bp) {
+        VAssign(v, e, goto): {
+            fold(goto, -1, max);
+        }
+        VIf(e1, c, e2, goto, elseGoto): {
+            max(fold(goto, -1, max), fold(elseGoto, -1, max));
+        }
+        VPrint(e, goto): {
+            fold(goto, -1, max);
+        }
+    }
+    max(acc, maxBody);
+    })
+}
+
+incMarkers(b : [VBody], n : int) -> [VBody] {
+	fold(b, [], \acc, bp -> {
+        addBody = switch (bp) {
+			VAssign(v, e, goto): {
+                VAssign(v, e, fold(goto, [], \acc1, l ->
+                    concat(acc1, [l + n])));
+            }
+			VIf(e1, c, e2, goto, elseGoto): {
+                VIf(e1, c, e2,
+                    fold(goto, [], \acc1, l ->
+                        concat(acc1, [l + n])),
+                    fold(elseGoto, [], \acc1, l ->
+                        concat(acc1, [l + n])))
+            };
+			VPrint(e, goto): {
+                VPrint(e, fold(goto, [], \acc1, l ->
+                    concat(acc1, [l + n])))
+            };
+		};
+    concat(acc, [addBody]);
+  })
+}
+
+replaceMarkers(b : [VBody], n : int, m : int) -> [VBody] {
+	fold(b, [], \acc, bp -> {
+    replaceBody = switch (bp) {
+			VAssign(v, e, goto): {
+                VAssign(v, e, fold(goto, [], \acc1, l ->
+                    concat(acc1, if (l == n) [m] else [l])))
+            };
+			VIf(e1, c, e2, goto, elseGoto): {
+                VIf(e1, c, e2,
+                    fold(goto, [], \acc1, l ->
+                        concat(acc1, if (l == n) [m] else [l])),
+                    fold(elseGoto, [], \acc1, l ->
+                        concat(acc1, if (l == n) [m] else [l])))
+            };
+			VPrint(e, goto): {
+                VPrint(e, fold(goto, [], \acc1, l ->
+                    concat(acc1, if (l == n) [m] else [l])))
+            };
+		}
+    concat(acc, [replaceBody])
+  })
+}
+
+oppositeCond(cond : string) -> string {
+  if (cond == "==") {"!="}
+  else if (cond == "!=") {"=="}
+  else if (cond == "<=") {">"}
+  else if (cond == ">=") {"<"}
+  else if (cond == "<") {">="}
+  else if (cond == ">") {"<="}
+  else {"unknown"}
+}
+
+body2vBody(body : Body) -> [VBody] {
+	switch(body) {
+		Assign(v, e): [VAssign(v, e, [1])];
+		Print(e): [VPrint(e, [1])];
+		Test(e1, c, e2): [VIf(e1, c, e2, [1], [])];
+		SeqExec(b):
+			concatA(fold(b, VSeqExecAcc([], 0), \acc, bp -> {
+					vbp = body2vBody(bp);
+					size = maxMarker(vbp);
+					VSeqExecAcc(concat(acc.bodies, [incMarkers(vbp, acc.maxMarker)]), acc.maxMarker + size); // добавляем к аккумулятору элемент SeqExec с увеличенными на max_lab метками и обновляем max_lab
+				}
+			).bodies);
+		ChoiceExec(b): {
+			choices = fold(b, VChoiceAcc([], [], [], 1), \acc, bp -> {
+					vbp = body2vBody(bp);
+					size = maxMarker(vbp);
+					VChoiceAcc(
+						concat(acc.bodies, [incMarkers(vbp, acc.maxMarker)]),
+						concat(acc.starts, [acc.maxMarker]),
+						concat(acc.ends, [acc.maxMarker + size]),
+						acc.maxMarker + size
+					);
+				}
+			);
+			concat(
+				[VIf(ArInt(0), "==", ArInt(0), choices.starts, [])],
+				foldi(choices.bodies, [], \i, acc, bp ->
+					concat(acc, replaceMarkers(bp, choices.ends[i], choices.maxMarker))
+				)
+			);
+		}
+		Loop(l): {
+			vl = incMarkers(body2vBody(l), 1);
+			size = maxMarker(vl);
+			concat(
+				[VIf(ArInt(0), "==", ArInt(0), [1, size], [])],
+				replaceMarkers(vl, size, 0)
+			)
+		}
+        While(e1, s, e2, b): {
+            body2vBody(
+                SeqExec(
+                    concat(
+                        [Loop(SeqExec(concat([Test(e1, s, e2)], [SeqExec([b])])))],
+                        [Test(e1, oppositeCond(s), e2)]
+                    )
+                )
+            )
+        }
+	}
+}
+
+nm2vnm(prog : Program) -> VProgram {
+		VProgram(prog.d, body2vBody(prog.b))
+}
+
+type2str(t : VarType) -> string {
+    switch (t) {
+        TypeInt(): "int";
+        TypeArray(subt): concatStrings(["[", type2str(subt), "]"]);
+    }
+}
+
+decl2str(d : Declaration) -> string {
+  concatStrings(["var ", d.v.val, " : ", type2str(d.t), ";"]);
+}
+
+vbody2str(b : VBody) -> string {
+	switch (b) {
+		VAssign(v, e, goto): {
+            concatStrings([v.val, " := ", ar2str(e), " go to {", strGlue(map(goto, i2s), " "), "}"])
+        };
+		VIf(e1, c, e2, goto, elseGoto): {
+            concatStrings(["if (", ar2str(e1), " ", c, " ", ar2str(e2), ") ", "go to {", strGlue(map(goto, i2s), " "), "} else ", "go to {", strGlue(map(elseGoto, i2s), " "), "}"])
+        };
+		VPrint(e, goto): {
+            concatStrings(["print(", ar2str(e), ")", " go to {", strGlue(map(goto, i2s), " "), "}"])
+        };
+	}
+}
+
+vnm2str(vProg : VProgram) -> string {
+	declarations = fold(vProg.d, "", \str, dp -> concatStrings([str, decl2str(dp), "\n"]));
+	body = foldi(vProg.b, "", \i, str, bp -> concatStrings([str, i2s(i), ": ", vbody2str(bp), "\n"]));
+    concatStrings([declarations, "\n", body]);
+}
+
+main() {
+    fileString = getFileContent("./in4.nm");
+
+    ast = s2ast(fileString);
+
+    println(ast);
+
+    if (typeCheck(ast) == true) {
+        println("Success");
+
+        virtual_nemo_program = nm2vnm(ast);
+        println("");
+        println(virtual_nemo_program);
+        println("");
+        println(vnm2str(virtual_nemo_program));
+
+    } else {
+        println("Error");
+    }
+}
