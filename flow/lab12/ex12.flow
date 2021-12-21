@@ -318,7 +318,7 @@ body2vBody(body : Body) -> [VBody] {
 			concatA(fold(b, VSeqExecAcc([], 0), \acc, bp -> {
 					vbp = body2vBody(bp);
 					size = maxMarker(vbp);
-					VSeqExecAcc(concat(acc.bodies, [incMarkers(vbp, acc.maxMarker)]), acc.maxMarker + size); // добавляем к аккумулятору элемент SeqExec с увеличенными на max_lab метками и обновляем max_lab
+					VSeqExecAcc(concat(acc.bodies, [incMarkers(vbp, acc.maxMarker)]), acc.maxMarker + size);
 				}
 			).bodies);
 		ChoiceExec(b): {
