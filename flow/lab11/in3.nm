@@ -1,0 +1,16 @@
+var n : int;
+var i : int;
+var j : int;
+var fib : [int];
+var f : [int];
+
+{
+  fib := upd(fib, 0, 1);
+  fib := upd(fib, 1, 1);
+  i := 2;
+  while (i < n)  {
+    fib := upd(fib, i, (get(fib, (i - 1)) + get(fib, (i - 2))));
+    i := (i + 1)
+  };
+  print(fib)
+}

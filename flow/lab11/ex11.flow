@@ -143,7 +143,7 @@ bodyCheck(declaration: [Declaration], body: Body) -> bool {
             }
         }
         Print(e): {
-            if (getExprType(declaration, e) != Some(TypeInt())) {
+            if (getExprType(declaration, e) != Some(TypeInt()) && getExprType(declaration, e) != Some(TypeArray(TypeInt()))) {
                 println("Error in print argument");
                 false
             } else {
@@ -211,7 +211,7 @@ getPartExprType(decl: [Declaration], expression: ArExpr) -> Maybe<VarType> {
 }
 
 main() {
-    fileString = getFileContent("./in.nm");
+    fileString = getFileContent("./in4.nm");
 
     ast = s2ast(fileString);
 
