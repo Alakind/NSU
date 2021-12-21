@@ -1,3 +1,12 @@
+import lingo/pegcode/driver;
+import string;
+import ds/set;
+import fs/filesystem;
+import ds/array;
+import maybe;
+import ds/tuples;
+import math/math;
+import runtime;
 
 Program(d: [Declaration], b: Body);
 Body ::= SeqExec, ChoiceExec, Print, Assign, Loop, While, Test;
@@ -65,7 +74,7 @@ typeCheck(program: Program) -> bool {
 }
 
 declarationCheck(declaration: [Declaration]) {
-    res = fold(d, Some(makeSet()), \varDec, decl -> {
+    res = fold(declaration, Some(makeSet()), \varDec, decl -> {
         switch(varDec) {
             Some(set): {
                 if (!containsSet(set, decl.v)) {
@@ -86,10 +95,10 @@ declarationCheck(declaration: [Declaration]) {
 bodyCheck(declaration: [Declaration], body: Body) -> bool {
     switch(body) {
         Assign(v, e): {
-            res = find(declaration, \decl -> v == decl.v);
-            switch(res) {
+            result = find(declaration, \decl -> v == decl.v);
+            switch(result) {
                 Some(decl): {
-                    type = getExprType(d, e);
+                    type = getExprType(declaration, e);
                     switch(type) {
                         Some(exprtype): {
                             if (decl.t == exprtype) {
@@ -107,8 +116,110 @@ bodyCheck(declaration: [Declaration], body: Body) -> bool {
                 }
                 None(): {
                     println("Error no declaration for var " + v.val);
+                    false;
                 }
             }
         }
+        Test(e1, s, e2): {
+            if (getPartExprType(declaration, e1) != Some(TypeInt())) {
+                println("Error left expr in test " + ar2str(e1));
+                false
+            } else if (getPartExprType(declaration, e2) != Some(TypeInt())) {
+                println("Error left expr in test " + ar2str(e2));
+                false
+            } else {
+                true
+            }
+        }
+        While(e1, s, e2, b): {
+            if (getPartExprType(declaration, e1) != Some(TypeInt())) {
+                println("Error left expr in while " + ar2str(e1));
+                false
+            } else if (getPartExprType(declaration, e2) != Some(TypeInt())) {
+                println("Error left expr in while " + ar2str(e2));
+                false
+            } else {
+                bodyCheck(declaration, b);
+            }
+        }
+        Print(e): {
+            if (getExprType(declaration, e) != Some(TypeInt())) {
+                println("Error in print argument");
+                false
+            } else {
+                true
+            }
+        }
+        Loop(b): {
+            bodyCheck(declaration, b)
+        }
+        SeqExec(bodies): {
+            all(map(bodies, \b -> bodyCheck(declaration, b)))
+        }
+        ChoiceExec(bodies): {
+            all(map(bodies, \b -> bodyCheck(declaration, b)))
+        }
+    }
+}
+
+getExprType(d: [Declaration], expr: ArExpr) -> Maybe<VarType> {
+    switch(expr) {
+        Get(a, i): {
+            result = getExprType(d, a);
+            switch(result) {
+                Some(t): {
+                    Some(t);
+                }
+                None(): {
+                    None();
+                }
+            }
+        }
+        Upd(a, i, value): {
+            result = getExprType(d, a);
+            switch(result) {
+                Some(t): {
+                    Some(t);
+                }
+                None(): {
+                    None();
+                }
+            }
+        }
+        default: {
+            getPartExprType(d, expr);
+        }
+    }
+}
+
+getPartExprType(decl: [Declaration], expression: ArExpr) -> Maybe<VarType> {
+    switch(expression) {
+        ArVar(value): {
+            result = find(decl, \declaration -> value == declaration.v.val);
+            switch(result) {
+                Some(declaration): Some(declaration.t);
+                None(): {
+                    println("Error no declaration for var" + value);
+                    None()
+                }
+            }
+        }
+        default: {
+            Some(TypeInt())
+        }
+    }
+}
+
+main() {
+    fileString = getFileContent("./in.nm");
+
+    ast = s2ast(fileString);
+
+    println(ast);
+
+    if (typeCheck(ast) == true) {
+        println("Success");
+    } else {
+        println("Error");
     }
 }
