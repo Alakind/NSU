@@ -1,0 +1,2 @@
+gene_id	gene_symbol	description	scientific_name	common_name	tax_id	genomic_range	orientation	location	gene_type	transcript_accession	transcript_name	transcript_length	transcript_cds_coords	protein_accession	isoform_name	protein_length	protein_name
+938653	argR	transcriptional regulator (AhrC(ArgR)-arginine)	Bacillus subtilis subsp. subtilis str. 168		224308	NC_000964.3:2522324-2522773	-		PROTEIN_CODING					NP_390305.1		149	transcriptional regulator (AhrC(ArgR)-arginine)
