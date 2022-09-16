@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/alakin/Documents/studying/csharp/csharp.csproj": {}
+    "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj": {}
   },
   "projects": {
-    "/home/alakin/Documents/studying/csharp/csharp.csproj": {
+    "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/alakin/Documents/studying/csharp/csharp.csproj",
+        "projectUniqueName": "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj",
         "projectName": "csharp",
-        "projectPath": "/home/alakin/Documents/studying/csharp/csharp.csproj",
+        "projectPath": "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj",
         "packagesPath": "/home/alakin/.nuget/packages/",
-        "outputPath": "/home/alakin/Documents/studying/csharp/obj/",
+        "outputPath": "/home/alakin/Documents/studying/NSU/csharp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/alakin/.nuget/NuGet/NuGet.Config"

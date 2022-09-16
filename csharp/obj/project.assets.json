@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/alakin/Documents/studying/csharp/csharp.csproj",
+      "projectUniqueName": "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj",
       "projectName": "csharp",
-      "projectPath": "/home/alakin/Documents/studying/csharp/csharp.csproj",
+      "projectPath": "/home/alakin/Documents/studying/NSU/csharp/csharp.csproj",
       "packagesPath": "/home/alakin/.nuget/packages/",
-      "outputPath": "/home/alakin/Documents/studying/csharp/obj/",
+      "outputPath": "/home/alakin/Documents/studying/NSU/csharp/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/alakin/.nuget/NuGet/NuGet.Config"
