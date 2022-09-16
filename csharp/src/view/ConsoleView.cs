@@ -1,9 +1,12 @@
 namespace view.ConsoleView;
-class ConsoleView
+
+using model.Character;
+
+class ConsoleView : IView
 {
-    public void greet()
+    public void Greet()
     {
-        Console.WriteLine(@"Welcome Picky Princess's Castle!
+        Console.WriteLine(@"Welcome to Picky Princess's Castle!
         ┈┈┈┈▅┈┈▕▀┈┈┈┈┈┈
         ┈┈┈▕┈┈┈╱╲▕▀┈┈┈┈
         ┈┈┈╱╲┈┈▏▕╱╲┈┈┈┈
@@ -13,5 +16,10 @@ class ConsoleView
         ▏▏┊▏▎┃┊┊┃▏▎▏▎▏▕
         ▇▆▅▃▂┻┻┻┻▂▃▅▆▇▉
 ");
+    }
+
+    public void ShowCharacter(Character character)
+    {
+        Console.WriteLine(character.Name + ", " + character.Coolness.ToString());
     }
 }
