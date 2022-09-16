@@ -1,4 +1,4 @@
-namespace view;
+namespace view.ConsoleView;
 class ConsoleView
 {
     public void greet()
