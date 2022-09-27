@@ -9,6 +9,6 @@ view.Greet();
 
 Character[] characters = reader.GetCharacters();
 
-for (int i = 0; i < characters.Length; i++) {
-    view.ShowCharacter(characters[i]);
+foreach (Character character in characters) {
+    view.ShowCharacter(character);
 }

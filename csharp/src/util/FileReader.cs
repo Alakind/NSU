@@ -9,13 +9,7 @@ class FileReader
         string[] lines = System.IO.File.ReadAllLines(@"./res/characters.txt");
 
         var random = new Random();
-        for (int i = lines.Length - 1; i >= 1; i--)
-        {
-            int j = random.Next(i + 1);
-            var temp = lines[j];
-            lines[j] = lines[i];
-            lines[i] = temp;
-        }
+        lines = lines.OrderBy(x => random.Next()).ToArray();
 
         Character[] characters = new Character[lines.Length];
 

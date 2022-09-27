@@ -20,6 +20,6 @@ class ConsoleView : IView
 
     public void ShowCharacter(Character character)
     {
-        Console.WriteLine(character.Name + ", " + character.Coolness.ToString());
+        Console.WriteLine($"{character.Name}, {character.Coolness}");
     }
 }

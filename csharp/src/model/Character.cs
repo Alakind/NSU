@@ -2,22 +2,22 @@ namespace model.Character;
 
 class Character
 {
-    private int _coolness;
-    private string _name;
 
     public Character(string name, int coolness)
     {
-        this._coolness = coolness;
-        this._name = name;
+        this.Coolness = coolness;
+        this.Name = name;
     }
 
     public int Coolness
     {
-        get { return _coolness; }
+        get;
+        private set;
     }
 
     public string Name
     {
-        get { return _name; }
+        get;
+        private set;
     }
 }
