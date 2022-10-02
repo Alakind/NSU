@@ -1,4 +1,4 @@
-namespace model.Character;
+namespace model;
 
 class Character
 {
@@ -11,13 +11,11 @@ class Character
 
     public int Coolness
     {
-        get;
-        private set;
+        get; private set;
     }
 
     public string Name
     {
-        get;
-        private set;
+        get; private set;
     }
 }

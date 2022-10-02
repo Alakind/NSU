@@ -1,14 +1,20 @@
-﻿using view.ConsoleView;
-using util.FileReader;
-using model.Character;
+﻿using view;
+using util;
+using model;
 
 var view = new ConsoleView();
-var reader = new FileReader();
+var reader = new CharacterGenerator();
 
 view.Greet();
 
-Character[] characters = reader.GetCharacters();
+Character[] characters = reader.GetCharactersFromFile();
 
-foreach (Character character in characters) {
+var hall = new Hall(characters);
+
+var character = hall.NextCharacter();
+
+while (character != null)
+{
     view.ShowCharacter(character);
+    character = hall.NextCharacter();
 }

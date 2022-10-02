@@ -1,6 +1,6 @@
-namespace view.ConsoleView;
+namespace view;
 
-using model.Character;
+using model;
 
 class ConsoleView : IView
 {

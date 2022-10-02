@@ -1,10 +1,10 @@
-namespace util.FileReader;
+namespace util;
 
-using model.Character;
+using model;
 
-class FileReader
+class CharacterGenerator
 {
-    public Character[] GetCharacters()
+    public Character[] GetCharactersFromFile()
     {
         string[] lines = System.IO.File.ReadAllLines(@"./res/characters.txt");
 
