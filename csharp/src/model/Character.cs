@@ -9,13 +9,7 @@ class Character
         this.Name = name;
     }
 
-    public int Coolness
-    {
-        get; private set;
-    }
+    public int Coolness{ get; private set; }
 
-    public string Name
-    {
-        get; private set;
-    }
+    public string Name{ get; private set; }
 }
