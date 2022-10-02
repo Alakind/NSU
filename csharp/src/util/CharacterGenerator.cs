@@ -18,6 +18,8 @@ class CharacterGenerator
             characters[i] = new Character(lines[i], i + 1);
         }
 
+        characters = characters.OrderBy(x => random.Next()).ToArray();
+
         return characters;
     }
 }

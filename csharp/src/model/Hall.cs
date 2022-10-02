@@ -12,7 +12,7 @@ class Hall
 
     public Character? CurrentCharacter{ get; private set; }
     public Character[] CharactersInHall{ get; private set; }
-    private int PassedNumber;
+    public int PassedNumber;
 
     public Character? NextCharacter()
     {

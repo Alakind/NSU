@@ -11,10 +11,16 @@ Character[] characters = reader.GetCharactersFromFile();
 
 var hall = new Hall(characters);
 
-var character = hall.NextCharacter();
+// var character = hall.NextCharacter();
 
-while (character != null)
-{
-    view.ShowCharacter(character);
-    character = hall.NextCharacter();
-}
+// while (character != null)
+// {
+//     view.ShowCharacter(character);
+//     character = hall.NextCharacter();
+// }
+
+var diana = new Princess(hall);
+
+Character? groom = diana.ClassicSolution();
+
+view.ShowGroom(groom);
