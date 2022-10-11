@@ -6,7 +6,7 @@ class CharacterGenerator
 {
     public Character[] GetCharactersFromFile()
     {
-        string[] lines = System.IO.File.ReadAllLines(@"./res/characters.txt");
+        string[] lines = System.IO.File.ReadAllLines(@"./res/top100characters.txt");
 
         var random = new Random();
         lines = lines.OrderBy(x => random.Next()).ToArray();

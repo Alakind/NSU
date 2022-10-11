@@ -2,8 +2,7 @@ namespace model;
 
 static class Friend
 {
-
-    public static bool CompareCharacters(Character? firstCharacter, Character? secondCharacter)
+    public static bool CharactersComparator(Character? firstCharacter, Character? secondCharacter)
     {
         if (firstCharacter == null || secondCharacter == null) {
             return true;
@@ -11,15 +10,15 @@ static class Friend
         return firstCharacter.Coolness > secondCharacter.Coolness;
     }
 
-    public static Character? PickCoolest(Character? firstCharacter, Character? secondCharacter)
+    public static Character? PickCoolest(Character? currentCharacter, Character? beenCharacter, Hall hall)
     {
-        if (firstCharacter == null || secondCharacter == null) {
+        if (currentCharacter == null || beenCharacter == null || hall.CharactersInHall.Contains(beenCharacter)) {
             return null;
         }
-        if (CompareCharacters(firstCharacter, secondCharacter))
+        if (CharactersComparator(currentCharacter, beenCharacter))
         {
-            return firstCharacter;
+            return currentCharacter;
         }
-        return secondCharacter;
+        return beenCharacter;
     }
 }

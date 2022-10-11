@@ -2,24 +2,27 @@ namespace model;
 
 class Hall
 {
+    public Character? CurrentCharacter{ get; private set; }
+    public List<Character> CharactersInHall{ get; private set; }
+    public int PassedNumber;
 
     public Hall(Character[] characters)
     {
-        this.CharactersInHall = characters;
+        this.CharactersInHall = new List<Character>(characters);
         this.CurrentCharacter = null;
         this.PassedNumber = 0;
     }
 
-    public Character? CurrentCharacter{ get; private set; }
-    public Character[] CharactersInHall{ get; private set; }
-    public int PassedNumber;
-
     public Character? NextCharacter()
     {
-        if (CharactersInHall.Length == PassedNumber) {
+        if (CharactersInHall.Count == 0)
+        {
             return null;
         }
 
-        return CharactersInHall[PassedNumber++];
+        Character nextCharacter = CharactersInHall[0];
+        CharactersInHall.RemoveAt(0);
+        PassedNumber++;
+        return nextCharacter;
     }
 }

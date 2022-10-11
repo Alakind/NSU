@@ -1,31 +1,33 @@
 namespace model;
 
+using util;
+
 class Princess
 {
+    public Hall GreatWaitingRoom{ get; private set; }
 
     public Princess(Hall hall)
     {
         GreatWaitingRoom = hall;
     }
 
-    public Hall GreatWaitingRoom{ get; private set; }
-
-    public Character? ClassicSolution() {
+    public Character? ChooseGroom() {
         Character? coolestYet = GreatWaitingRoom.NextCharacter();
         Character? currentCharacter = GreatWaitingRoom.NextCharacter();
-        while (GreatWaitingRoom.PassedNumber < 40)
+        while (GreatWaitingRoom.PassedNumber < Constants.NumberOfCharacters * Constants.PartToPass)
         {
-            coolestYet = Friend.PickCoolest(coolestYet, currentCharacter);
+            coolestYet = Friend.PickCoolest(currentCharacter, coolestYet, GreatWaitingRoom);
             currentCharacter = GreatWaitingRoom.NextCharacter();
         }
 
         currentCharacter = GreatWaitingRoom.NextCharacter();
-        while (Friend.CompareCharacters(coolestYet, currentCharacter) && GreatWaitingRoom.PassedNumber < 98)
+        while (Friend.CharactersComparator(coolestYet, currentCharacter) && GreatWaitingRoom.PassedNumber < Constants.NumberOfCharacters - 2)
         {
             currentCharacter = GreatWaitingRoom.NextCharacter();
         }
 
-        if (Friend.CompareCharacters(coolestYet, currentCharacter)) {
+        if (Friend.CharactersComparator(coolestYet, currentCharacter))
+        {
             return null;
         }
 
