@@ -23,7 +23,7 @@ class ConsoleView : IView
         Console.WriteLine($"{character.Name}, {character.Coolness}");
     }
 
-    public void ShowGroom(Character? character)
+    public void ShowGroom(Character? character, int happiness)
     {
         if (character == null)
         {
@@ -31,5 +31,6 @@ class ConsoleView : IView
             return;
         }
         Console.WriteLine($"Princess have picked: {character.Name}!!! They are solid {character.Coolness}/100!!!");
+        Console.WriteLine($"Princess happiness is {happiness}");
     }
 }

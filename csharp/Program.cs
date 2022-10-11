@@ -15,4 +15,4 @@ var diana = new Princess(hall);
 
 Character? groom = diana.ChooseGroom();
 
-view.ShowGroom(groom);
+view.ShowGroom(groom, diana.countHappines(groom));

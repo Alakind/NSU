@@ -33,4 +33,15 @@ class Princess
 
         return currentCharacter;
     }
+
+    public int countHappines(Character? groom) {
+        if (groom == null)
+        {
+            return 10;
+        }
+        else if (groom.Coolness < Constants.NumberOfCharacters / 2) {
+            return 0;
+        }
+        return groom.Coolness;
+    }
 }
