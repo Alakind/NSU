@@ -23,14 +23,14 @@ class ConsoleView : IView
         Console.WriteLine($"{character.Name}, {character.Coolness}");
     }
 
-    public void ShowGroom(Character? character, int happiness)
+    public void ShowGroom(string? character, int happiness)
     {
         if (character == null)
         {
             Console.WriteLine($"Princess is strong and independant");
             return;
         }
-        Console.WriteLine($"Princess have picked: {character.Name}!!! They are solid {character.Coolness}/100!!!");
+        Console.WriteLine($"Princess have picked: {character}!!!");
         Console.WriteLine($"Princess happiness is {happiness}");
     }
 }

@@ -11,8 +11,10 @@ Character[] characters = reader.GetCharactersFromFile();
 
 var hall = new Hall(characters);
 
-var diana = new Princess(hall);
+var victoria = new Friend(hall);
 
-Character? groom = diana.ChooseGroom();
+var diana = new Princess(hall, victoria);
 
-view.ShowGroom(groom, diana.countHappines(groom));
+string? groom = diana.ChooseGroom();
+
+view.ShowGroom(groom, diana.CountHappines(hall.CurrentCharacter));

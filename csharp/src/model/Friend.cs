@@ -1,19 +1,28 @@
 namespace model;
 
-static class Friend
+class Friend
 {
-    public static bool CharactersComparator(Character? firstCharacter, Character? secondCharacter)
+    public Hall GreatWaitingRoom { get; private set; }
+
+    public Friend(Hall hall)
+    {
+        GreatWaitingRoom = hall;
+    }
+
+    public bool CharactersComparator(string? firstCharacter, string? secondCharacter)
     {
         if (firstCharacter == null || secondCharacter == null)
         {
             return true;
         }
-        return firstCharacter.Coolness > secondCharacter.Coolness;
+        return GreatWaitingRoom.GetBeenCharacterByName(firstCharacter)?.Coolness
+            >
+            GreatWaitingRoom.GetBeenCharacterByName(secondCharacter)?.Coolness;
     }
 
-    public static Character? PickCoolest(Character? currentCharacter, Character? beenCharacter, Hall hall)
+    public string? PickCoolest(string? currentCharacter, string? beenCharacter)
     {
-        if (currentCharacter == null || beenCharacter == null || hall.CharactersInHall.Contains(beenCharacter))
+        if (currentCharacter == null || beenCharacter == null)
         {
             return null;
         }
@@ -22,5 +31,10 @@ static class Friend
             return currentCharacter;
         }
         return beenCharacter;
+    }
+
+    public string? NextCharacter()
+    {
+        return GreatWaitingRoom.NextCharacter();
     }
 }

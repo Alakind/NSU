@@ -4,29 +4,34 @@ using util;
 
 class Princess
 {
-    public Hall GreatWaitingRoom { get; private set; }
+    private Friend Victoria;
+    private int CharactersPassed;
 
-    public Princess(Hall hall)
+    public Princess(Hall hall, Friend friend)
     {
-        GreatWaitingRoom = hall;
+        Victoria = friend;
+        CharactersPassed = 1;
     }
 
-    public Character? ChooseGroom() {
-        Character? coolestYet = GreatWaitingRoom.NextCharacter();
-        Character? currentCharacter = GreatWaitingRoom.NextCharacter();
-        while (GreatWaitingRoom.PassedNumber < Constants.NumberOfCharacters * Constants.PartToPass)
+    public string? ChooseGroom() {
+        string? coolestYet = Victoria.NextCharacter();
+        string? currentCharacter = Victoria.NextCharacter();
+        while (CharactersPassed < Constants.NumberOfCharacters * Constants.PartToPass)
         {
-            coolestYet = Friend.PickCoolest(currentCharacter, coolestYet, GreatWaitingRoom);
-            currentCharacter = GreatWaitingRoom.NextCharacter();
+            coolestYet = Victoria.PickCoolest(currentCharacter, coolestYet);
+            currentCharacter = Victoria.NextCharacter();
+            CharactersPassed++;
         }
 
-        currentCharacter = GreatWaitingRoom.NextCharacter();
-        while (Friend.CharactersComparator(coolestYet, currentCharacter) && GreatWaitingRoom.PassedNumber < Constants.NumberOfCharacters - 2)
+        currentCharacter = Victoria.NextCharacter();
+        CharactersPassed++;
+        while (Victoria.CharactersComparator(coolestYet, currentCharacter) && CharactersPassed < Constants.NumberOfCharacters - 2)
         {
-            currentCharacter = GreatWaitingRoom.NextCharacter();
+            currentCharacter = Victoria.NextCharacter();
+            CharactersPassed++;
         }
 
-        if (Friend.CharactersComparator(coolestYet, currentCharacter))
+        if (Victoria.CharactersComparator(coolestYet, currentCharacter))
         {
             return null;
         }
@@ -38,7 +43,7 @@ class Princess
     {
         if (groom == null)
         {
-            return Constants.NooneChosen;
+            return Constants.NooneChosenPoints;
         }
         else if (groom.Coolness < Constants.NumberOfCharacters / 2)
         {
