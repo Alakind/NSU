@@ -4,7 +4,7 @@ using util;
 
 class Princess
 {
-    public Hall GreatWaitingRoom{ get; private set; }
+    public Hall GreatWaitingRoom { get; private set; }
 
     public Princess(Hall hall)
     {
@@ -34,12 +34,14 @@ class Princess
         return currentCharacter;
     }
 
-    public int countHappines(Character? groom) {
+    public int CountHappines(Character? groom)
+    {
         if (groom == null)
         {
-            return 10;
+            return Constants.NooneChosen;
         }
-        else if (groom.Coolness < Constants.NumberOfCharacters / 2) {
+        else if (groom.Coolness < Constants.NumberOfCharacters / 2)
+        {
             return 0;
         }
         return groom.Coolness;
