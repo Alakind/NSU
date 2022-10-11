@@ -13,7 +13,8 @@ class Princess
         CharactersPassed = 1;
     }
 
-    public string? ChooseGroom() {
+    public string? ChooseGroom()
+    {
         string? coolestYet = Victoria.NextCharacter();
         string? currentCharacter = Victoria.NextCharacter();
         while (CharactersPassed < Constants.NumberOfCharacters * Constants.PartToPass)
@@ -25,13 +26,13 @@ class Princess
 
         currentCharacter = Victoria.NextCharacter();
         CharactersPassed++;
-        while (Victoria.CharactersComparator(coolestYet, currentCharacter) && CharactersPassed < Constants.NumberOfCharacters - 2)
+        while (Victoria.PickCoolest(coolestYet, currentCharacter) == coolestYet && CharactersPassed < Constants.NumberOfCharacters - 2)
         {
             currentCharacter = Victoria.NextCharacter();
             CharactersPassed++;
         }
 
-        if (Victoria.CharactersComparator(coolestYet, currentCharacter))
+        if (Victoria.PickCoolest(coolestYet, currentCharacter) == coolestYet)
         {
             return null;
         }

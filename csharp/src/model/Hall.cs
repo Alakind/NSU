@@ -15,10 +15,12 @@ class Hall
         this.PassedNumber = 0;
     }
 
-    public Character? GetBeenCharacterByName(string? name) {
+    public Character? GetBeenCharacterByName(string? name)
+    {
         for (int i = 0; i < CharactersBeen.Count; i++)
         {
-            if (CharactersBeen[i].Name == name){
+            if (CharactersBeen[i].Name == name)
+            {
                 return CharactersBeen[i];
             }
             else if (CurrentCharacter?.Name == name)
