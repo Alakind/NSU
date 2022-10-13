@@ -4,34 +4,41 @@ class Hall
 {
     public Character? CurrentCharacter { get; private set; }
     public List<Character> CharactersInHall { get; private set; }
-    public List<Character> CharactersBeen { get; private set; }
+    public List<Character> CharactersPassed { get; private set; }
     public int PassedNumber;
 
     public Hall(Character[] characters)
     {
         this.CharactersInHall = new List<Character>(characters);
-        this.CharactersBeen = new List<Character>();
+        this.CharactersPassed = new List<Character>();
         this.CurrentCharacter = null;
         this.PassedNumber = 0;
     }
 
+    /// <summary>
+    /// Returns Character object by their name only if character already seen princess.
+    /// Otherwise returns null.
+    /// </summary>
     public Character? GetBeenCharacterByName(string? name)
     {
-        for (int i = 0; i < CharactersBeen.Count; i++)
+        foreach (Character character in CharactersPassed)
         {
-            if (CharactersBeen[i].Name == name)
+            if (character.Name == name)
             {
-                return CharactersBeen[i];
+                return character;
             }
-            else if (CurrentCharacter?.Name == name)
-            {
-                return CurrentCharacter;
-            }
+        }
+        if (CurrentCharacter?.Name == name)
+        {
+            return CurrentCharacter;
         }
         return null;
     }
 
-    public string? NextCharacter()
+    /// <summary>
+    /// Returns next cahracters name
+    /// </summary>
+    public string? GetNextCharacterName()
     {
         if (CharactersInHall.Count == 0)
         {
@@ -39,7 +46,7 @@ class Hall
         }
         if (CurrentCharacter != null)
         {
-            CharactersBeen.Add(CurrentCharacter);
+            CharactersPassed.Add(CurrentCharacter);
         }
 
         Character nextCharacter = CharactersInHall[0];

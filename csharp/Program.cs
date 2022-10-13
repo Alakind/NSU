@@ -17,4 +17,5 @@ var diana = new Princess(hall, victoria);
 
 string? groom = diana.ChooseGroom();
 
-view.ShowGroom(groom, diana.CountHappines(hall.CurrentCharacter));
+view.ShowGroom(groom);
+view.ShowHappines(hall.GetBeenCharacterByName(groom));

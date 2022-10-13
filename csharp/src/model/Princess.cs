@@ -10,46 +10,38 @@ class Princess
     public Princess(Hall hall, Friend friend)
     {
         Victoria = friend;
-        CharactersPassed = 1;
+        CharactersPassed = 0;
     }
 
+    /// <summary>
+    /// Chooses groom by some algorithm.
+    /// Returns their name.
+    /// </summary>
     public string? ChooseGroom()
     {
-        string? coolestYet = Victoria.NextCharacter();
-        string? currentCharacter = Victoria.NextCharacter();
+        string? coolestYet = Victoria.GetNextCharacterName();
+        string? currentCharacterName = Victoria.GetNextCharacterName();
+        CharactersPassed++;
         while (CharactersPassed < Constants.NumberOfCharacters * Constants.PartToPass)
         {
-            coolestYet = Victoria.PickCoolest(currentCharacter, coolestYet);
-            currentCharacter = Victoria.NextCharacter();
+            coolestYet = Victoria.PickCoolest(currentCharacterName, coolestYet);
+            currentCharacterName = Victoria.GetNextCharacterName();
             CharactersPassed++;
         }
 
-        currentCharacter = Victoria.NextCharacter();
+        currentCharacterName = Victoria.GetNextCharacterName();
         CharactersPassed++;
-        while (Victoria.PickCoolest(coolestYet, currentCharacter) == coolestYet && CharactersPassed < Constants.NumberOfCharacters - 2)
+        while (Victoria.PickCoolest(coolestYet, currentCharacterName) == coolestYet && CharactersPassed < Constants.NumberOfCharacters - 2)
         {
-            currentCharacter = Victoria.NextCharacter();
+            currentCharacterName = Victoria.GetNextCharacterName();
             CharactersPassed++;
         }
 
-        if (Victoria.PickCoolest(coolestYet, currentCharacter) == coolestYet)
+        if (Victoria.PickCoolest(coolestYet, currentCharacterName) == coolestYet)
         {
             return null;
         }
 
-        return currentCharacter;
-    }
-
-    public int CountHappines(Character? groom)
-    {
-        if (groom == null)
-        {
-            return Constants.NooneChosenPoints;
-        }
-        else if (groom.Coolness < Constants.NumberOfCharacters / 2)
-        {
-            return 0;
-        }
-        return groom.Coolness;
+        return currentCharacterName;
     }
 }

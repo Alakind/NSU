@@ -2,16 +2,24 @@ namespace model;
 
 class Friend
 {
-    public Hall GreatWaitingRoom { get; private set; }
+    private Hall GreatWaitingRoom;
 
     public Friend(Hall hall)
     {
         GreatWaitingRoom = hall;
     }
 
+    /// <summary>
+    /// Returns coolest character out two. If one of them is null, or can't be compared -- returns null.
+    /// </summary>
     public string? PickCoolest(string? currentCharacter, string? beenCharacter)
     {
-        if (currentCharacter == null || beenCharacter == null)
+        if (
+            currentCharacter == null ||
+            beenCharacter == null ||
+            GreatWaitingRoom.GetBeenCharacterByName(currentCharacter) == null ||
+            GreatWaitingRoom.GetBeenCharacterByName(beenCharacter) == null
+        )
         {
             return null;
         }
@@ -26,8 +34,11 @@ class Friend
         return beenCharacter;
     }
 
-    public string? NextCharacter()
+    /// <summary>
+    /// Returns name of next character
+    /// </summary>
+    public string? GetNextCharacterName()
     {
-        return GreatWaitingRoom.NextCharacter();
+        return GreatWaitingRoom.GetNextCharacterName();
     }
 }

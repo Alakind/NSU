@@ -1,6 +1,7 @@
 namespace view;
 
 using model;
+using util;
 
 class ConsoleView : IView
 {
@@ -23,7 +24,7 @@ class ConsoleView : IView
         Console.WriteLine($"{character.Name}, {character.Coolness}");
     }
 
-    public void ShowGroom(string? character, int happiness)
+    public void ShowGroom(string? character)
     {
         if (character == null)
         {
@@ -31,6 +32,20 @@ class ConsoleView : IView
             return;
         }
         Console.WriteLine($"Princess have picked: {character}!!!");
-        Console.WriteLine($"Princess happiness is {happiness}");
+    }
+
+    public void ShowHappines(Character? groom)
+    {
+        if (groom == null)
+        {
+            Console.WriteLine($"Princess happiness is {Constants.NooneChosenPoints}");
+            return;
+        }
+        else if (groom.Coolness < Constants.NumberOfCharacters / 2)
+        {
+            Console.WriteLine($"Princess happiness is {0}");
+            return;
+        }
+        Console.WriteLine($"Princess happiness is {groom.Coolness}");
     }
 }
