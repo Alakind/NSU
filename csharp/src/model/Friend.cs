@@ -12,33 +12,25 @@ class Friend
     /// <summary>
     /// Returns coolest character out two. If one of them is null, or can't be compared -- returns null.
     /// </summary>
-    public string? PickCoolest(string? currentCharacter, string? beenCharacter)
+    public string? PickCoolest(string? currentCharacterName, string? beenCharacterName)
     {
         if (
-            currentCharacter == null ||
-            beenCharacter == null ||
-            GreatWaitingRoom.GetBeenCharacterByName(currentCharacter) == null ||
-            GreatWaitingRoom.GetBeenCharacterByName(beenCharacter) == null
+            currentCharacterName == null ||
+            beenCharacterName == null ||
+            !GreatWaitingRoom.IsCharacterVisitedByName(currentCharacterName) ||
+            !GreatWaitingRoom.IsCharacterVisitedByName(beenCharacterName)
         )
         {
             return null;
         }
         if (
-            GreatWaitingRoom.GetBeenCharacterByName(currentCharacter)?.Coolness
+            GreatWaitingRoom.GetBeenCharacterByName(currentCharacterName)?.Coolness
             >
-            GreatWaitingRoom.GetBeenCharacterByName(beenCharacter)?.Coolness
+            GreatWaitingRoom.GetBeenCharacterByName(beenCharacterName)?.Coolness
         )
         {
-            return currentCharacter;
+            return currentCharacterName;
         }
-        return beenCharacter;
-    }
-
-    /// <summary>
-    /// Returns name of next character
-    /// </summary>
-    public string? GetNextCharacterName()
-    {
-        return GreatWaitingRoom.GetNextCharacterName();
+        return beenCharacterName;
     }
 }

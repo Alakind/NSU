@@ -34,18 +34,8 @@ class ConsoleView : IView
         Console.WriteLine($"Princess have picked: {character}!!!");
     }
 
-    public void ShowHappines(Character? groom)
+    public void ShowHappines(int? hapiness)
     {
-        if (groom == null)
-        {
-            Console.WriteLine($"Princess happiness is {Constants.NooneChosenPoints}");
-            return;
-        }
-        else if (groom.Coolness < Constants.NumberOfCharacters / 2)
-        {
-            Console.WriteLine($"Princess happiness is {0}");
-            return;
-        }
-        Console.WriteLine($"Princess happiness is {groom.Coolness}");
+        Console.WriteLine($"Princess happiness is {hapiness}");
     }
 }

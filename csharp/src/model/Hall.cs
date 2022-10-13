@@ -3,14 +3,14 @@ namespace model;
 class Hall
 {
     public Character? CurrentCharacter { get; private set; }
-    public List<Character> CharactersInHall { get; private set; }
-    public List<Character> CharactersPassed { get; private set; }
-    public int PassedNumber;
+    private List<Character> CharactersInHall;
+    private List<Character> CharactersVisited;
+    private int PassedNumber;
 
     public Hall(Character[] characters)
     {
         this.CharactersInHall = new List<Character>(characters);
-        this.CharactersPassed = new List<Character>();
+        this.CharactersVisited = new List<Character>();
         this.CurrentCharacter = null;
         this.PassedNumber = 0;
     }
@@ -21,7 +21,7 @@ class Hall
     /// </summary>
     public Character? GetBeenCharacterByName(string? name)
     {
-        foreach (Character character in CharactersPassed)
+        foreach (Character character in CharactersVisited)
         {
             if (character.Name == name)
             {
@@ -38,7 +38,7 @@ class Hall
     /// <summary>
     /// Returns next cahracters name
     /// </summary>
-    public string? GetNextCharacterName()
+    public string? GetNextVisitorName()
     {
         if (CharactersInHall.Count == 0)
         {
@@ -46,7 +46,7 @@ class Hall
         }
         if (CurrentCharacter != null)
         {
-            CharactersPassed.Add(CurrentCharacter);
+            CharactersVisited.Add(CurrentCharacter);
         }
 
         Character nextCharacter = CharactersInHall[0];
@@ -54,5 +54,14 @@ class Hall
         PassedNumber++;
         CurrentCharacter = nextCharacter;
         return nextCharacter.Name;
+    }
+
+    public bool IsCharacterVisitedByName(string characterName)
+    {
+        if (this.GetBeenCharacterByName(characterName) == null)
+        {
+            return false;
+        }
+        return true;
     }
 }

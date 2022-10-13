@@ -5,12 +5,14 @@ using util;
 class Princess
 {
     private Friend Victoria;
-    private int CharactersPassed;
+    private int CharactersVisitedCounter;
+    private ThroneRoom GoldenThroneRoom;
 
-    public Princess(Hall hall, Friend friend)
+    public Princess(ThroneRoom throneRoom, Friend friend)
     {
         Victoria = friend;
-        CharactersPassed = 0;
+        CharactersVisitedCounter = 0;
+        GoldenThroneRoom = throneRoom;
     }
 
     /// <summary>
@@ -19,22 +21,25 @@ class Princess
     /// </summary>
     public string? ChooseGroom()
     {
-        string? coolestYet = Victoria.GetNextCharacterName();
-        string? currentCharacterName = Victoria.GetNextCharacterName();
-        CharactersPassed++;
-        while (CharactersPassed < Constants.NumberOfCharacters * Constants.PartToPass)
+        string? coolestYet = GoldenThroneRoom.GetNextVisitorName();
+        string? currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
+        CharactersVisitedCounter++;
+        while (CharactersVisitedCounter < Constants.NumberOfCharacters * Constants.PartToPass)
         {
             coolestYet = Victoria.PickCoolest(currentCharacterName, coolestYet);
-            currentCharacterName = Victoria.GetNextCharacterName();
-            CharactersPassed++;
+            currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
+            CharactersVisitedCounter++;
         }
 
-        currentCharacterName = Victoria.GetNextCharacterName();
-        CharactersPassed++;
-        while (Victoria.PickCoolest(coolestYet, currentCharacterName) == coolestYet && CharactersPassed < Constants.NumberOfCharacters - 2)
+        currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
+        CharactersVisitedCounter++;
+        while (
+            Victoria.PickCoolest(coolestYet, currentCharacterName) == coolestYet &&
+            CharactersVisitedCounter < Constants.NumberOfCharacters - 2
+        )
         {
-            currentCharacterName = Victoria.GetNextCharacterName();
-            CharactersPassed++;
+            currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
+            CharactersVisitedCounter++;
         }
 
         if (Victoria.PickCoolest(coolestYet, currentCharacterName) == coolestYet)
@@ -43,5 +48,18 @@ class Princess
         }
 
         return currentCharacterName;
+    }
+
+    public int GetHappines(int? coolness)
+    {
+        if (coolness == null)
+        {
+            return Constants.NooneChosenPoints;
+        }
+        else if (coolness < Constants.NumberOfCharacters / 2)
+        {
+            return 0;
+        }
+        return (int) coolness;
     }
 }

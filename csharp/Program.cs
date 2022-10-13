@@ -10,12 +10,15 @@ view.Greet();
 Character[] characters = reader.GetCharactersFromFile();
 
 var hall = new Hall(characters);
+var throneRoom = new ThroneRoom(hall);
 
 var victoria = new Friend(hall);
 
-var diana = new Princess(hall, victoria);
+var diana = new Princess(throneRoom, victoria);
 
-string? groom = diana.ChooseGroom();
+string? groomName = diana.ChooseGroom();
 
-view.ShowGroom(groom);
-view.ShowHappines(hall.GetBeenCharacterByName(groom));
+Character? groom = hall.GetBeenCharacterByName(groomName);
+
+view.ShowGroom(groomName);
+view.ShowHappines(diana.GetHappines(groom?.Coolness));
