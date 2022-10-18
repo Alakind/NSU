@@ -2,7 +2,7 @@ namespace model;
 
 class Hall
 {
-    public Character? CurrentCharacter { get; private set; }
+    public Character? CurrentCharacter;
     private List<Character> CharactersInHall;
     private List<Character> CharactersVisited;
     private int PassedNumber;
@@ -19,14 +19,11 @@ class Hall
     /// Returns Character object by their name only if character already seen princess.
     /// Otherwise returns null.
     /// </summary>
-    public Character? GetBeenCharacterByName(string? name)
+    public Character? GetVisitedCharacterByName(string? name)
     {
-        foreach (Character character in CharactersVisited)
-        {
-            if (character.Name == name)
-            {
-                return character;
-            }
+        var foundCharacter = CharactersVisited.FirstOrDefault(character => character.Name == name);
+        if (foundCharacter != null) {
+            return foundCharacter;
         }
         if (CurrentCharacter?.Name == name)
         {
@@ -58,7 +55,8 @@ class Hall
 
     public bool IsCharacterVisitedByName(string characterName)
     {
-        if (this.GetBeenCharacterByName(characterName) == null)
+        // TODO: ternary
+        if (this.GetVisitedCharacterByName(characterName) == null)
         {
             return false;
         }

@@ -1,5 +1,7 @@
 namespace model;
 
+using exceptions;
+
 class Friend
 {
     private Hall GreatWaitingRoom;
@@ -10,27 +12,27 @@ class Friend
     }
 
     /// <summary>
-    /// Returns coolest character out two. If one of them is null, or can't be compared -- returns null.
+    /// Returns coolest character name out two. If one of them is null, or can't be compared -- returns null.
     /// </summary>
-    public string? PickCoolest(string? currentCharacterName, string? beenCharacterName)
+    public string? PickCoolest(string? currentCharacterName, string? visitedCharacterName)
     {
         if (
             currentCharacterName == null ||
-            beenCharacterName == null ||
+            visitedCharacterName == null ||
             !GreatWaitingRoom.IsCharacterVisitedByName(currentCharacterName) ||
-            !GreatWaitingRoom.IsCharacterVisitedByName(beenCharacterName)
+            !GreatWaitingRoom.IsCharacterVisitedByName(visitedCharacterName)
         )
         {
-            return null;
+            throw new InvalidInputException("Character given to camparison is not valid!");
         }
         if (
-            GreatWaitingRoom.GetBeenCharacterByName(currentCharacterName)?.Coolness
+            GreatWaitingRoom.GetVisitedCharacterByName(currentCharacterName)?.Coolness
             >
-            GreatWaitingRoom.GetBeenCharacterByName(beenCharacterName)?.Coolness
+            GreatWaitingRoom.GetVisitedCharacterByName(visitedCharacterName)?.Coolness
         )
         {
             return currentCharacterName;
         }
-        return beenCharacterName;
+        return visitedCharacterName;
     }
 }

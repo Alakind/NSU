@@ -1,6 +1,7 @@
 ﻿using view;
 using util;
 using model;
+using exceptions;
 
 var view = new ConsoleView();
 var reader = new CharacterGenerator();
@@ -16,9 +17,16 @@ var victoria = new Friend(hall);
 
 var diana = new Princess(throneRoom, victoria);
 
-string? groomName = diana.ChooseGroom();
+try
+{
+    string? groomName = diana.ChooseGroom();
 
-Character? groom = hall.GetBeenCharacterByName(groomName);
+    Character? groom = hall.GetVisitedCharacterByName(groomName);
 
-view.ShowGroom(groomName);
-view.ShowHappines(diana.GetHappines(groom?.Coolness));
+    view.ShowGroom(groomName);
+    view.ShowHappines(diana.GetHappines(groom?.Coolness));
+}
+catch(CastleException error)
+{
+    Console.WriteLine($"Exception: {error}");
+}

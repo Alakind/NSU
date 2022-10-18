@@ -52,7 +52,7 @@ class Princess
 
     public int GetHappines(int? coolness)
     {
-        if (coolness == null)
+        if (!coolness.HasValue)
         {
             return Constants.NooneChosenPoints;
         }
@@ -60,6 +60,6 @@ class Princess
         {
             return 0;
         }
-        return (int) coolness;
+        return coolness.Value;
     }
 }
