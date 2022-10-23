@@ -21,10 +21,13 @@ try
 {
     string? groomName = diana.ChooseGroom();
 
-    Character? groom = hall.GetVisitedCharacterByName(groomName);
+    if (groomName != null)
+    {
+        Character? groom = hall.GetVisitedCharacterByName(groomName);
+        view.ShowHappines(diana.GetHappines(groom?.Coolness));
+    }
 
     view.ShowGroom(groomName);
-    view.ShowHappines(diana.GetHappines(groom?.Coolness));
 }
 catch(CastleException error)
 {

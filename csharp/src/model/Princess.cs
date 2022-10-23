@@ -21,8 +21,8 @@ class Princess
     /// </summary>
     public string? ChooseGroom()
     {
-        string? coolestYet = GoldenThroneRoom.GetNextVisitorName();
-        string? currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
+        string coolestYet = GoldenThroneRoom.GetNextVisitorName();
+        string currentCharacterName = GoldenThroneRoom.GetNextVisitorName();
         CharactersVisitedCounter++;
         while (CharactersVisitedCounter < Constants.NumberOfCharacters * Constants.PartToPass)
         {
@@ -56,7 +56,7 @@ class Princess
         {
             return Constants.NooneChosenPoints;
         }
-        else if (coolness < Constants.NumberOfCharacters / 2)
+        if (coolness < Constants.NumberOfCharacters / 2)
         {
             return 0;
         }

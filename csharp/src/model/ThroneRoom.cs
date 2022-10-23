@@ -12,7 +12,7 @@ class ThroneRoom
     /// <summary>
     /// Returns name of next character
     /// </summary>
-    public string? GetNextVisitorName()
+    public string GetNextVisitorName()
     {
         return GreatWaitingRoom.GetNextVisitorName();
     }

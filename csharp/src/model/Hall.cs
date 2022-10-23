@@ -19,10 +19,11 @@ class Hall
     /// Returns Character object by their name only if character already seen princess.
     /// Otherwise returns null.
     /// </summary>
-    public Character? GetVisitedCharacterByName(string? name)
+    public Character? GetVisitedCharacterByName(string name)
     {
         var foundCharacter = CharactersVisited.FirstOrDefault(character => character.Name == name);
-        if (foundCharacter != null) {
+        if (foundCharacter != null)
+        {
             return foundCharacter;
         }
         if (CurrentCharacter?.Name == name)
@@ -35,12 +36,8 @@ class Hall
     /// <summary>
     /// Returns next cahracters name
     /// </summary>
-    public string? GetNextVisitorName()
+    public string GetNextVisitorName()
     {
-        if (CharactersInHall.Count == 0)
-        {
-            return null;
-        }
         if (CurrentCharacter != null)
         {
             CharactersVisited.Add(CurrentCharacter);
@@ -55,11 +52,6 @@ class Hall
 
     public bool IsCharacterVisitedByName(string characterName)
     {
-        // TODO: ternary
-        if (this.GetVisitedCharacterByName(characterName) == null)
-        {
-            return false;
-        }
-        return true;
+        return this.GetVisitedCharacterByName(characterName) == null ? false : true;
     }
 }

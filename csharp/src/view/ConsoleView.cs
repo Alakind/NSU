@@ -34,7 +34,7 @@ class ConsoleView : IView
         Console.WriteLine($"Princess have picked: {character}!!!");
     }
 
-    public void ShowHappines(int? hapiness)
+    public void ShowHappines(int hapiness)
     {
         Console.WriteLine($"Princess happiness is {hapiness}");
     }
