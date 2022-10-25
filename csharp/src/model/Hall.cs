@@ -52,6 +52,6 @@ class Hall
 
     public bool IsCharacterVisitedByName(string characterName)
     {
-        return this.GetVisitedCharacterByName(characterName) == null ? false : true;
+        return this.GetVisitedCharacterByName(characterName) != null;
     }
 }

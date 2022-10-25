@@ -23,12 +23,10 @@ class Friend
         {
             throw new InvalidInputException("Character given to camparison is not valid!");
         }
-        return  GreatWaitingRoom.GetVisitedCharacterByName(currentCharacterName).Coolness
-                >
-                GreatWaitingRoom.GetVisitedCharacterByName(visitedCharacterName).Coolness
-            ?
-            currentCharacterName
-            :
-            visitedCharacterName;
+        int currentCharacterCoolness = GreatWaitingRoom.GetVisitedCharacterByName(currentCharacterName).Coolness;
+        int visitedCharacterCoolness = GreatWaitingRoom.GetVisitedCharacterByName(visitedCharacterName).Coolness;
+
+        return currentCharacterCoolness > visitedCharacterCoolness ?
+            currentCharacterName : visitedCharacterName;
     }
 }
