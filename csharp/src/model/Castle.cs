@@ -10,19 +10,19 @@ using model;
 class Castle : IHostedService
 {
     private IHostApplicationLifetime Lifetime;
-    private Princess princess;
-    private Hall hall;
-    private ThroneRoom throneRoom;
-    private Friend friend;
-    private CharacterGenerator reader;
+    private readonly Princess _princess;
+    private readonly Hall _hall;
+    private readonly ThroneRoom _throneRoom;
+    private readonly Friend _friend;
+    private readonly CharacterGenerator _reader;
 
     public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, CharacterGenerator reader, IHostApplicationLifetime lifetime)
     {
-        this.princess = princess;
-        this.hall = hall;
-        this.throneRoom = throneRoom;
-        this.friend = friend;
-        this.reader = reader;
+        this._princess = princess;
+        this._hall = hall;
+        this._throneRoom = throneRoom;
+        this._friend = friend;
+        this._reader = reader;
         Lifetime = lifetime;
     }
 
@@ -32,16 +32,16 @@ class Castle : IHostedService
 
         view.Greet();
 
-        Character[] characters = reader.GetCharactersFromFile();
+        Character[] characters = _reader.GetCharactersFromFile();
 
         try
         {
-            string? groomName = princess.ChooseGroom();
+            string? groomName = _princess.ChooseGroom();
 
             if (groomName != null)
             {
-                Character? groom = hall.GetVisitedCharacterByName(groomName);
-                view.ShowHappines(princess.GetHappines(groom?.Coolness));
+                Character? groom = _hall.GetVisitedCharacterByName(groomName);
+                view.ShowHappines(_princess.GetHappines(groom?.Coolness));
             }
 
             view.ShowGroom(groomName);
