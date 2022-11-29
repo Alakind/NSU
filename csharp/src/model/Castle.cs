@@ -14,20 +14,21 @@ class Castle : IHostedService
     private Hall hall;
     private ThroneRoom throneRoom;
     private Friend friend;
+    private CharacterGenerator reader;
 
-    public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, IHostApplicationLifetime lifetime)
+    public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, CharacterGenerator reader, IHostApplicationLifetime lifetime)
     {
         this.princess = princess;
         this.hall = hall;
         this.throneRoom = throneRoom;
         this.friend = friend;
+        this.reader = reader;
         Lifetime = lifetime;
     }
 
     private void StartGroomViewings()
     {
         var view = new ConsoleView();
-        var reader = new CharacterGenerator();
 
         view.Greet();
 
