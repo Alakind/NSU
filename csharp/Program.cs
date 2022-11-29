@@ -21,6 +21,7 @@ class Program
             services.AddScoped<Hall>();
             services.AddScoped<Friend>(); 
             services.AddScoped<CharacterGenerator>();
+            services.AddScoped<ThroneRoom>();
         });
     }
 }

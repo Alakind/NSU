@@ -5,13 +5,27 @@ using Microsoft.Extensions.Logging;
 using exceptions;
 using view;
 using util;
+using model;
 
-public class Castle : IHostedService
+class Castle : IHostedService
 {
     private IHostApplicationLifetime Lifetime;
+    // private Hall hall;
+    private Princess princess;
+    private Hall hall;
+    private ThroneRoom throneRoom;
+    private Friend friend;
 
-    public Castle(IHostApplicationLifetime lifetime)
+        // services.AddScoped<Princess>();
+        // services.AddScoped<Hall>();
+        // services.AddScoped<Friend>(); 
+        // services.AddScoped<CharacterGenerator>();
+    public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, IHostApplicationLifetime lifetime)
     {
+        this.princess = princess;
+        this.hall = hall;
+        this.throneRoom = throneRoom;
+        this.friend = friend;
         Lifetime = lifetime;
     }
 
@@ -24,21 +38,14 @@ public class Castle : IHostedService
 
         Character[] characters = reader.GetCharactersFromFile();
 
-        var hall = new Hall(characters);
-        var throneRoom = new ThroneRoom(hall);
-
-        var victoria = new Friend(hall);
-
-        var diana = new Princess(throneRoom, victoria);
-
         try
         {
-            string? groomName = diana.ChooseGroom();
+            string? groomName = princess.ChooseGroom();
 
             if (groomName != null)
             {
                 Character? groom = hall.GetVisitedCharacterByName(groomName);
-                view.ShowHappines(diana.GetHappines(groom?.Coolness));
+                view.ShowHappines(princess.GetHappines(groom?.Coolness));
             }
 
             view.ShowGroom(groomName);
