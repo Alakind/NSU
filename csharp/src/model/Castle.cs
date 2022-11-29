@@ -10,16 +10,11 @@ using model;
 class Castle : IHostedService
 {
     private IHostApplicationLifetime Lifetime;
-    // private Hall hall;
     private Princess princess;
     private Hall hall;
     private ThroneRoom throneRoom;
     private Friend friend;
 
-        // services.AddScoped<Princess>();
-        // services.AddScoped<Hall>();
-        // services.AddScoped<Friend>(); 
-        // services.AddScoped<CharacterGenerator>();
     public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, IHostApplicationLifetime lifetime)
     {
         this.princess = princess;
