@@ -1,35 +1,27 @@
-﻿using view;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using view;
 using util;
 using model;
 using exceptions;
 
-var view = new ConsoleView();
-var reader = new CharacterGenerator();
-
-view.Greet();
-
-Character[] characters = reader.GetCharactersFromFile();
-
-var hall = new Hall(characters);
-var throneRoom = new ThroneRoom(hall);
-
-var victoria = new Friend(hall);
-
-var diana = new Princess(throneRoom, victoria);
-
-try
+class Program
 {
-    string? groomName = diana.ChooseGroom();
-
-    if (groomName != null)
+    public static void Main(string[] args)
     {
-        Character? groom = hall.GetVisitedCharacterByName(groomName);
-        view.ShowHappines(diana.GetHappines(groom?.Coolness));
+        CreateHostBuilder(args).Build().Run();
     }
 
-    view.ShowGroom(groomName);
-}
-catch(CastleException error)
-{
-    Console.WriteLine($"Exception: {error}");
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args).ConfigureServices((hostContext, services) =>
+        {
+            services.AddHostedService<Castle>();
+            services.AddScoped<Princess>();
+            services.AddScoped<Hall>();
+            services.AddScoped<Friend>(); 
+            services.AddScoped<CharacterGenerator>();
+            services.AddScoped<ThroneRoom>();
+        });
+    }
 }

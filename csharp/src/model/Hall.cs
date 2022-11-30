@@ -1,5 +1,7 @@
 namespace model;
 
+using util;
+
 class Hall
 {
     public Character? CurrentCharacter;
@@ -7,8 +9,10 @@ class Hall
     private List<Character> CharactersVisited;
     private int PassedNumber;
 
-    public Hall(Character[] characters)
+    public Hall(CharacterGenerator characterGenerator)
     {
+        Character[] characters = characterGenerator.GetCharactersFromFile();
+        Console.WriteLine(characters);
         this.CharactersInHall = new List<Character>(characters);
         this.CharactersVisited = new List<Character>();
         this.CurrentCharacter = null;
