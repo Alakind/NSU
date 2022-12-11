@@ -2,7 +2,7 @@ namespace util;
 
 using model;
 
-class CharacterGenerator
+public class CharacterGenerator
 {
     public Character[] GetCharactersFromFile()
     {

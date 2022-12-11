@@ -7,7 +7,7 @@ using view;
 using util;
 using model;
 
-class Castle : IHostedService
+public class Castle : IHostedService
 {
     private IHostApplicationLifetime Lifetime;
     private readonly Princess _princess;

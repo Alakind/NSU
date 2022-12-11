@@ -2,7 +2,7 @@ namespace model;
 
 using util;
 
-class Hall
+public class Hall
 {
     public Character? CurrentCharacter;
     private List<Character> CharactersInHall;

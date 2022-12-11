@@ -2,7 +2,7 @@ namespace model;
 
 using exceptions;
 
-class Friend
+public class Friend
 {
     private Hall GreatWaitingRoom;
 
