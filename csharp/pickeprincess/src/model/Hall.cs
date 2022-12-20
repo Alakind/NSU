@@ -1,6 +1,7 @@
 namespace model;
 
 using util;
+using exceptions;
 
 public class Hall
 {
@@ -45,6 +46,11 @@ public class Hall
         if (CurrentCharacter != null)
         {
             CharactersVisited.Add(CurrentCharacter);
+        }
+
+        if (CharactersVisited.Count == 100)
+        {
+            throw new HallException("Characters in hall list is empty");
         }
 
         Character nextCharacter = CharactersInHall[0];
