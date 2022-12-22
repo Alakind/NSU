@@ -32,7 +32,7 @@ public class Castle : IHostedService
 
         view.Greet();
 
-        Character[] characters = _reader.GetCharactersFromFile();
+        Character[] characters = _reader.GetCharactersList();
 
         try
         {

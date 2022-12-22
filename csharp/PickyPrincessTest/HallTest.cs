@@ -37,6 +37,6 @@ public class HallTest
         
         Action action = () => hall.GetNextVisitorName();
 
-        Assert.ThrowsException<HallException>(action);
+        Assert.ThrowsException<HallException>(action, "Characters in hall list is empty");
     }
 }

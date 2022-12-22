@@ -2,18 +2,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using util;
 using model;
+using mocks;
 
 namespace PickyPrincessTest;
 
 [TestClass]
-public class UnitTest1
+public class CharacterGeneratorTest
 {
     [TestMethod]
-    public void NamesUniq()
+    public void NamesUnique()
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGeneratorMock();
 
-        Character[] characters = generator.GetCharactersFromFile();
+        Character[] characters = generator.GetCharactersList();
         var isCharacterBeen = new Dictionary<string, bool>();
         for (int i = 0; i < characters.Length; i++) {
             isCharacterBeen.Add(characters[i].Name, false);

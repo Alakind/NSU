@@ -3,6 +3,7 @@ using util;
 using model;
 using exceptions;
 using System;
+using mocks;
 
 namespace PickyPrincessTest;
 
@@ -22,10 +23,10 @@ public class FriendTest
         var character1 = hall.GetVisitedCharacterByName(characterName1);
         var character2 = hall.GetVisitedCharacterByName(characterName2);
         
-        var coolestCharacter = character1.Coolness > character2.Coolness
+        var coolestCharacterName = character1.Coolness > character2.Coolness
             ? character1.Name : character2.Name;
         
-        Assert.AreEqual(coolestCharacter, friend.PickCoolest(character1.Name, character2.Name));
+        Assert.AreEqual(coolestCharacterName, friend.PickCoolest(character1.Name, character2.Name));
     }
 
     [TestMethod]
@@ -39,6 +40,6 @@ public class FriendTest
         
         Action action = () => friend.PickCoolest(characterName, "anonim");
 
-        Assert.ThrowsException<InvalidInputException>(action);
+        Assert.ThrowsException<InvalidInputException>(action, "Character given to camparison is not valid!");
     }
 }

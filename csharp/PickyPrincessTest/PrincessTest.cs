@@ -10,7 +10,7 @@ namespace PickyPrincessTest;
 public class PrincessTest
 {
     [TestMethod]
-    public void HappinessMathTest()
+    public void HappinessMathTestNull()
     {
         var generator = new CharacterGenerator();
         var hall = new Hall(generator);
@@ -18,22 +18,26 @@ public class PrincessTest
         var throneRoom = new ThroneRoom(hall);
         var princess = new Princess(throneRoom, friend);
 
-        var character = new Character("Name", 10);
-        Assert.AreEqual(0, princess.GetHappines(character.Coolness));
-
-        character = new Character("Name", 100);
-        Assert.AreEqual(100, princess.GetHappines(character.Coolness));
-
-        character = new Character("Name", 90);
-        Assert.AreEqual(90, princess.GetHappines(character.Coolness));
-
-        character = new Character("Name", 50);
-        Assert.AreEqual(50, princess.GetHappines(character.Coolness));
-
-        character = new Character("Name", 49);
-        Assert.AreEqual(0, princess.GetHappines(character.Coolness));
-
         Assert.AreEqual(10, princess.GetHappines(null));
+    }
+
+    [TestMethod]
+    [DataRow(100, 100)]
+    [DataRow(98, 98)]
+    [DataRow(0, 10)]
+    [DataRow(90, 90)]
+    [DataRow(50, 50)]
+    [DataRow(0, 49)]
+    public void HappinessMathTest(int expectHappiness, int coolness)
+    {
+        var generator = new CharacterGenerator();
+        var hall = new Hall(generator);
+        var friend = new Friend(hall);
+        var throneRoom = new ThroneRoom(hall);
+        var princess = new Princess(throneRoom, friend);
+
+        var character = new Character("Name", coolness);
+        Assert.AreEqual(expectHappiness, princess.GetHappines(character.Coolness));
     }
 
     [TestMethod]
@@ -52,6 +56,6 @@ public class PrincessTest
         
         Action action = () => princess.ChooseGroom();
 
-        Assert.ThrowsException<HallException>(action);
+        Assert.ThrowsException<HallException>(action, "Characters in hall list is empty");
     }
 }

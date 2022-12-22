@@ -12,7 +12,7 @@ public class Hall
 
     public Hall(CharacterGenerator characterGenerator)
     {
-        Character[] characters = characterGenerator.GetCharactersFromFile();
+        Character[] characters = characterGenerator.GetCharactersList();
         Console.WriteLine(characters);
         this.CharactersInHall = new List<Character>(characters);
         this.CharactersVisited = new List<Character>();
@@ -48,7 +48,7 @@ public class Hall
             CharactersVisited.Add(CurrentCharacter);
         }
 
-        if (CharactersVisited.Count == 100)
+        if (CharactersVisited.Count == Constants.NumberOfCharacters)
         {
             throw new HallException("Characters in hall list is empty");
         }
