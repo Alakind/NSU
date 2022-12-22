@@ -17,6 +17,8 @@
   <ItemGroup>
     <ProjectReference Include="..\pickeprincess\csharp.csproj" />
     <EmbeddedResource Include="../pickeprincess/res/top100characters.txt" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="FluentAssertions.Analyzers" Version="0.11.4" />
   </ItemGroup>
 
 </Project>
