@@ -3,6 +3,7 @@ using util;
 using model;
 using exceptions;
 using System;
+using mocks;
 
 namespace PickyPrincessTest;
 
@@ -12,15 +13,18 @@ public class HallTest
     [TestMethod]
     public void NextCharacterTest()
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGeneratorMock();
         var hall = new Hall(generator);
 
-        var characterName = hall.GetNextVisitorName();
-        Assert.IsInstanceOfType(characterName, typeof(string));
+        for (int i = 0; i < 3; i++)
+        {
+            var characterName = hall.GetNextVisitorName();
+            var character = hall.GetVisitedCharacterByName(characterName);
 
-        var character = hall.GetVisitedCharacterByName(characterName);
-        Assert.IsInstanceOfType(character.Name, typeof(string));
-        Assert.IsInstanceOfType(character.Coolness, typeof(int));
+            Assert.AreEqual(character.Coolness, i + 1);
+        }
+
+
     }
 
     [TestMethod]

@@ -10,7 +10,7 @@ public class Hall
     private List<Character> CharactersVisited;
     private int PassedNumber;
 
-    public Hall(CharacterGenerator characterGenerator)
+    public Hall(ICharacterGenerator characterGenerator)
     {
         Character[] characters = characterGenerator.GetCharactersList();
         Console.WriteLine(characters);

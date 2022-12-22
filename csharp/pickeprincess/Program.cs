@@ -20,7 +20,7 @@ public class Program
             services.AddScoped<Princess>();
             services.AddScoped<Hall>();
             services.AddScoped<Friend>(); 
-            services.AddScoped<CharacterGenerator>();
+            services.AddScoped<ICharacterGenerator, CharacterGenerator>();
             services.AddScoped<ThroneRoom>();
         });
     }
