@@ -23,8 +23,6 @@ public class HallTest
 
             Assert.AreEqual(character.Coolness, i + 1);
         }
-
-
     }
 
     [TestMethod]
