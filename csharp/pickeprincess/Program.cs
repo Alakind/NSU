@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using database;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using view;
 using util;
@@ -14,6 +15,8 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
+        AttemptData.SetAttemptNumber(args);
+        
         return Host.CreateDefaultBuilder(args).ConfigureServices((hostContext, services) =>
         {
             services.AddHostedService<Castle>();
@@ -22,6 +25,7 @@ public class Program
             services.AddScoped<Friend>(); 
             services.AddScoped<ICharacterGenerator, CharacterGenerator>();
             services.AddScoped<ThroneRoom>();
+            services.AddScoped<ApplicationContext>();
         });
     }
 }
