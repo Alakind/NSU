@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csharp", "pickeprincess\csharp.csproj", "{DE745B06-6E58-4FBC-8C5D-67B47C1629D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PickyPrincessTest", "PickyPrincessTest\PickyPrincessTest.csproj", "{BAD6ECF2-5B84-46B7-BF15-E32B85F7793E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE745B06-6E58-4FBC-8C5D-67B47C1629D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE745B06-6E58-4FBC-8C5D-67B47C1629D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE745B06-6E58-4FBC-8C5D-67B47C1629D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE745B06-6E58-4FBC-8C5D-67B47C1629D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAD6ECF2-5B84-46B7-BF15-E32B85F7793E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAD6ECF2-5B84-46B7-BF15-E32B85F7793E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAD6ECF2-5B84-46B7-BF15-E32B85F7793E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAD6ECF2-5B84-46B7-BF15-E32B85F7793E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -2,7 +2,7 @@ namespace model;
 
 using util;
 
-class Princess
+public class Princess
 {
     private Friend Victoria;
     private int CharactersVisitedCounter;

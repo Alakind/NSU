@@ -2,11 +2,11 @@ namespace util;
 
 using model;
 
-class CharacterGenerator
+public class CharacterGenerator : ICharacterGenerator
 {
-    public Character[] GetCharactersFromFile()
+    public Character[] GetCharactersList()
     {
-        string[] lines = System.IO.File.ReadAllLines(@"./res/top100characters.txt");
+        string[] lines = System.IO.File.ReadAllLines(Path.Combine(Environment.CurrentDirectory, "res", "top100characters.txt"));
 
         var random = new Random();
         lines = lines.OrderBy(x => random.Next()).ToArray();

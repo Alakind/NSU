@@ -1,6 +1,6 @@
 namespace model;
 
-class ThroneRoom
+public class ThroneRoom
 {
     private Hall GreatWaitingRoom;
 

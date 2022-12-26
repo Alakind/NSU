@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <EmbeddedResource Include="res/top100characters.txt" />
   </ItemGroup>
 
 </Project>

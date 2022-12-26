@@ -1,6 +1,6 @@
 namespace model;
 
-class Character
+public class Character
 {
     public int Coolness{ get; private set; }
 

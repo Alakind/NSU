@@ -3,7 +3,7 @@ namespace view;
 using model;
 using util;
 
-class ConsoleView : IView
+public class ConsoleView : IView
 {
     public void Greet()
     {

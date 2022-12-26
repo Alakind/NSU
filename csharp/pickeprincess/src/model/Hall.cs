@@ -1,17 +1,18 @@
 namespace model;
 
 using util;
+using exceptions;
 
-class Hall
+public class Hall
 {
     public Character? CurrentCharacter;
     private List<Character> CharactersInHall;
     private List<Character> CharactersVisited;
     private int PassedNumber;
 
-    public Hall(CharacterGenerator characterGenerator)
+    public Hall(ICharacterGenerator characterGenerator)
     {
-        Character[] characters = characterGenerator.GetCharactersFromFile();
+        Character[] characters = characterGenerator.GetCharactersList();
         Console.WriteLine(characters);
         this.CharactersInHall = new List<Character>(characters);
         this.CharactersVisited = new List<Character>();
@@ -45,6 +46,11 @@ class Hall
         if (CurrentCharacter != null)
         {
             CharactersVisited.Add(CurrentCharacter);
+        }
+
+        if (CharactersVisited.Count == Constants.NumberOfCharacters)
+        {
+            throw new HallException("Characters in hall list is empty");
         }
 
         Character nextCharacter = CharactersInHall[0];

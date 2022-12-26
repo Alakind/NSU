@@ -7,16 +7,16 @@ using view;
 using util;
 using model;
 
-class Castle : IHostedService
+public class Castle : IHostedService
 {
     private IHostApplicationLifetime Lifetime;
     private readonly Princess _princess;
     private readonly Hall _hall;
     private readonly ThroneRoom _throneRoom;
     private readonly Friend _friend;
-    private readonly CharacterGenerator _reader;
+    private readonly ICharacterGenerator _reader;
 
-    public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, CharacterGenerator reader, IHostApplicationLifetime lifetime)
+    public Castle(Princess princess, Hall hall, ThroneRoom throneRoom, Friend friend, ICharacterGenerator reader, IHostApplicationLifetime lifetime)
     {
         this._princess = princess;
         this._hall = hall;
@@ -32,7 +32,7 @@ class Castle : IHostedService
 
         view.Greet();
 
-        Character[] characters = _reader.GetCharactersFromFile();
+        Character[] characters = _reader.GetCharactersList();
 
         try
         {

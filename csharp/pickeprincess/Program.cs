@@ -5,7 +5,7 @@ using util;
 using model;
 using exceptions;
 
-class Program
+public class Program
 {
     public static void Main(string[] args)
     {
@@ -20,7 +20,7 @@ class Program
             services.AddScoped<Princess>();
             services.AddScoped<Hall>();
             services.AddScoped<Friend>(); 
-            services.AddScoped<CharacterGenerator>();
+            services.AddScoped<ICharacterGenerator, CharacterGenerator>();
             services.AddScoped<ThroneRoom>();
         });
     }
