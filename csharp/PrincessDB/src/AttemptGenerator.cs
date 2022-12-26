@@ -7,11 +7,9 @@ using util;
 
 public class AttemptGenerator
 {
-    public async Task Generate()
+    public async Task Generate(ApplicationContext db)
     {
         var generator = new CharacterGenerator(null);
-
-        await using ApplicationContext db = new ApplicationContext();
         
         for (var i = 0; i < 100; i++)
         {

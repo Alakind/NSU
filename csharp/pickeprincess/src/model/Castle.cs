@@ -36,8 +36,6 @@ public class Castle : IHostedService
 
             view.Greet();
 
-            // Character[] characters = _reader.GetCharactersList();
-
             if (AttemptData.AttemptNumber == -1)
             {
                 var sum = 0;
