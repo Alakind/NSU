@@ -3,16 +3,29 @@ using util;
 using model;
 using exceptions;
 using System;
+using database;
+using Microsoft.EntityFrameworkCore;
 
 namespace PickyPrincessTest;
 
 [TestClass]
 public class PrincessTest
 {
+    private ApplicationContext _context;
+
+    [ClassInitialize]
+    public void SetUp()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        _context = new ApplicationContext();
+    }
+
     [TestMethod]
     public void HappinessMathTestNull()
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGenerator(_context);
         var hall = new Hall(generator);
         var friend = new Friend(hall);
         var throneRoom = new ThroneRoom(hall);
@@ -30,7 +43,7 @@ public class PrincessTest
     [DataRow(0, 49)]
     public void HappinessMathTest(int expectHappiness, int coolness)
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGenerator(_context);
         var hall = new Hall(generator);
         var friend = new Friend(hall);
         var throneRoom = new ThroneRoom(hall);
@@ -43,7 +56,7 @@ public class PrincessTest
     [TestMethod]
     public void NoCharactersLeftTest()
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGenerator(_context);
         var hall = new Hall(generator);
         var friend = new Friend(hall);
         var throneRoom = new ThroneRoom(hall);

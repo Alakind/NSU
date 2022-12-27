@@ -1,3 +1,5 @@
+using database;
+
 namespace model;
 
 using Microsoft.Extensions.Hosting;
@@ -26,16 +28,33 @@ public class Castle : IHostedService
         Lifetime = lifetime;
     }
 
-    private void StartGroomViewings()
+    private async void StartGroomViewings()
     {
-        var view = new ConsoleView();
-
-        view.Greet();
-
-        Character[] characters = _reader.GetCharactersList();
-
         try
         {
+            var view = new ConsoleView();
+
+            view.Greet();
+
+            if (AttemptData.AttemptNumber == -1)
+            {
+                var sum = 0;
+                for (var i = 0; i < Constants.NumberOfCharacters; i++)
+                {
+                    AttemptData.AttemptNumber = i;
+                    await this._hall.CallNewCharacters();
+                    string? groomNameAttempt = _princess.ChooseGroom();
+
+                    Character? groom = _hall.GetVisitedCharacterByName(groomNameAttempt);
+                    sum += _princess.GetHappines(groom?.Coolness);
+                }
+                
+                Console.WriteLine("Average:");
+                Console.WriteLine(sum / Constants.NumberOfCharacters);
+                return;
+            }
+            
+            await this._hall.CallNewCharacters();
             string? groomName = _princess.ChooseGroom();
 
             if (groomName != null)

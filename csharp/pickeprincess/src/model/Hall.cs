@@ -9,15 +9,23 @@ public class Hall
     private List<Character> CharactersInHall;
     private List<Character> CharactersVisited;
     private int PassedNumber;
+    private ICharacterGenerator characterGenerator;
 
     public Hall(ICharacterGenerator characterGenerator)
     {
-        Character[] characters = characterGenerator.GetCharactersList();
-        Console.WriteLine(characters);
-        this.CharactersInHall = new List<Character>(characters);
+        this.characterGenerator = characterGenerator;
         this.CharactersVisited = new List<Character>();
         this.CurrentCharacter = null;
         this.PassedNumber = 0;
+    }
+
+    public async Task CallNewCharacters()
+    {
+        this.CharactersVisited = new List<Character>();
+        this.CurrentCharacter = null;
+        this.PassedNumber = 0;
+        Character[] characters = await characterGenerator.GetCharactersListDb();
+        this.CharactersInHall = new List<Character>(characters);
     }
 
     /// <summary>

@@ -3,6 +3,8 @@ using util;
 using model;
 using exceptions;
 using System;
+using database;
+using Microsoft.EntityFrameworkCore;
 using mocks;
 
 namespace PickyPrincessTest;
@@ -10,6 +12,17 @@ namespace PickyPrincessTest;
 [TestClass]
 public class FriendTest
 {
+    private ApplicationContext _context;
+
+    [ClassInitialize]
+    public void SetUp()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        _context = new ApplicationContext();
+    }
+    
     [TestMethod]
     public void CompareTest()
     {
@@ -29,7 +42,7 @@ public class FriendTest
     [TestMethod]
     public void NotFamiliarTest()
     {
-        var generator = new CharacterGenerator();
+        var generator = new CharacterGenerator(_context);
         var hall = new Hall(generator);
         var friend = new Friend(hall);
 
