@@ -2,7 +2,6 @@ namespace database;
 
 public static class AttemptData
 {
-    
     public static int AttemptNumber;
 
     public static void SetAttemptNumber(string[] args)

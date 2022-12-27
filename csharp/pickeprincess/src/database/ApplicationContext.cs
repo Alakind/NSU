@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using util;
 
 namespace database;
 
@@ -15,6 +16,10 @@ public class ApplicationContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=princessdb;Username=admin;Password=1234");
+        optionsBuilder.UseNpgsql("Host="+ Constants.DBHost
+                                        + ";Port=" + Constants.DBPort
+                                        + ";Database=" + Constants.DBName
+                                        + ";Username=" + Constants.DBUsername
+                                        + ";Password=" + Constants.DBPassword);
     }
 }

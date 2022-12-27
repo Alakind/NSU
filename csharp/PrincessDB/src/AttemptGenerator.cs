@@ -21,7 +21,7 @@ public class AttemptGenerator
         for (var i = 0; i < Constants.NumberOfCharacters; i++)
         {
             var characters = generator.GetCharactersList();
-            var numberInAttempt = 0;
+            var indexInAttempt = 0;
             var attempt = new AttemptEntity
             {
                 Number = i,
@@ -29,13 +29,13 @@ public class AttemptGenerator
                 {
                     Coolness = character.Coolness,
                     Name =  character.Name,
-                    NumberInAttempt = numberInAttempt++,
+                    IndexInAttempt = indexInAttempt++,
                     Attempt = i
                 }).ToArray().ToList()
             };
             
-            await db.Attempts.AddAsync(attempt);
+            await _db.Attempts.AddAsync(attempt);
         }
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
 }
