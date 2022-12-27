@@ -7,11 +7,11 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var generator = new AttemptGenerator();
-        
         await using ApplicationContext db = new ApplicationContext();
+        
+        var generator = new AttemptGenerator(db);
 
-        await generator.Generate(db);
+        await generator.GenerateAttempt();
     }
 }
 

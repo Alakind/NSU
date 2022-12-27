@@ -25,9 +25,9 @@ public class AttemptGeneratorTest
     [TestMethod]
     public async void GenerateAttemptTest()
     {
-        var generator = new AttemptGenerator();
+        var generator = new AttemptGenerator(_context);
 
-        await generator.Generate(_context);
+        await generator.GenerateAttempt();
         
         var attemptEntity = await _context.Attempts
             .Include(c => c.CharactersList)

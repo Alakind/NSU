@@ -19,7 +19,7 @@ public class Hall
         this.PassedNumber = 0;
     }
 
-    public async Task SetUpDB()
+    public async Task CallNewCharacters()
     {
         this.CharactersVisited = new List<Character>();
         this.CurrentCharacter = null;

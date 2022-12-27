@@ -2,6 +2,9 @@ namespace database;
 
 using model;
 
+/// <summary>
+/// Entity to store Attempt
+/// </summary>
 public class AttemptEntity
 {
     public int Id { get; set; }

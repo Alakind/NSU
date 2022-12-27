@@ -42,18 +42,11 @@ public class Castle : IHostedService
                 for (var i = 0; i < Constants.NumberOfCharacters; i++)
                 {
                     AttemptData.AttemptNumber = i;
-                    await this._hall.SetUpDB();
+                    await this._hall.CallNewCharacters();
                     string? groomNameAttempt = _princess.ChooseGroom();
 
-                    if (groomNameAttempt != null)
-                    {
-                        Character? groom = _hall.GetVisitedCharacterByName(groomNameAttempt);
-                        sum += _princess.GetHappines(groom?.Coolness);
-                    }
-                    else
-                    {
-                        sum += Constants.NooneChosenPoints;
-                    }
+                    Character? groom = _hall.GetVisitedCharacterByName(groomNameAttempt);
+                    sum += _princess.GetHappines(groom?.Coolness);
                 }
                 
                 Console.WriteLine("Average:");
@@ -61,7 +54,7 @@ public class Castle : IHostedService
                 return;
             }
             
-            await this._hall.SetUpDB();
+            await this._hall.CallNewCharacters();
             string? groomName = _princess.ChooseGroom();
 
             if (groomName != null)

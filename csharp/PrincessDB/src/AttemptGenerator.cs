@@ -7,11 +7,18 @@ using util;
 
 public class AttemptGenerator
 {
-    public async Task Generate(ApplicationContext db)
+    private ApplicationContext _db;
+
+    public AttemptGenerator(ApplicationContext db)
     {
-        var generator = new CharacterGenerator(null);
+        _db = db;
+    }
+    
+    public async Task GenerateAttempt()
+    {
+        var generator = new CharacterGenerator(_db);
         
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < Constants.NumberOfCharacters; i++)
         {
             var characters = generator.GetCharactersList();
             var numberInAttempt = 0;

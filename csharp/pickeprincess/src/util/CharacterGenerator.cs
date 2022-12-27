@@ -1,4 +1,5 @@
 using database;
+using exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace util;
@@ -39,6 +40,11 @@ public class CharacterGenerator : ICharacterGenerator
             .Include(c => c.CharactersList)
             .FirstOrDefaultAsync(a => a.Number == AttemptData.AttemptNumber);
 
+        if (attemptEntity == null)
+        {
+            throw new InvalidInputException("Attempt number is not valid!");
+        }
+        
         return attemptEntity.CharactersList.Select(characterEntity => new Character(
                 characterEntity.Name,
                 characterEntity.Coolness
@@ -46,11 +52,3 @@ public class CharacterGenerator : ICharacterGenerator
         ).ToArray();
     }
 }
-
-// CharactersList = characters.Select(character => new CharacterEntity
-// {
-//     Coolness = character.Coolness,
-//     Name =  character.Name,
-//     NumberInAttempt = numberInAttempt++,
-//     Attempt = i
-// }).ToArray().ToList()

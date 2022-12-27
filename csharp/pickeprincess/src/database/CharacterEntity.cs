@@ -2,6 +2,9 @@ namespace database;
 
 using model;
 
+/// <summary>
+/// Enitity to store character
+/// </summary>
 public class CharacterEntity
 {
     public int Id { get; set; }
