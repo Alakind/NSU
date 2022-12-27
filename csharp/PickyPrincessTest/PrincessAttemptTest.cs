@@ -23,7 +23,11 @@ public class PrincessAttemptTest
     }
 
     [TestMethod]
-    public async void GenerateAttemptTest()
+    [DataRow(0)]
+    [DataRow(2)]
+    [DataRow(34)]
+    [DataRow(42)]
+    public async void PrincessHandleAttemptTest(int attemptNumber)
     {
         var attemptGenerator = new AttemptGenerator(_context);
 
@@ -35,11 +39,13 @@ public class PrincessAttemptTest
         var throneRoom = new ThroneRoom(hall);
         var princess = new Princess(throneRoom, friend);
         
+        AttemptData.AttemptNumber = attemptNumber;
         await hall.CallNewCharacters();
+        string? groomName1 = princess.ChooseGroom();
         
-        string? groomName = princess.ChooseGroom();
+        await hall.CallNewCharacters();
+        string? groomName2 = princess.ChooseGroom();
 
-        Character? groom = hall.GetVisitedCharacterByName(groomName);
-        Assert.IsInstanceOfType(princess.GetHappines(groom?.Coolness), typeof(int));
+        Assert.Equals(groomName1, groomName2);
     }
 }
